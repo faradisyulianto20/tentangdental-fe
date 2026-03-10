@@ -9,12 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as PromoRouteImport } from './routes/promo'
+import { Route as ProfilDokterRouteImport } from './routes/profil-dokter'
+import { Route as LayananRouteImport } from './routes/layanan'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReservasiIndexRouteImport } from './routes/reservasi/index'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const PromoRoute = PromoRouteImport.update({
+  id: '/promo',
+  path: '/promo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfilDokterRoute = ProfilDokterRouteImport.update({
+  id: '/profil-dokter',
+  path: '/profil-dokter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LayananRoute = LayananRouteImport.update({
+  id: '/layanan',
+  path: '/layanan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,40 +35,77 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReservasiIndexRoute = ReservasiIndexRouteImport.update({
+  id: '/reservasi/',
+  path: '/reservasi/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/layanan': typeof LayananRoute
+  '/profil-dokter': typeof ProfilDokterRoute
+  '/promo': typeof PromoRoute
+  '/reservasi/': typeof ReservasiIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/layanan': typeof LayananRoute
+  '/profil-dokter': typeof ProfilDokterRoute
+  '/promo': typeof PromoRoute
+  '/reservasi': typeof ReservasiIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/layanan': typeof LayananRoute
+  '/profil-dokter': typeof ProfilDokterRoute
+  '/promo': typeof PromoRoute
+  '/reservasi/': typeof ReservasiIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/layanan' | '/profil-dokter' | '/promo' | '/reservasi/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/layanan' | '/profil-dokter' | '/promo' | '/reservasi'
+  id:
+    | '__root__'
+    | '/'
+    | '/layanan'
+    | '/profil-dokter'
+    | '/promo'
+    | '/reservasi/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  LayananRoute: typeof LayananRoute
+  ProfilDokterRoute: typeof ProfilDokterRoute
+  PromoRoute: typeof PromoRoute
+  ReservasiIndexRoute: typeof ReservasiIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/promo': {
+      id: '/promo'
+      path: '/promo'
+      fullPath: '/promo'
+      preLoaderRoute: typeof PromoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profil-dokter': {
+      id: '/profil-dokter'
+      path: '/profil-dokter'
+      fullPath: '/profil-dokter'
+      preLoaderRoute: typeof ProfilDokterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/layanan': {
+      id: '/layanan'
+      path: '/layanan'
+      fullPath: '/layanan'
+      preLoaderRoute: typeof LayananRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -65,12 +115,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reservasi/': {
+      id: '/reservasi/'
+      path: '/reservasi'
+      fullPath: '/reservasi/'
+      preLoaderRoute: typeof ReservasiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  LayananRoute: LayananRoute,
+  ProfilDokterRoute: ProfilDokterRoute,
+  PromoRoute: PromoRoute,
+  ReservasiIndexRoute: ReservasiIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
