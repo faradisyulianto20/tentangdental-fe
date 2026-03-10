@@ -11,7 +11,7 @@ export default function ProfilDokter() {
               <p className="font-bold text-lg mt-6">{dokter.nama}</p>
               <p className="font-bold text-muted-foreground">{dokter.spesialis}</p>
             </div>
-            <div className="w-full relative -bottom-3">
+            <div className="w-full relative">
               <img src={dokter.imgUrl} className="w-92 object-cover absolute right-0 z-10 bottom-0 max-h-[400px]" />
             </div>
           </div>
