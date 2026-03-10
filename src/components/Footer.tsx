@@ -21,7 +21,7 @@ export default function Footer() {
             Sab, Min, Sen, Kam:{' '}
             <span className="text-primary">08:00 - 21:00</span> (dg reservasi){' '}
             <br></br>
-            Rab & Jum: <span>14:00 - 21:00 </span>(dg reservasi) <br></br>
+            Rab & Jum: <span className="text-primary">14:00 - 21:00 </span>(dg reservasi) <br></br>
             Sel : <span className="text-primary">Libur</span>
           </div>
           <div className="flex gap-1">
@@ -72,7 +72,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <p className="m-0">&copy; {year} Your name here. All rights reserved.</p>
+      <p className="m-0">&copy; {year} Tentang Dental. All rights reserved.</p>
     </footer>
   )
 }
