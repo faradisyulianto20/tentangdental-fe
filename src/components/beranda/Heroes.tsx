@@ -9,7 +9,7 @@ const images = [
 
 export default function Heroes() {
   return (
-    <section className="page-wrap flex items-center gap-6 py-20 text-center">
+    <section className="page-wrap flex-col md:flex-row gap-2 md:flex items-center gap-6 py-20 text-center">
       <div className="text-left flex flex-col gap-3">
         <h1 className="font-bold text-primary text-6xl">
           Smile Makes A Lasting Impression

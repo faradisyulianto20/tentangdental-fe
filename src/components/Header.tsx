@@ -9,6 +9,8 @@ const navigation = [
   { name: 'Profil Dokter', href: '/profil-dokter' },
 ]
 
+const android = false
+
 export default function Header() {
   const [navItems, setNavItems] = useState('Beranda')
 
@@ -19,17 +21,25 @@ export default function Header() {
         Tentang Dental
       </Link>
       <div className="flex justify-center">
-        {navigation.map((item) => (
-          <Button
-            variant={'ghost'}
-            key={item.name}
-            data-active={navItems === item.name}
-            className={`${navItems === item.name ? 'text-[#58C4EC]' : ''}`}
-            onClick={() => setNavItems(item.name)}
-          >
-            <Link to={item.href}>{item.name}</Link>
+        {android ? (
+          <Button variant={'ghost'} className="text-[#58C4EC]">
+            <Link to="/">Menu</Link>
           </Button>
-        ))}
+        ) : (
+          <>
+            {navigation.map((item) => (
+              <Button
+                variant={'ghost'}
+                key={item.name}
+                data-active={navItems === item.name}
+                className={`${navItems === item.name ? 'text-[#58C4EC]' : ''}`}
+                onClick={() => setNavItems(item.name)}
+              >
+                <Link to={item.href}>{item.name}</Link>
+              </Button>
+            ))}
+          </>
+        )}
       </div>
       <div className="min-w-38.5 justify-end flex">
         <Button variant={'default'}>
