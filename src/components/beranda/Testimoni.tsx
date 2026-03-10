@@ -157,7 +157,7 @@ export default function Testimoni() {
               <div className="flex items-center gap-1 mx-2">
                 {testimonials.map((testi, index) => (
                   <div
-                    className={`w-2 h-2 ${testimonial.name === testi.name ? 'bg-[#B4E5F6]' : 'bg-[#B4E5F6]/50'} rounded-full`}
+                    className={`w-2 h-2 ${testimonial.name === testi.name ? 'bg-[#B4E5F6]' : 'bg-[#B4E5F6]/50'} rounded-full`} key={index}
                   ></div>
                 ))}
               </div>

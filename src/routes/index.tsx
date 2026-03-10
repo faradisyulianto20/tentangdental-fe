@@ -4,6 +4,7 @@ import Testimoni from '../components/beranda/Testimoni'
 import Layanan from '../components/beranda/Layanan'
 import Separator from '../components/beranda/Separator'
 import Galeri from '../components/beranda/Galeri'
+import ProfilDokter from "../components/beranda/ProfilDokter"
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Separator />
       </div>
       <Galeri />
+      <ProfilDokter />
     </div>
   )
 }
