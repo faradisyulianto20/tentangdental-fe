@@ -4,7 +4,7 @@ import { Triangle } from 'lucide-react'
 
 export default function Promo() {
   return (
-    <div className="text-center">
+    <div className="text-center max-w-6xl">
       <h1 className="text-primary text-3xl font-bold mt-6">Promo</h1>
       <p className="text-muted-foreground">
         Temukan promo terbaik untuk harga terbaik

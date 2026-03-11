@@ -71,7 +71,7 @@ export default function Testimoni() {
     (_, index) => index !== currentTestimonial,
   )
   return (
-    <section className="w-full flex flex-col md:flex-row items-end gap-6 py-20 text-center justify-between">
+    <section className="w-full flex flex-col md:flex-row items-end gap-6 py-20 text-center justify-between max-w-6xl">
       <div className="flex gap-2 items-end relative w-full">
         <div className="bg-primary w-[155px] h-[242px] rounded-tr-4xl rounded-bl-4xl rounded" />
         <div className="bg-[#B9D654] w-[156px] h-[98px] rounded rounded-tl-4xl rounded-br-4xl" />

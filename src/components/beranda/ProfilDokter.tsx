@@ -1,6 +1,6 @@
 export default function ProfilDokter() {
   return (
-    <div>
+    <div className="max-w-6xl">
       <h1 className="text-primary text-3xl font-bold">Profil Dokter</h1>
       <p className="text-muted-foreground mb-12">Temukan dokter-dokter profesional</p>
       <div className="flex flex-col gap-4 mt-6 justify-center w-full">

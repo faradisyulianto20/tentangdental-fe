@@ -69,7 +69,7 @@ export default function GalleryCarousel() {
   }
 
   return (
-    <div className="w-full flex flex-col items-center gap-8 py-12 overflow-hidden">
+    <div className="w-full flex flex-col items-center gap-8 py-12 overflow-hidden max-w-6xl">
         <div className="text-center">
              <h1 className="text-primary text-3xl font-bold">Galeri</h1>
             <p className="text-muted-foreground">Temukan Tempat Ternyaman dan Fasilitas Terlengkap di Tentang Dental.</p>
