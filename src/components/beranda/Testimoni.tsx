@@ -71,12 +71,12 @@ export default function Testimoni() {
     (_, index) => index !== currentTestimonial,
   )
   return (
-    <section className="flex flex-col md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between max-w-6xl mx-6">
+    <section className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between max-w-6xl mx-6 md:w-full">
       {/* Sembunyikan seluruh decorative element di mobile */}
-      <div className="hidden lg:flex gap-2 items-end relative">
+      <div className="hidden  lg:flex gap-2 items-end relative">
         <div className="bg-primary w-[155px] h-[242px] rounded-tr-4xl rounded-bl-4xl rounded" />
         <div className="bg-[#B9D654] w-[156px] h-[98px] rounded rounded-tl-4xl rounded-br-4xl" />
-        <div className="absolute right-16 -top-40 w-[300px] h-[300px]">
+        <div className="absolute -right-40 -top-45 w-[300px] h-[300px]">
           <img
             src={otherTestimonials[0].imgUrl}
             alt="Testimoni Image"
