@@ -11,7 +11,7 @@ export default function Promo() {
       </p>
       <div className="flex justify-center gap-4 mt-6">
         {promo.map((promo, index) => (
-          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2">
+          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2 text-[#1682B1]">
             <div className="text-xl font-bold text-primary">{promo.judul}</div>
             <img
               src={promo.imgUrl}
@@ -27,7 +27,7 @@ export default function Promo() {
             </div>
             <ul className="text-left text-primary leading-5 min-h-32">
               {promo.benefit.map((benefit, index) => (
-                <li key={index} className="flex gap-1 items-center">
+                <li key={index} className="flex gap-1 items-center text-sm">
                   <Triangle className="w-2 h-2 rotate-180 " /> {benefit}
                 </li>
               ))}

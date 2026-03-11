@@ -16,7 +16,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-lg max-w-338 mx-auto w-full">
+    <header className="sticky top-0 z-50 bg-white mx-auto w-full">
       {/* Top bar */}
       <div className="flex justify-between items-center px-6 md:px-10 py-4">
         <Link to="/" className="flex font-bold items-center gap-2">

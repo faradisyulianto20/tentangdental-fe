@@ -1,18 +1,33 @@
 export default function ProfilDokter() {
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-6xl relative">
+      <img
+        className="absolute -right-100 -top-125 -z-10 w-3/4 pointer-events-none"
+        src="bgblue.png"
+      />
       <h1 className="text-primary text-3xl font-bold">Profil Dokter</h1>
-      <p className="text-muted-foreground mb-12">Temukan dokter-dokter profesional</p>
+      <p className="text-muted-foreground mb-12">
+        Temukan dokter-dokter profesional
+      </p>
       <div className="flex flex-col gap-4 mt-6 justify-center w-full">
         {listDokter.map((dokter, index) => (
-          <div className={` ${index % 2 === 0 ? 'ms-auto' : 'flex-row-reverse'} flex w-3/4 rounded-lg shadow-md  border-2 mt-6`}>
+          <div
+            className={` ${index % 2 === 0 ? 'ms-auto' : 'flex-row-reverse'} flex w-3/4 rounded-lg shadow-md  border-2 mt-6`}
+          >
             <div className="p-4">
-              <p className="text-muted-foreground text-sm">{dokter.deskripsi}</p>
+              <p className="text-muted-foreground text-sm">
+                {dokter.deskripsi}
+              </p>
               <p className="font-bold text-lg mt-6">{dokter.nama}</p>
-              <p className="font-bold text-muted-foreground">{dokter.spesialis}</p>
+              <p className="font-bold text-muted-foreground">
+                {dokter.spesialis}
+              </p>
             </div>
             <div className="w-full relative">
-              <img src={dokter.imgUrl} className="w-92 object-cover absolute right-0 z-10 bottom-0 max-h-[400px]" />
+              <img
+                src={dokter.imgUrl}
+                className="w-92 object-cover absolute right-0 z-10 bottom-0 max-h-[400px]"
+              />
             </div>
           </div>
         ))}
@@ -35,5 +50,5 @@ const listDokter = [
     spesialis: 'Spesialis Konversi Gigi',
     deskripsi:
       'Sebagai spesialis konservasi gigi, perhatian utama saya adalah menjaga serta merawat gigi alami Anda agar tetap sehat dan berfungsi optimal dalam jangka panjang, melalui perawatan yang tepat, modern, dan berstandar tinggi.',
-  }
+  },
 ]

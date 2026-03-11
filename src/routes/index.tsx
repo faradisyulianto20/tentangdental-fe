@@ -6,6 +6,7 @@ import Separator from '../components/beranda/Separator'
 import Galeri from '../components/beranda/Galeri'
 import ProfilDokter from '../components/beranda/ProfilDokter'
 import Promo from '../components/beranda/Promo'
+import FAQ from '../components/beranda/FAQ'
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
     <div className="overflow-hidden w-full">
       <div className="flex flex-col items-center justify-center mx-auto relative">
         <img
-          className="absolute -top-0 -right-[400px] -z-10 w-3/4 pointer-events-none"
+          className="absolute -top-10 -right-[400px] -z-10 w-3/4 pointer-events-none"
           src="bggradient.png"
         />
         <Heroes />
@@ -25,6 +26,7 @@ function App() {
         <Galeri />
         <ProfilDokter />
         <Promo />
+        <FAQ />
       </div>
     </div>
   )
