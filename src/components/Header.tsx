@@ -1,12 +1,27 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Button } from './ui/button'
-import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Menu, X, ChevronDown } from 'lucide-react'
+
+const layanan = [
+  'Scaling',
+  'Oral Profilaksis',
+  'Tambal Gigi',
+  'Desensitasi Gigi',
+  'Perawatan Saluran Akar',
+  'Cabut Gigi',
+  'Perawatan Gigi Anak',
+  'Bleaching',
+  'Veneer',
+  'Aligner Gigi',
+  'Crown',
+  'Gigi Tiruan',
+]
 
 const navigation = [
   { name: 'Beranda', href: '/' },
   { name: 'Promo', href: '/promo' },
-  { name: 'Layanan', href: '/layanan' },
+  { name: 'Layanan', href: '/layanan', hasDropdown: true },
   { name: 'Profil Dokter', href: '/profil-dokter' },
 ]
 
@@ -14,10 +29,26 @@ export default function Header() {
   const { location } = useRouterState()
   const currentPath = location.pathname
   const [menuOpen, setMenuOpen] = useState(false)
+  const [layananOpen, setLayananOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const mobileLayananRef = useRef<HTMLDivElement>(null)
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const insideDesktop = dropdownRef.current?.contains(e.target as Node)
+      const insideMobile = mobileLayananRef.current?.contains(e.target as Node)
+      if (!insideDesktop && !insideMobile) {
+        setLayananOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  console.log(layananOpen)
   return (
-    <header className="sticky top-0 z-50 bg-white mx-auto w-full">
-      {/* Top bar */}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white w-full shadow-sm">
       <div className="flex justify-between items-center px-6 md:px-10 py-4">
         <Link to="/" className="flex font-bold items-center gap-2">
           <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
@@ -25,9 +56,45 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex justify-center">
+        <nav className="hidden md:flex justify-center items-center">
           {navigation.map((item) => {
-            const isActive = currentPath === item.href
+            const isActive =
+              currentPath === item.href ||
+              currentPath.startsWith(item.href + '/')
+
+            if (item.hasDropdown) {
+              return (
+                <div key={item.name} className="relative" ref={dropdownRef}>
+                  <Button
+                    variant="ghost"
+                    className={`gap-1 ${isActive ? 'text-[#58C4EC]' : ''}`}
+                    onClick={() => setLayananOpen((prev) => !prev)}
+                  >
+                    {item.name}
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${layananOpen ? 'rotate-180' : ''}`}
+                    />
+                  </Button>
+
+                  {layananOpen && (
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[420px] bg-white rounded-xl shadow-lg border border-gray-100 p-4 grid grid-cols-3 gap-2 z-50">
+                      {layanan.map((name) => (
+                        <Link
+                          key={name}
+                          to={`/layanan/${name.toLowerCase().replace(/ /g, '-')}`}
+                          onClick={() => setLayananOpen(false)}
+                          className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg py-2 transition"
+                        >
+                          {name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+
             return (
               <Button
                 variant="ghost"
@@ -62,6 +129,43 @@ export default function Header() {
         <div className="md:hidden flex flex-col px-6 pb-4 gap-1 border-t border-gray-100">
           {navigation.map((item) => {
             const isActive = currentPath === item.href
+
+            if (item.hasDropdown) {
+              return (
+                <div key={item.name} ref={mobileLayananRef}>
+                  <Button
+                    variant="ghost"
+                    className={`justify-start w-full gap-1 ${isActive ? 'text-[#58C4EC]' : ''}`}
+                    onClick={() => setLayananOpen((prev) => !prev)}
+                  >
+                    {item.name}
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${layananOpen ? 'rotate-180' : ''}`}
+                    />
+                  </Button>
+
+                  {layananOpen && (
+                    <div className="grid grid-cols-2 gap-1 pl-4 pb-2">
+                      {layanan.map((name) => (
+                        <Link
+                          key={name}
+                          to={`/layanan/${name.toLowerCase().replace(/ /g, '-')}`}
+                          onClick={() => {
+                            setLayananOpen(false)
+                            setMenuOpen(false)
+                          }}
+                          className="text-sm text-gray-700 hover:text-[#58C4EC] rounded-lg  py-2 transition"
+                        >
+                          {name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+
             return (
               <Button
                 variant="ghost"
@@ -74,7 +178,12 @@ export default function Header() {
               </Button>
             )
           })}
-          <Button variant="default" className="mt-2" asChild onClick={() => setMenuOpen(false)}>
+          <Button
+            variant="default"
+            className="mt-2"
+            asChild
+            onClick={() => setMenuOpen(false)}
+          >
             <Link to="/reservasi">Reservasi</Link>
           </Button>
         </div>

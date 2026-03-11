@@ -5,25 +5,25 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <div className="w-full max-w-6xl">
-      <div className="text-center my-12">
-        <h1 className="text-primary text-3xl font-bold">
+    <div className="max-w-6xl mx-6 w-full">
+      <div className="text-center my-12 w-full">
+        <h1 className="text-primary text-xl md:text-3xl font-bold">
           Pertanyaan yang Sering Ditanyakan
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm md:text-base">
           Temukan jawaban atas pertanyaan umum seputar perencanaan UMKM
         </p>
       </div>
-      <div className="flex flex-col gap-2 w-full my-6">
+      <div className="flex flex-col gap-2 my-6 mx-6">
         {faq.map((item, index) => (
           <div
-            className="p-4 rounded-lg border border-primary w-full flex flex-col gap-2 text-primary cursor-pointer"
+            className="p-4 rounded-lg border border-primary flex flex-col gap-2 text-primary cursor-pointer"
             key={index}
             onClick={() => setOpenIndex(openIndex === index ? null : index)}
           >
             <div className="flex justify-between">
 
-            <p className="font-bold">{item.pertanyaan}</p>
+            <p className={`font-bold text-sm md:text-base ${openIndex === index ? ('line-clamp-none') : ('line-clamp-1')}`}>{item.pertanyaan}</p>
              {openIndex === index ? (
                 <ChevronRight className="text-muted-foreground rotate-90" />
             ) : (
@@ -32,7 +32,7 @@ export default function FAQ() {
             
             </div>
             {openIndex === index && (
-              <p className="text-muted-foreground">{item.jawaban}</p>
+              <p className="text-muted-foreground text-sm md:text-base">{item.jawaban}</p>
             )}
           </div>
         ))}

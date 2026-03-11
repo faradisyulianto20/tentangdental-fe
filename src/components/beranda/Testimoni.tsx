@@ -71,8 +71,9 @@ export default function Testimoni() {
     (_, index) => index !== currentTestimonial,
   )
   return (
-    <section className="w-full flex flex-col md:flex-row items-end gap-6 py-20 text-center justify-between max-w-6xl">
-      <div className="flex gap-2 items-end relative w-full">
+    <section className="flex flex-col md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between max-w-6xl mx-6">
+      {/* Sembunyikan seluruh decorative element di mobile */}
+      <div className="hidden lg:flex gap-2 items-end relative">
         <div className="bg-primary w-[155px] h-[242px] rounded-tr-4xl rounded-bl-4xl rounded" />
         <div className="bg-[#B9D654] w-[156px] h-[98px] rounded rounded-tl-4xl rounded-br-4xl" />
         <div className="absolute right-16 -top-40 w-[300px] h-[300px]">
@@ -103,9 +104,23 @@ export default function Testimoni() {
           />
         </div>
       </div>
-      <div className="text-left flex flex-col gap-2 w-full">
-        <h1 className="font-bold text-primary text-3xl">Testimoni</h1>
-        <p className="text-black font-bold max-w-md text-4xl">
+
+      {/* Mobile: tampilkan foto dalam grid biasa */}
+      <div className="flex lg:hidden justify-center gap-3 flex-wrap mt-4">
+        {otherTestimonials.slice(0, 5).map((t, i) => (
+          <img
+            key={i}
+            src={t.imgUrl}
+            alt="Testimoni"
+            className="w-14 h-14 rounded-full object-cover"
+          />
+        ))}
+      </div>
+      <div className="text-left flex flex-col gap-2">
+        <h1 className="font-bold text-primary text-xl md:text-3xl">
+          Testimoni
+        </h1>
+        <p className="text-black font-bold max-w-md text-2xl md:text-4xl">
           Periksa apa yang dikatakan pasien tentang kami.
         </p>
         <div className="bg-[#E0F4FB] p-4 gap-2 rounded-lg">
@@ -114,10 +129,10 @@ export default function Testimoni() {
             alt="Testimoni Image"
             className="w-6 h-6 object-cover"
           />
-          <p className="text-muted-foreground max-w-md text-lg mt-6">
+          <p className="text-muted-foreground max-w-md text-sm md:text-lg mt-6">
             {testimonial.description}
           </p>
-          <div className="flex gap-2 items-end justify-between">
+          <div className="flex flex-col md:flex-row gap-6 md:items-end justify-between">
             <div className="flex gap-1 mt-6">
               <img
                 src={testimonial.imgUrl}
@@ -125,7 +140,7 @@ export default function Testimoni() {
                 className="w-12 h-12 rounded-full shadow-lg object-cover"
               />
               <div className="flex flex-col justify-center">
-                <p className="text-muted-foreground max-w-md text-lg">
+                <p className="text-muted-foreground max-w-md md:text-lg">
                   {testimonial.name}
                 </p>
                 <div className="flex w-4 h-4 gap-1">
@@ -157,7 +172,8 @@ export default function Testimoni() {
               <div className="flex items-center gap-1 mx-2">
                 {testimonials.map((testi, index) => (
                   <div
-                    className={`w-2 h-2 ${testimonial.name === testi.name ? 'bg-[#B4E5F6]' : 'bg-[#B4E5F6]/50'} rounded-full`} key={index}
+                    className={`w-2 h-2 ${testimonial.name === testi.name ? 'bg-[#B4E5F6]' : 'bg-[#B4E5F6]/50'} rounded-full`}
+                    key={index}
                   ></div>
                 ))}
               </div>

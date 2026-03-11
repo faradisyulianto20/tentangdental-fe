@@ -4,14 +4,14 @@ import { Triangle } from 'lucide-react'
 
 export default function Promo() {
   return (
-    <div className="text-center max-w-6xl">
-      <h1 className="text-primary text-3xl font-bold mt-6">Promo</h1>
-      <p className="text-muted-foreground">
+    <div className="text-center max-w-6xl mx-6">
+      <h1 className="text-primary text-xl md:text-3xl font-bold mt-6">Promo</h1>
+      <p className="text-muted-foreground text-sm md:text-base">
         Temukan promo terbaik untuk harga terbaik
       </p>
-      <div className="flex justify-center gap-4 mt-6">
+      <div className="flex flex-wrap justify-center gap-4 mt-6">
         {promo.map((promo, index) => (
-          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2 text-[#1682B1]">
+          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2 text-[#1682B1]" key={index}>
             <div className="text-xl font-bold text-primary">{promo.judul}</div>
             <img
               src={promo.imgUrl}

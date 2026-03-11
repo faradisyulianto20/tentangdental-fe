@@ -2,9 +2,9 @@ import { Link } from '@tanstack/react-router'
 
 export default function Layanan() {
     return (
-        <div className="text-center max-w-6xl">
-            <h1 className="text-primary text-3xl font-bold">Layanan</h1>
-            <p className="text-muted-foreground">Kami melayani berbagai perawatan gigi esensial, aesthetic gigi, Prostodonsia, dan perawatan gigi anak.</p>
+        <div className="text-center max-w-6xl mx-6">
+            <h1 className="text-primary text-xl md:text-3xl font-bold">Layanan</h1>
+            <p className="text-muted-foreground text-sm md:text-base">Kami melayani berbagai perawatan gigi esensial, aesthetic gigi, Prostodonsia, dan perawatan gigi anak.</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
                 {layanan.map((item, index) => (
