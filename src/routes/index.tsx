@@ -15,14 +15,14 @@ function App() {
     <div className="overflow-hidden w-full">
       <div className="flex flex-col items-center justify-center mx-auto relative">
         <img
-          className="absolute -top-10 -right-[400px] -z-10 w-3/4 pointer-events-none"
+          className="absolute -top-10 -right-100 -z-10 w-3/4 pointer-events-none"
           src="bggradient.png"
         />
         <Heroes />
         <Testimoni />
         <Promo />
         <Layanan />
-        <div className="bg-gradient-to-r from-[#01C8FF] to-[#6DDFFF] w-full mt-6 py-6">
+        <div className="bg-linear-to-r from-[#01C8FF] to-[#6DDFFF] w-full mt-6 py-6">
           <Separator />
         </div>
         <Galeri />

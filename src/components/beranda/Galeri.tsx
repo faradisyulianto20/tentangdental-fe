@@ -81,7 +81,7 @@ export default function GalleryCarousel() {
       </div>
       {/* Carousel */}
       {/* Carousel container - lebih kecil di mobile */}
-      <div className="relative w-full max-w-4xl h-[200px] md:h-[320px]">
+      <div className="relative w-full max-w-4xl h-50 md:h-80">
         {images.map((img, index) => {
           const offset = getPosition(index)
           const style = getStyle(offset)

@@ -6,7 +6,7 @@ export const Route = createFileRoute('/profil-dokter')({
 })
 
 function RouteComponent() {
-  return <div className='w-full flex justify-center mt-32'>
+  return <div className='w-full flex justify-center mt-20'>
       <ProfilDokter />
     </div>
 }

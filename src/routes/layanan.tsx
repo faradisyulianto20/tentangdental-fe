@@ -1,21 +1,39 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
-import { title } from 'process'
+import { useNavigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/layanan')({
+  validateSearch: (search) => {
+    return {
+      id: search.id,
+    }
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
+  const { id } = Route.useSearch()
+
+  const handleNavigate = (id: string) => {
+    navigate({
+      to: '/layanan',
+      search: {
+        id,
+      },
+    })
+  }
+
+  const layananFiltered = layanan.filter((item) => item.title !== id)
+
   return (
-    <div className="w-full max-w-6xl mx-auto flex justify-center flex-col items-center my-12 mx-6">
+    <div className="w-full max-w-6xl flex justify-center flex-col items-center my-12 mx-auto">
       <h1 className="text-primary text-xl md:text-3xl font-bold">
         {artikel.title}
       </h1>
       <p className="text-muted-foreground text-sm md:text-base mt-3">
         {artikel.subtitle}
       </p>
-      <div className="w-full my-12 rounded-xl max-w-[1163px] h-[447px] overflow-hidden">
+      <div className="w-full my-12 rounded-xl max-w-290.75 h-111.75 overflow-hidden">
         <img
           src={artikel.imgPath}
           alt={artikel.title}
@@ -29,12 +47,12 @@ function RouteComponent() {
         />
         <div className="w-2/4">
           <h1 className="font-bold text-2xl">Layanan Lainnya</h1>
-          <div className='flex flex-col gap-3 mt-6'>
-            {layanan.map((item, index) => (
-              <Link
-                to={`/layanan?id=${item.title.toLowerCase().replace(/ /g, '-')}`}
+          <div className="flex flex-col gap-3 mt-6">
+            {layananFiltered.map((item, index) => (
+              <button
+                onClick={() => handleNavigate(item.title)}
                 key={index}
-                className="flex items-center gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
+                className="flex items-left text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
               >
                 <img
                   src={`/${item.icon}`}
@@ -44,7 +62,7 @@ function RouteComponent() {
                 <div>
                   <h2 className="text-base font-bold">{item.title}</h2>
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
         </div>

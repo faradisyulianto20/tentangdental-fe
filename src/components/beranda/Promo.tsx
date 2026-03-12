@@ -11,7 +11,7 @@ export default function Promo() {
       </p>
       <div className="flex flex-wrap justify-center gap-4 mt-6">
         {promo.map((promo, index) => (
-          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2 text-[#1682B1] shadow-md" key={index}>
+          <div className="p-4 rounded-lg border border-primary w-59 flex flex-col gap-2 text-[#1682B1] shadow-md" key={index}>
             <div className="text-xl font-bold text-primary">{promo.judul}</div>
             <img
               src={promo.imgUrl}
@@ -32,8 +32,8 @@ export default function Promo() {
                 </li>
               ))}
             </ul>
-            <Link to={`reservasi?id=${promo.judul}`}>
-              <Button className='bg-gradient-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md'>Pesan Sekarang</Button>
+            <Link to="/reservasi">
+              <Button className='bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md'>Pesan Sekarang</Button>
             </Link>
           </div>
         ))}

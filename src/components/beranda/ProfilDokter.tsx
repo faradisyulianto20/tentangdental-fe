@@ -14,7 +14,7 @@ export default function ProfilDokter() {
       <div className="flex flex-col gap-4 mt-6 justify-center w-full">
         {listDokter.map((dokter, index) => (
           <div
-            className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-[2px] bg-gradient-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6`}
+            className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-0.5 bg-linear-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6`}
             key={index}
           >
             <div
@@ -32,7 +32,7 @@ export default function ProfilDokter() {
               <div className="w-full md:relative h-fit md:h-auto flex justify-center">
                 <img
                   src={dokter.imgUrl}
-                  className="md:w-92 object-cover md:absolute md:right-0 z-10 -bottom-4 max-h-[400px]"
+                  className="md:w-92 object-cover md:absolute md:right-0 z-10 -bottom-4 max-h-100"
                 />
               </div>
             </div>

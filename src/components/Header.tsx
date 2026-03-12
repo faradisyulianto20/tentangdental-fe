@@ -25,9 +25,9 @@ const navigation = [
   {
     name: 'Berita',
     href: '/berita',
-  },  
+  },
   { name: 'Profil Dokter', href: '/profil-dokter' },
-]
+] as const
 
 export default function Header() {
   const { location } = useRouterState()
@@ -66,7 +66,7 @@ export default function Header() {
               currentPath === item.href ||
               currentPath.startsWith(item.href + '/')
 
-            if (item.hasDropdown) {
+            if ('hasDropdown' in item && item.hasDropdown) {
               return (
                 <div key={item.name} className="relative" ref={dropdownRef}>
                   <Button
@@ -82,11 +82,12 @@ export default function Header() {
                   </Button>
 
                   {layananOpen && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[420px] bg-white rounded-xl shadow-lg border border-gray-100 p-4 grid grid-cols-3 gap-2 z-50">
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-105 bg-white rounded-xl shadow-lg border border-gray-100 p-4 grid grid-cols-3 gap-2 z-50">
                       {layanan.map((name) => (
                         <Link
                           key={name}
-                          to={`/layanan?id=${name.toLowerCase().replace(/ /g, '-')}`}
+                          to="/layanan"
+                          search={{ id: name.toLowerCase().replace(/ /g, '-') }}
                           onClick={() => setLayananOpen(false)}
                           className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg p-2 transition"
                         >
@@ -134,7 +135,7 @@ export default function Header() {
           {navigation.map((item) => {
             const isActive = currentPath === item.href
 
-            if (item.hasDropdown) {
+            if ('hasDropdown' in item && item.hasDropdown) {
               return (
                 <div key={item.name} ref={mobileLayananRef}>
                   <Button
@@ -154,7 +155,8 @@ export default function Header() {
                       {layanan.map((name) => (
                         <Link
                           key={name}
-                          to={`/layanan/${name.toLowerCase().replace(/ /g, '-')}`}
+                          to="/layanan"
+                          search={{ id: name.toLowerCase().replace(/ /g, '-') }}
                           onClick={() => {
                             setLayananOpen(false)
                             setMenuOpen(false)

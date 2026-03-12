@@ -2,13 +2,27 @@
 
 import { useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 
 export default function Berita() {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+
+  const navigateBerita = (id: string) => {
+    navigate({
+      to: '/berita',
+      search: {
+        id,
+      },
+    })
+  }
 
   const scroll = (dir: 'left' | 'right') => {
     if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: dir === 'right' ? 300 : -300, behavior: 'smooth' })
+      scrollRef.current.scrollBy({
+        left: dir === 'right' ? 300 : -300,
+        behavior: 'smooth',
+      })
     }
   }
 
@@ -22,7 +36,7 @@ export default function Berita() {
         {/* Left Arrow */}
         <button
           onClick={() => scroll('left')}
-          className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-[2px] bg-gradient-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+          className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
         >
           <div className="bg-white rounded-full p-1.5">
             <ChevronLeft className="w-5 h-5 text-gray-700" />
@@ -32,16 +46,22 @@ export default function Berita() {
         {/* Scroll Container */}
         <div
           ref={scrollRef}
-          className="flex gap-12 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory  [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory  [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {berita.map((item, index) => (
-            <div key={index} className="flex flex-col flex-shrink-0 w-62 snap-start">
+            <div key={index} className="flex flex-col shrink-0 w-62 snap-start cursor-pointer hover:shadow-md p-4 rounded-lg border" onClick={()=>navigateBerita(item.title)}>
               <div className="hover:shadow-md cursor-pointer">
-                <img src={item.imgPath} alt={item.title} className="rounded-xl w-62 h-48 object-cover" />
+                <img
+                  src={item.imgPath}
+                  alt={item.title}
+                  className="rounded-xl w-62 h-48 object-cover"
+                />
               </div>
               <div className="flex flex-col text-left">
                 <h2 className="text-lg font-semibold mt-4">{item.title}</h2>
-                <p className="text-gray-600 mt-2 line-clamp-3">{item.subtitle}</p>
+                <p className="text-gray-600 mt-2 line-clamp-3">
+                  {item.subtitle}
+                </p>
               </div>
             </div>
           ))}
@@ -50,7 +70,7 @@ export default function Berita() {
         {/* Right Arrow */}
         <button
           onClick={() => scroll('right')}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-[2px] bg-gradient-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+          className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
         >
           <div className="bg-white rounded-full p-1.5">
             <ChevronRight className="w-5 h-5 text-gray-700" />

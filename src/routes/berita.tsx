@@ -1,14 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
+import { useParams } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/berita')({
+  validateSearch: (search) => {
+    return {
+      id: search.id,
+    }
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { id } = Route.useSearch()
+
   return (
-    <div className="w-full max-w-6xl mx-auto flex justify-center flex-col items-center mx-6">
-      <div className="w-full my-12 rounded-xl max-w-[1163px] h-[447px] overflow-hidden">
+    <div className="w-full max-w-6xl flex justify-center flex-col items-center mx-auto">
+      <div className="w-full my-12 rounded-xl max-w-290.65 h-111.75 overflow-hidden">
         <img
           src={berita.imgPath}
           alt={berita.title}

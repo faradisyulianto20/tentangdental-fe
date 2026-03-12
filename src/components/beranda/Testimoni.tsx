@@ -74,33 +74,33 @@ export default function Testimoni() {
     <section className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between max-w-6xl mx-6 md:w-full">
       {/* Sembunyikan seluruh decorative element di mobile */}
       <div className="hidden  lg:flex gap-2 items-end relative">
-        <div className="bg-primary w-[155px] h-[242px] rounded-tr-4xl rounded-bl-4xl rounded" />
-        <div className="bg-[#B9D654] w-[156px] h-[98px] rounded rounded-tl-4xl rounded-br-4xl" />
-        <div className="absolute -right-40 -top-45 w-[300px] h-[300px]">
+        <div className="bg-primary w-38.75 h-60.5 rounded-tr-4xl rounded-bl-4xl rounded" />
+        <div className="bg-[#B9D654] w-39 h-24.5 rounded rounded-tl-4xl rounded-br-4xl" />
+        <div className="absolute -right-40 -top-45 w-75 h-75">
           <img
             src={otherTestimonials[0].imgUrl}
             alt="Testimoni Image"
-            className="w-[120px] rounded-full h-[120px] object-cover absolute top-12 right-12"
+            className="w-30 rounded-full h-30 object-cover absolute top-12 right-12"
           />
           <img
             src={otherTestimonials[1].imgUrl}
             alt="Testimoni Image"
-            className="w-[74px] rounded-full h-[74px] object-cover absolute top-12 -left-20"
+            className="w-18.5 rounded-full h-18.5 object-cover absolute top-12 -left-20"
           />
           <img
             src={otherTestimonials[2].imgUrl}
             alt="Testimoni Image"
-            className="w-[100px] rounded-full h-[100px] object-cover absolute top-32"
+            className="w-25 rounded-full h-25 object-cover absolute top-32"
           />
           <img
             src={otherTestimonials[3].imgUrl}
             alt="Testimoni Image"
-            className="w-[90px] rounded-full h-[90px] object-cover absolute top-52 right-30"
+            className="w-22.5 rounded-full h-22.5 object-cover absolute top-52 right-30"
           />
           <img
             src={otherTestimonials[4].imgUrl}
             alt="Testimoni Image"
-            className="w-[75px] rounded-full h-[75px] object-cover absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4"
+            className="w-18.75 rounded-full h-18.75 object-cover absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4"
           />
         </div>
       </div>
