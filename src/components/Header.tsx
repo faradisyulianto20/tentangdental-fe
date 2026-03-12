@@ -61,7 +61,7 @@ export default function Header() {
     >
       <header
         className={`bg-white w-full shadow-sm transition-all duration-300 ${
-          scrolled ? 'rounded-2xl shadow-md' : 'rounded-none shadow-sm'
+          scrolled ? 'rounded-full shadow-md' : 'rounded-none shadow-sm'
         }`}
       >
         <div className="flex justify-between items-center px-6 md:px-10 py-4">

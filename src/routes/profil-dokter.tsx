@@ -6,5 +6,9 @@ export const Route = createFileRoute('/profil-dokter')({
 })
 
 function RouteComponent() {
-  return <ProfilDokter />
+  return (
+    <div className="flex justify-center">
+      <ProfilDokter />
+    </div>
+  )
 }
