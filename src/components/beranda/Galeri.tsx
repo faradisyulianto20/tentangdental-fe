@@ -1,5 +1,17 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+}
+
+// Ga dipake karena bikin posisi error
+// const itemVariants = {
+//   hidden: { opacity: 0, y: 20 },
+//   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+// }
 
 const images = [
   { src: '/hero.png', alt: 'Ruang Klinik' },
@@ -81,7 +93,7 @@ export default function GalleryCarousel() {
       </div>
       {/* Carousel */}
       {/* Carousel container - lebih kecil di mobile */}
-      <div className="relative w-full max-w-4xl h-50 md:h-80">
+      <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="relative w-full max-w-4xl h-50 md:h-80">
         {images.map((img, index) => {
           const offset = getPosition(index)
           const style = getStyle(offset)
@@ -104,7 +116,7 @@ export default function GalleryCarousel() {
             </div>
           )
         })}
-      </div>
+      </motion.div>
 
       {/* Controls */}
       <div className="flex items-center gap-2 md:gap-4">

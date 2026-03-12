@@ -1,5 +1,16 @@
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+}
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -7,36 +18,66 @@ export default function FAQ() {
   return (
     <div className="max-w-6xl mx-6 w-full">
       <div className="text-center my-12 w-full">
-        <h1 className="text-primary text-xl md:text-3xl font-bold">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-primary text-xl md:text-3xl font-bold"
+        >
           Pertanyaan yang Sering Ditanyakan
-        </h1>
-        <p className="text-muted-foreground text-sm md:text-base mt-3">
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-muted-foreground text-sm md:text-base mt-3"
+        >
           Temukan jawaban atas pertanyaan umum seputar perencanaan UMKM
-        </p>
+        </motion.p>
       </div>
-      <div className="flex flex-col gap-2 my-6 mx-6">
+
+      <motion.div
+        variants={containerVariants}
+        className="flex flex-col gap-2 my-6 mx-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+      >
         {faq.map((item, index) => (
-          <div
-            className="p-4 rounded-lg border border-primary flex flex-col gap-2 text-primary cursor-pointer"
+          <motion.div
             key={index}
+            variants={itemVariants}
+            className="p-4 rounded-lg border border-primary flex flex-col gap-2 text-primary cursor-pointer"
             onClick={() => setOpenIndex(openIndex === index ? null : index)}
           >
             <div className="flex justify-between">
-
-            <p className={`font-bold text-sm md:text-base ${openIndex === index ? ('line-clamp-none') : ('line-clamp-1')}`}>{item.pertanyaan}</p>
-             {openIndex === index ? (
-                <ChevronRight className="text-muted-foreground rotate-90" />
-            ) : (
-                <ChevronRight className="text-muted-foreground" />
-            )}
-            
+              <p
+                className={`font-bold text-sm md:text-base ${openIndex === index ? 'line-clamp-none' : 'line-clamp-1'}`}
+              >
+                {item.pertanyaan}
+              </p>
+              <ChevronRight
+                className={`text-muted-foreground transition-transform duration-300 ${openIndex === index ? 'rotate-90' : ''}`}
+              />
             </div>
-            {openIndex === index && (
-              <p className="text-muted-foreground text-sm md:text-base">{item.jawaban}</p>
-            )}
-          </div>
+
+            <AnimatePresence initial={false}>
+              {openIndex === index && (
+                <motion.p
+                  key="jawaban"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="text-muted-foreground text-sm md:text-base overflow-hidden"
+                >
+                  {item.jawaban}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }

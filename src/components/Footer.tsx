@@ -5,7 +5,7 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-[var(--footer-bg)] text-center text-sm text-[var(--text-muted)] border mt-6">
+    <footer className="bg-(--footer-bg) text-center text-sm text-(--text-muted) border mt-6">
       <div className="page-wrap py-10 flex justify-evenly md:flex-row flex-col gap-2 mx-6">
         <div className="flex flex-col gap-2">
           <div className="flex">
@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
         <div className='flex flex-col justify-center items-center'>
           <p className="font-bold text-xl mb-2">Alamat</p>
-          <div className="w-[150px] md:w-[300px] h-[15 0px] rounded-xl overflow-hidden">
+          <div className="w-37.5 md:w-75 h-37.5 rounded-xl overflow-hidden">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1!2d106.7!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPuri+Permata+Cipondoh!5e0!3m2!1sen!2sid!4v1"
               width="100%"

@@ -1,8 +1,19 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+}
 
 export default function Berita() {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -11,9 +22,7 @@ export default function Berita() {
   const navigateBerita = (id: string) => {
     navigate({
       to: '/berita',
-      search: {
-        id,
-      },
+      search: { id },
     })
   }
 
@@ -28,9 +37,13 @@ export default function Berita() {
 
   return (
     <div className="text-center max-w-7xl px-16 mt-12">
-      <h1 className="text-primary text-xl md:text-3xl font-bold">
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-primary text-xl md:text-3xl font-bold"
+      >
         Berita Terkini
-      </h1>
+      </motion.h1>
 
       <div className="relative mt-6">
         {/* Left Arrow */}
@@ -44,28 +57,35 @@ export default function Berita() {
         </button>
 
         {/* Scroll Container */}
-        <div
+        <motion.div
           ref={scrollRef}
-          className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory  [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
         >
           {berita.map((item, index) => (
-            <div key={index} className="flex flex-col shrink-0 w-62 snap-start cursor-pointer hover:shadow-md p-4 rounded-lg border" onClick={()=>navigateBerita(item.title)}>
+            <motion.div
+              key={index}
+              className="flex flex-col shrink-0 w-64 snap-start cursor-pointer hover:shadow-md rounded-md border"
+              onClick={() => navigateBerita(item.title)}
+              variants={itemVariants}
+            >
               <div className="hover:shadow-md cursor-pointer">
                 <img
                   src={item.imgPath}
                   alt={item.title}
-                  className="rounded-xl w-62 h-48 object-cover"
+                  className="rounded-t-xl w-64 h-44 object-cover"
                 />
               </div>
-              <div className="flex flex-col text-left">
-                <h2 className="text-lg font-semibold mt-4">{item.title}</h2>
-                <p className="text-gray-600 mt-2 line-clamp-3">
-                  {item.subtitle}
-                </p>
+              <div className="flex flex-col text-left p-4">
+                <h2 className="text-lg font-semibold leading-5 line-clamp-2">{item.title}</h2>
+                <p className="text-gray-600 mt-2 line-clamp-3 text-sm">{item.subtitle}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Right Arrow */}
         <button

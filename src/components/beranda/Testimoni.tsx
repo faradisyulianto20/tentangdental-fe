@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const testimonials = [
   {
@@ -77,30 +78,50 @@ export default function Testimoni() {
         <div className="bg-primary w-38.75 h-60.5 rounded-tr-4xl rounded-bl-4xl rounded" />
         <div className="bg-[#B9D654] w-39 h-24.5 rounded rounded-tl-4xl rounded-br-4xl" />
         <div className="absolute -right-40 -top-45 w-75 h-75">
-          <img
+          <motion.img
             src={otherTestimonials[0].imgUrl}
             alt="Testimoni Image"
             className="w-30 rounded-full h-30 object-cover absolute top-12 right-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2}}
+            transition={{ duration: 0.5 }}
           />
-          <img
+          <motion.img
             src={otherTestimonials[1].imgUrl}
             alt="Testimoni Image"
             className="w-18.5 rounded-full h-18.5 object-cover absolute top-12 -left-20"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2}}
+            transition={{ duration: 0.5 }}
           />
-          <img
+          <motion.img
             src={otherTestimonials[2].imgUrl}
             alt="Testimoni Image"
             className="w-25 rounded-full h-25 object-cover absolute top-32"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{once: true, amount: 0.2}}
+            transition={{ duration: 0.5 }}
           />
-          <img
+          <motion.img
             src={otherTestimonials[3].imgUrl}
             alt="Testimoni Image"
             className="w-22.5 rounded-full h-22.5 object-cover absolute top-52 right-30"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{once: true, amount: 0.2}}
+            transition={{ duration: 0.5 }}
           />
-          <img
+          <motion.img
             src={otherTestimonials[4].imgUrl}
             alt="Testimoni Image"
             className="w-18.75 rounded-full h-18.75 object-cover absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{once: true, amount: 0.2}}
+            transition={{ duration: 0.5 }}
           />
         </div>
       </div>
@@ -108,22 +129,26 @@ export default function Testimoni() {
       {/* Mobile: tampilkan foto dalam grid biasa */}
       <div className="flex lg:hidden justify-center gap-3 flex-wrap mt-4">
         {otherTestimonials.slice(0, 5).map((t, i) => (
-          <img
+          <motion.img
             key={i}
             src={t.imgUrl}
             alt="Testimoni"
             className="w-14 h-14 rounded-full object-cover"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2}}
+            transition={{ duration: 0.5 }}
           />
         ))}
       </div>
       <div className="text-left flex flex-col gap-2">
-        <h1 className="font-bold text-primary text-xl md:text-3xl">
+        <motion.h1 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{once: true, amount:0.2}} transition={{ duration: 0.5 }} className="font-bold text-primary text-xl md:text-3xl">
           Testimoni
-        </h1>
-        <p className="text-black font-bold max-w-md text-2xl md:text-4xl">
+        </motion.h1>
+        <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{once: true, amount: 0.2}} transition={{ duration: 0.5 }} className="text-black font-bold max-w-md text-2xl md:text-4xl">
           Periksa apa yang dikatakan pasien tentang kami.
-        </p>
-        <div className="bg-[#E0F4FB] p-4 gap-2 rounded-lg">
+        </motion.p>
+        <motion.div initial={{ opacity: 0, y: 20}} whileInView={{ opacity: 1, y: 0}} viewport={{once: true, amount: 0.2}} transition={{ duration: 0.5 }} className="bg-[#E0F4FB] p-4 gap-2 rounded-lg">
           <img
             src="/icons/petik.svg"
             alt="Testimoni Image"
@@ -189,7 +214,7 @@ export default function Testimoni() {
               />
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )
