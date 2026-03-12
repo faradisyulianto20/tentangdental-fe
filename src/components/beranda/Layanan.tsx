@@ -8,7 +8,7 @@ export default function Layanan() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
                 {layanan.map((item, index) => (
-                    <Link to={`Artikel?id=${item.title}`} key={index} className="flex flex-col items-center gap-2 border p-6 border-primary rounded-lg cursor-pointer hover:shadow-md">
+                    <Link to={`layanan?id=${item.title.toLowerCase().replace(/ /g, '-')}`} key={index} className="flex flex-col items-center gap-2 border p-6 border-primary rounded-lg cursor-pointer hover:shadow-md">
                         <img src={`/${item.imgPath}`} alt={item.title} className="w-12 h-12" />
                         <h2 className="text-2xl font-bold">{item.title}</h2>
                         <p className="text-muted-foreground text-center text-sm">{item.subTitle}</p>

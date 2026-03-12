@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PromoRouteImport } from './routes/promo'
 import { Route as ProfilDokterRouteImport } from './routes/profil-dokter'
 import { Route as LayananRouteImport } from './routes/layanan'
+import { Route as BeritaRouteImport } from './routes/berita'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReservasiIndexRouteImport } from './routes/reservasi/index'
 
@@ -30,6 +31,11 @@ const LayananRoute = LayananRouteImport.update({
   path: '/layanan',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BeritaRoute = BeritaRouteImport.update({
+  id: '/berita',
+  path: '/berita',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const ReservasiIndexRoute = ReservasiIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/berita': typeof BeritaRoute
   '/layanan': typeof LayananRoute
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/berita': typeof BeritaRoute
   '/layanan': typeof LayananRoute
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/berita': typeof BeritaRoute
   '/layanan': typeof LayananRoute
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
@@ -65,12 +74,19 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/layanan' | '/profil-dokter' | '/promo' | '/reservasi/'
+  fullPaths:
+    | '/'
+    | '/berita'
+    | '/layanan'
+    | '/profil-dokter'
+    | '/promo'
+    | '/reservasi/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/layanan' | '/profil-dokter' | '/promo' | '/reservasi'
+  to: '/' | '/berita' | '/layanan' | '/profil-dokter' | '/promo' | '/reservasi'
   id:
     | '__root__'
     | '/'
+    | '/berita'
     | '/layanan'
     | '/profil-dokter'
     | '/promo'
@@ -79,6 +95,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BeritaRoute: typeof BeritaRoute
   LayananRoute: typeof LayananRoute
   ProfilDokterRoute: typeof ProfilDokterRoute
   PromoRoute: typeof PromoRoute
@@ -108,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayananRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/berita': {
+      id: '/berita'
+      path: '/berita'
+      fullPath: '/berita'
+      preLoaderRoute: typeof BeritaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -127,6 +151,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BeritaRoute: BeritaRoute,
   LayananRoute: LayananRoute,
   ProfilDokterRoute: ProfilDokterRoute,
   PromoRoute: PromoRoute,

@@ -1,3 +1,4 @@
+import Promo from '#/components/beranda/Promo'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/promo')({
@@ -5,5 +6,7 @@ export const Route = createFileRoute('/promo')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/promo"!</div>
+  return <div className='w-full flex justify-center'>
+    <Promo />
+  </div>
 }

@@ -22,6 +22,10 @@ const navigation = [
   { name: 'Beranda', href: '/' },
   { name: 'Promo', href: '/promo' },
   { name: 'Layanan', href: '/layanan', hasDropdown: true },
+  {
+    name: 'Berita',
+    href: '/berita',
+  },  
   { name: 'Profil Dokter', href: '/profil-dokter' },
 ]
 
@@ -82,9 +86,9 @@ export default function Header() {
                       {layanan.map((name) => (
                         <Link
                           key={name}
-                          to={`/layanan/${name.toLowerCase().replace(/ /g, '-')}`}
+                          to={`/layanan?id=${name.toLowerCase().replace(/ /g, '-')}`}
                           onClick={() => setLayananOpen(false)}
-                          className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg py-2 transition"
+                          className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg p-2 transition"
                         >
                           {name}
                         </Link>
