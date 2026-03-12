@@ -10,7 +10,7 @@ export default function FAQ() {
         <h1 className="text-primary text-xl md:text-3xl font-bold">
           Pertanyaan yang Sering Ditanyakan
         </h1>
-        <p className="text-muted-foreground text-sm md:text-base">
+        <p className="text-muted-foreground text-sm md:text-base mt-3">
           Temukan jawaban atas pertanyaan umum seputar perencanaan UMKM
         </p>
       </div>

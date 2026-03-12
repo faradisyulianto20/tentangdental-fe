@@ -2,33 +2,39 @@ export default function ProfilDokter() {
   return (
     <div className="max-w-6xl relative mx-6">
       <img
-        className="absolute -right-100 -top-125 -z-10 w-3/4 pointer-events-none"
+        className="absolute -right-100 -top-175 -z-10 w-3/4 pointer-events-none"
         src="bgblue.png"
       />
-      <h1 className="text-primary text-xl md:text-3xl font-bold">Profil Dokter</h1>
+      <h1 className="text-primary text-xl md:text-3xl font-bold">
+        Profil Dokter
+      </h1>
       <p className="text-muted-foreground mb-12 text-sm md:text-base">
         Temukan dokter-dokter profesional
       </p>
       <div className="flex flex-col gap-4 mt-6 justify-center w-full">
         {listDokter.map((dokter, index) => (
           <div
-            className={` ${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} flex md:w-3/4 rounded-lg shadow-md  border-2 mt-6`}
+            className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-[2px] bg-gradient-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6`}
             key={index}
           >
-            <div className="p-4">
-              <p className="text-muted-foreground text-sm">
-                {dokter.deskripsi}
-              </p>
-              <p className="font-bold text-lg mt-6">{dokter.nama}</p>
-              <p className="font-bold text-muted-foreground">
-                {dokter.spesialis}
-              </p>
-            </div>
-            <div className="w-full md:relative h-fit md:h-auto flex justify-center">
-              <img
-                src={dokter.imgUrl}
-                className="md:w-92 object-cover md:absolute md:right-0 z-10 bottom-0 max-h-[400px]"
-              />
+            <div
+              className={`${index % 2 === 0 ? 'flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} flex w-full rounded-[6px] bg-white dark:bg-zinc-950`}
+            >
+              <div className="p-4">
+                <p className="text-muted-foreground text-sm">
+                  {dokter.deskripsi}
+                </p>
+                <p className="font-bold text-lg mt-6">{dokter.nama}</p>
+                <p className="font-bold text-muted-foreground">
+                  {dokter.spesialis}
+                </p>
+              </div>
+              <div className="w-full md:relative h-fit md:h-auto flex justify-center">
+                <img
+                  src={dokter.imgUrl}
+                  className="md:w-92 object-cover md:absolute md:right-0 z-10 -bottom-4 max-h-[400px]"
+                />
+              </div>
             </div>
           </div>
         ))}

@@ -6,6 +6,7 @@ import Separator from '../components/beranda/Separator'
 import Galeri from '../components/beranda/Galeri'
 import ProfilDokter from '../components/beranda/ProfilDokter'
 import Promo from '../components/beranda/Promo'
+import Berita from '../components/beranda/Berita'
 import FAQ from '../components/beranda/FAQ'
 export const Route = createFileRoute('/')({ component: App })
 
@@ -19,13 +20,14 @@ function App() {
         />
         <Heroes />
         <Testimoni />
+        <Promo />
         <Layanan />
         <div className="bg-gradient-to-r from-[#01C8FF] to-[#6DDFFF] w-full mt-6 py-6">
           <Separator />
         </div>
         <Galeri />
         <ProfilDokter />
-        <Promo />
+        <Berita />
         <FAQ />
       </div>
     </div>

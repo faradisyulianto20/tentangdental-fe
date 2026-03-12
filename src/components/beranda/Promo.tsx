@@ -6,12 +6,12 @@ export default function Promo() {
   return (
     <div className="text-center max-w-6xl mx-6">
       <h1 className="text-primary text-xl md:text-3xl font-bold mt-6">Promo</h1>
-      <p className="text-muted-foreground text-sm md:text-base">
+      <p className="text-muted-foreground text-sm md:text-base mt-3">
         Temukan promo terbaik untuk harga terbaik
       </p>
       <div className="flex flex-wrap justify-center gap-4 mt-6">
         {promo.map((promo, index) => (
-          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2 text-[#1682B1]" key={index}>
+          <div className="p-4 rounded-lg border border-primary w-[236px] flex flex-col gap-2 text-[#1682B1] shadow-md" key={index}>
             <div className="text-xl font-bold text-primary">{promo.judul}</div>
             <img
               src={promo.imgUrl}
@@ -25,7 +25,7 @@ export default function Promo() {
                 Rp {promo.hargaDiskon.toLocaleString('id-ID')}
               </div>
             </div>
-            <ul className="text-left text-primary leading-5 min-h-32">
+            <ul className="text-left text-primary leading-5 min-h-52">
               {promo.benefit.map((benefit, index) => (
                 <li key={index} className="flex gap-1 items-center text-sm">
                   <Triangle className="w-2 h-2 rotate-180 " /> {benefit}
@@ -33,7 +33,7 @@ export default function Promo() {
               ))}
             </ul>
             <Link to={`reservasi?id=${promo.judul}`}>
-              <Button>Pesan Sekarang</Button>
+              <Button className='bg-gradient-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md'>Pesan Sekarang</Button>
             </Link>
           </div>
         ))}

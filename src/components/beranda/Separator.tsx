@@ -7,7 +7,7 @@ export default function Separator() {
         <h1 className="text-3xl font-bold text-white">
           Konsultasi kesehatan dan mulutmu
         </h1>
-        <Button variant={'default'} className="text-black bg-white hover:bg-white/80">Reservasi Sekarang</Button>
+        <Button variant={'default'} className="text-black bg-white hover:bg-white/80 text-primary shadow-md">Reservasi Sekarang</Button>
       </div>
     </div>
   )
