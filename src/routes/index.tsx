@@ -6,7 +6,7 @@ import Separator from '../components/beranda/Separator'
 import Galeri from '../components/beranda/Galeri'
 import ProfilDokter from '../components/beranda/ProfilDokter'
 import Promo from '../components/beranda/Promo'
-import Berita from '../components/beranda/Berita'
+import Berita from '../components/beranda/Artikel'
 import FAQ from '../components/beranda/FAQ'
 export const Route = createFileRoute('/')({ component: App })
 

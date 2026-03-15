@@ -22,7 +22,7 @@ const navigation = [
   { name: 'Beranda', href: '/' },
   { name: 'Promo', href: '/promo' },
   { name: 'Layanan', href: '/layanan', hasDropdown: true },
-  { name: 'Berita', href: '/berita' },
+  { name: 'Artikel', href: '/artikel' },
   { name: 'Profil Dokter', href: '/profil-dokter' },
 ] as const
 

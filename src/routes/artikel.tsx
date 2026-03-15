@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import Artikel from '../components/beranda/Artikel'
 
-export const Route = createFileRoute('/berita')({
+export const Route = createFileRoute('/artikel')({
   validateSearch: (search) => {
     return {
       id: search.id,
@@ -25,51 +26,54 @@ function RouteComponent() {
   console.log(id)
 
   return (
-    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center xl:mx-auto">
-      <motion.div
-        variants={fadeUp}
-        custom={0}
-        initial="hidden"
-        animate="visible"
-        className="w-full my-12 rounded-xl max-w-290.65 h-111.75 overflow-hidden"
-      >
-        <img
-          src={berita.imgPath}
-          alt={berita.title}
-          className="object-cover w-full h-full"
+    <div className='mx-6 max-w-6xl flex flex-col justify-center items-center xl:mx-auto'>
+      <div className="mx-6 max-w-6xl flex justify-center flex-col items-center xl:mx-auto">
+        <motion.div
+          variants={fadeUp}
+          custom={0}
+          initial="hidden"
+          animate="visible"
+          className="w-full my-12 rounded-xl max-w-290.65 h-111.75 overflow-hidden"
+        >
+          <img
+            src={berita.imgPath}
+            alt={berita.title}
+            className="object-cover w-full h-full"
+          />
+        </motion.div>
+
+        <div className="text-left w-full">
+          <motion.h1
+            variants={fadeUp}
+            custom={0.2}
+            initial="hidden"
+            animate="visible"
+            className="text-xl md:text-3xl font-bold"
+          >
+            {berita.title}
+          </motion.h1>
+
+          <motion.p
+            variants={fadeUp}
+            custom={0.35}
+            initial="hidden"
+            animate="visible"
+            className="text-muted-foreground text-sm md:text-base mt-3"
+          >
+            {berita.penulis} - {berita.tanggal}
+          </motion.p>
+        </div>
+
+        <motion.div
+          variants={fadeUp}
+          custom={0.5}
+          initial="hidden"
+          animate="visible"
+          className="prose prose-sm md:prose-base max-w-none text-muted-foreground my-6"
+          dangerouslySetInnerHTML={{ __html: berita.content }}
         />
-      </motion.div>
-
-      <div className="text-left w-full">
-        <motion.h1
-          variants={fadeUp}
-          custom={0.2}
-          initial="hidden"
-          animate="visible"
-          className="text-xl md:text-3xl font-bold"
-        >
-          {berita.title}
-        </motion.h1>
-
-        <motion.p
-          variants={fadeUp}
-          custom={0.35}
-          initial="hidden"
-          animate="visible"
-          className="text-muted-foreground text-sm md:text-base mt-3"
-        >
-          {berita.penulis} - {berita.tanggal}
-        </motion.p>
       </div>
-
-      <motion.div
-        variants={fadeUp}
-        custom={0.5}
-        initial="hidden"
-        animate="visible"
-        className="prose prose-sm md:prose-base max-w-none text-muted-foreground my-6"
-        dangerouslySetInnerHTML={{ __html: berita.content }}
-      />
+      <Artikel />
     </div>
   )
 }

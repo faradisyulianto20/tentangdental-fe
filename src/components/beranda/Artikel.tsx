@@ -21,7 +21,7 @@ export default function Berita() {
 
   const navigateBerita = (id: string) => {
     navigate({
-      to: '/berita',
+      to: '/artikel',
       search: { id },
     })
   }
@@ -42,10 +42,10 @@ export default function Berita() {
         animate={{ opacity: 1, y: 0 }}
         className="text-primary text-xl md:text-3xl font-bold"
       >
-        Berita Terkini
+        Artikel    Terkini
       </motion.h1>
 
-      <div className="relative mt-6">
+      <div className="relative mt-12">
         {/* Left Arrow */}
         <button
           onClick={() => scroll('left')}
