@@ -1,6 +1,15 @@
+import { useState } from 'react'
+
+import { QueryClientProvider } from '@tanstack/react-query'
+import { createQueryClient } from '../lib/queryClient'
+
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+
+import NotFound from '../components/error/NotFound'
+import ErrorPage from '../components/error/ErrorPage'
+import Pending from '../components/error/Pending'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 
@@ -19,7 +28,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Tentang Dental',
       },
     ],
     links: [
@@ -30,32 +39,51 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: RootDocument,
+  errorComponent: (props) => <ErrorPage {...props} />,
+  pendingComponent: () => <Pending />,
+  notFoundComponent: () => <NotFound />,
 })
 
+interface RootErrorProps {
+  error: Error
+  info: {
+    componentStack: string
+  }
+  reset: () => void
+}
+
+function RootErrorComponent({ error, reset }: RootErrorProps) {
+  return <ErrorPage error={error} resetError={reset} />
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => createQueryClient())
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <HeadContent />
-      </head>
-      <body className="font-sans antialiased">
-        <Header />
-        <div className="pt-16">{children}</div>
-        <Footer />
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
+    <QueryClientProvider client={queryClient}>
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+          <HeadContent />
+        </head>
+        <body className="font-sans antialiased">
+          <Header />
+          <div className="pt-16">{children}</div>
+          <Footer />
+          <TanStackDevtools
+            config={{
+              position: 'bottom-right',
+            }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+          <Scripts />
+        </body>
+      </html>
+    </QueryClientProvider>
   )
 }
