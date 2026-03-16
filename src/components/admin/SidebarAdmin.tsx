@@ -1,12 +1,13 @@
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/admin/AppSidebar'
 import HeaderAdmin from './HeaderAdmin'
-import { LayoutDashboard, HelpCircle, Stethoscope, Newspaper, Tag, UserRound, Images, MessageSquareQuote, ClipboardList } from 'lucide-react'
+import { LayoutDashboard, HelpCircle, Stethoscope, Newspaper, Tag, UserRound, Images, MessageSquareQuote, ClipboardList, Calendar } from 'lucide-react'
 
 const navigations = [
-  { name: 'Dashboard',     url: '/admin/',                icon: LayoutDashboard },
+  { name: 'Dashboard',     url: '/admin',                icon: LayoutDashboard },
   { name: 'FAQ',           url: '/admin/faq',             icon: HelpCircle },
   { name: 'Layanan',       url: '/admin/layanan',         icon: Stethoscope },
+  { name: 'Reservasi',     url: '/admin/reservasi',       icon: Calendar },
   { name: 'Artikel',       url: '/admin/artikel',         icon: Newspaper },
   { name: 'Promo',         url: '/admin/promo',           icon: Tag },
   { name: 'Profil Dokter', url: '/admin/profil-dokter',   icon: UserRound },

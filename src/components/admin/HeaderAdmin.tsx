@@ -13,5 +13,5 @@ export default function HeaderAdmin({navigations}: {navigations: {name: string, 
         <p className="text-xs">Admin Klink</p>
       </div>
     </header>
-  )
+  ) 
 }

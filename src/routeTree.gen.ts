@@ -28,7 +28,6 @@ import { Route as AdminGaleriRouteImport } from './routes/admin/galeri'
 import { Route as AdminFaqRouteImport } from './routes/admin/faq'
 import { Route as AdminDataPasienRouteImport } from './routes/admin/data-pasien'
 import { Route as AdminArtikelRouteImport } from './routes/admin/artikel'
-import { Route as Admin_layoutRouteImport } from './routes/admin/__layout'
 
 const ReservasiRoute = ReservasiRouteImport.update({
   id: '/reservasi',
@@ -125,11 +124,6 @@ const AdminArtikelRoute = AdminArtikelRouteImport.update({
   path: '/admin/artikel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Admin_layoutRoute = Admin_layoutRouteImport.update({
-  id: '/admin/__layout',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -140,7 +134,6 @@ export interface FileRoutesByFullPath {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
-  '/admin': typeof Admin_layoutRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/data-pasien': typeof AdminDataPasienRoute
   '/admin/faq': typeof AdminFaqRoute
@@ -162,7 +155,6 @@ export interface FileRoutesByTo {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
-  '/admin': typeof AdminIndexRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/data-pasien': typeof AdminDataPasienRoute
   '/admin/faq': typeof AdminFaqRoute
@@ -172,6 +164,7 @@ export interface FileRoutesByTo {
   '/admin/promo': typeof AdminPromoRoute
   '/admin/reservasi': typeof AdminReservasiRoute
   '/admin/testimoni': typeof AdminTestimoniRoute
+  '/admin': typeof AdminIndexRoute
   '/login': typeof LoginIndexRoute
 }
 export interface FileRoutesById {
@@ -184,7 +177,6 @@ export interface FileRoutesById {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
-  '/admin/__layout': typeof Admin_layoutRoute
   '/admin/artikel': typeof AdminArtikelRoute
   '/admin/data-pasien': typeof AdminDataPasienRoute
   '/admin/faq': typeof AdminFaqRoute
@@ -208,7 +200,6 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
-    | '/admin'
     | '/admin/artikel'
     | '/admin/data-pasien'
     | '/admin/faq'
@@ -230,7 +221,6 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
-    | '/admin'
     | '/admin/artikel'
     | '/admin/data-pasien'
     | '/admin/faq'
@@ -240,6 +230,7 @@ export interface FileRouteTypes {
     | '/admin/promo'
     | '/admin/reservasi'
     | '/admin/testimoni'
+    | '/admin'
     | '/login'
   id:
     | '__root__'
@@ -251,7 +242,6 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
-    | '/admin/__layout'
     | '/admin/artikel'
     | '/admin/data-pasien'
     | '/admin/faq'
@@ -274,7 +264,6 @@ export interface RootRouteChildren {
   ProfilDokterRoute: typeof ProfilDokterRoute
   PromoRoute: typeof PromoRoute
   ReservasiRoute: typeof ReservasiRoute
-  Admin_layoutRoute: typeof Admin_layoutRoute
   AdminArtikelRoute: typeof AdminArtikelRoute
   AdminDataPasienRoute: typeof AdminDataPasienRoute
   AdminFaqRoute: typeof AdminFaqRoute
@@ -423,13 +412,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminArtikelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/__layout': {
-      id: '/admin/__layout'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof Admin_layoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -442,7 +424,6 @@ const rootRouteChildren: RootRouteChildren = {
   ProfilDokterRoute: ProfilDokterRoute,
   PromoRoute: PromoRoute,
   ReservasiRoute: ReservasiRoute,
-  Admin_layoutRoute: Admin_layoutRoute,
   AdminArtikelRoute: AdminArtikelRoute,
   AdminDataPasienRoute: AdminDataPasienRoute,
   AdminFaqRoute: AdminFaqRoute,
