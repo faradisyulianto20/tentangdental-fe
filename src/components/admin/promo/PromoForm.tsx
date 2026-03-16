@@ -12,24 +12,28 @@ export default function PromoForm() {
           <FieldSet>
             <FieldGroup>
               <Field>
-                <FieldLabel>Gambar Promo</FieldLabel>
                 <FileUpload label="Unggah Gambar Promo" />
               </Field>
-              <Field>
-                <FieldLabel>Judul Promo</FieldLabel>
-                <Input type='text' placeholder='Masukkan Judul Promo'/>
-              </Field>
-              <Field>
-                <FieldLabel>Harga Awal</FieldLabel>
-                <Input type="number" placeholder='Masukkan Harga Awal'/>
-              </Field>
+                <Field>
+                  <FieldLabel>Judul Promo</FieldLabel>
+                  <Input type="text" placeholder="Masukkan Judul Promo" />
+                </Field>
+              <FieldGroup className='grid grid-cols-2'>
+                <Field>
+                  <FieldLabel>Harga Awal</FieldLabel>
+                  <Input type="number" placeholder="Masukkan Harga Awal" />
+                </Field>
               <Field>
                 <FieldLabel>Harga Diskon</FieldLabel>
-                <Input type="number" placeholder='Masukkan Harga Diskon' />
+                <Input type="number" placeholder="Masukkan Harga Diskon" />
               </Field>
+              </FieldGroup>
               <Field>
                 <FieldLabel>Deskripsi Promo</FieldLabel>
-                <Textarea placeholder='Masukkan Deskripsi Promo' className='h-32 resize-none' />
+                <Textarea
+                  placeholder="Masukkan Deskripsi Promo"
+                  className="h-32 resize-none"
+                />
               </Field>
             </FieldGroup>
           </FieldSet>

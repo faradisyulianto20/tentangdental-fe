@@ -42,7 +42,7 @@ export function PromoCard({ promo, variants }: { promo: Promo; variants: any }) 
         dangerouslySetInnerHTML={{ __html: promo.description }}
         className="font-bold text-primary text-xs text-left"
       />
-      <Link to="/reservasi">
+      <Link to="/reservasi" className='mx-auto'>
         <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
           Pesan Sekarang
         </Button>
