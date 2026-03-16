@@ -42,7 +42,7 @@ export default function Berita() {
         animate={{ opacity: 1, y: 0 }}
         className="text-primary text-xl md:text-3xl font-bold"
       >
-        Artikel    Terkini
+        Artikel Terkini
       </motion.h1>
 
       <div className="relative mt-12">
@@ -66,24 +66,12 @@ export default function Berita() {
           viewport={{ once: true }}
         >
           {berita.map((item, index) => (
-            <motion.div
+            <ArtikelCard
               key={index}
-              className="flex flex-col shrink-0 w-64 snap-start cursor-pointer hover:shadow-md rounded-md border"
+              artikel={item}
+              index={index}
               onClick={() => navigateBerita(item.title)}
-              variants={itemVariants}
-            >
-              <div className="hover:shadow-md cursor-pointer">
-                <img
-                  src={item.imgPath}
-                  alt={item.title}
-                  className="rounded-t-xl w-64 h-44 object-cover"
-                />
-              </div>
-              <div className="flex flex-col text-left p-4">
-                <h2 className="text-lg font-semibold leading-5 line-clamp-2">{item.title}</h2>
-                <p className="text-gray-600 mt-2 line-clamp-3 text-sm">{item.subtitle}</p>
-              </div>
-            </motion.div>
+            />
           ))}
         </motion.div>
 
@@ -98,6 +86,40 @@ export default function Berita() {
         </button>
       </div>
     </div>
+  )
+}
+
+export function ArtikelCard({
+  artikel,
+  index,
+  onClick,
+}: {
+  artikel: (typeof berita)[0]
+  index: number
+  onClick: () => void
+}) {
+  return (
+    <motion.div
+      className="flex flex-col shrink-0 w-64 snap-start cursor-pointer hover:shadow-md rounded-md border"
+      onClick={onClick}
+      variants={itemVariants}
+    >
+      <div className="hover:shadow-md cursor-pointer">
+        <img
+          src={artikel.imgPath}
+          alt={artikel.title}
+          className="rounded-t-xl w-64 h-44 object-cover"
+        />
+      </div>
+      <div className="flex flex-col text-left p-4">
+        <h2 className="text-lg font-semibold leading-5 line-clamp-2">
+          {artikel.title}
+        </h2>
+        <p className="text-gray-600 mt-2 line-clamp-3 text-sm">
+          {artikel.subtitle}
+        </p>
+      </div>
+    </motion.div>
   )
 }
 
