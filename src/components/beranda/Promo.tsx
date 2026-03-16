@@ -13,6 +13,44 @@ const itemVariants = {
   transition: { duration: 0.5 },
 }
 
+type Promo = {
+  judul: string
+  imgUrl: string
+  hargaAwal: number
+  hargaDiskon: number
+  description: string
+}
+
+export function PromoCard({ promo, variants }: { promo: Promo; variants: any }) {
+  return (
+    <motion.div
+      variants={variants}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+      className="p-4 rounded-lg border border-primary w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
+    >
+      <div className="text-xl font-bold text-primary">{promo.judul}</div>
+      <img src={promo.imgUrl} className="w-52 h-24 object-cover rounded-md" />
+      <div className="flex flex-col mx-auto text-left">
+        <div className="text-primary text-xs line-through opacity-70">
+          Rp {promo.hargaAwal.toLocaleString('id-ID')}
+        </div>
+        <div className="text-2xl font-bold text-primary">
+          Rp {promo.hargaDiskon.toLocaleString('id-ID')}
+        </div>
+      </div>
+      <div
+        dangerouslySetInnerHTML={{ __html: promo.description }}
+        className="font-bold text-primary text-xs text-left"
+      />
+      <Link to="/reservasi">
+        <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
+          Pesan Sekarang
+        </Button>
+      </Link>
+    </motion.div>
+  )
+}
+
 export default function Promo() {
   return (
     <div className="text-center max-w-6xl mx-6">
@@ -39,116 +77,80 @@ export default function Promo() {
         viewport={{ once: true, amount: 0.2 }}
         className="flex flex-wrap justify-center gap-4 mt-6"
       >
-        {promo.map((promo, index) => (
-          <motion.div
-            variants={itemVariants}
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
-            className="p-4 rounded-lg border border-primary w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
-            key={index}
-          >
-            <div className="text-xl font-bold text-primary">{promo.judul}</div>
-            <img
-              src={promo.imgUrl}
-              className="w-52 h-24 object-cover rounded-md"
-            ></img>
-            <div className="flex flex-col mx-auto text-left">
-              <div className="text-primary text-xs line-through opacity-70">
-                Rp {promo.hargaAwal.toLocaleString('id-ID')}
-              </div>
-              <div className="text-2xl font-bold text-primary">
-                Rp {promo.hargaDiskon.toLocaleString('id-ID')}
-              </div>
-            </div>
-            <div dangerouslySetInnerHTML={{ __html: promo.description }} className='font-bold text-primary text-xs text-left' />
-            <Link to="/reservasi">
-              <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
-                Pesan Sekarang
-              </Button>
-            </Link>
-          </motion.div>
+        {promos.map((promo, index) => (
+          <PromoCard key={index} promo={promo} variants={itemVariants} />
         ))}
       </motion.div>
-      <Link to={'/promo'} className="mt-6 inline-block">
+      <Link to="/promo" className="mt-6 inline-block">
         <Button>Lihat Semua Promo</Button>
       </Link>
     </div>
   )
 }
-const promo = [
+
+const promos: Promo[] = [
   {
     judul: 'PSA (Paket)',
-    imgUrl: 'hero.png',
+    imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
     description: `
-  <div class="text-xs text-left">
-    <p class="mb-1">
-      Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.
-    </p>
-    <ul class="list-disc pl-4 space-y-1">
-      <li>Pembersihan Saluran Akar</li>
-      <li>Pengisian Saluran Akar</li>
-      <li>Tambalan Sementara</li>
-      <li>Konsultasi Dokter</li>
-    </ul>
-  </div>
-`,
-  },
-  {
-    judul: 'PSA (Paket)',
-    imgUrl: 'hero.png',
-    hargaAwal: 4200000,
-    hargaDiskon: 3000000,
-    description: `
-  <div class="text-xs text-left">
-    <p class="mb-1">
-      Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.
-    </p>
-    <ul class="list-disc pl-4 space-y-1">
-      <li>Pembersihan Saluran Akar</li>
-      <li>Pengisian Saluran Akar</li>
+      <div class="text-xs text-left">
+        <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
+        <ul class="list-disc pl-4 space-y-1">
+          <li>Pembersihan Saluran Akar</li>
+          <li>Pengisian Saluran Akar</li>
           <li>Tambalan Sementara</li>
           <li>Konsultasi Dokter</li>
         </ul>
-      </div>
-    `,
+      </div>`,
   },
   {
     judul: 'PSA (Paket)',
-    imgUrl: 'hero.png',
+    imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
     description: `
-  <div>
-    <p class="mb-1">
-      Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.
-    </p>
-    <ul class="list-disc pl-4 space-y-1">
-      <li>Pembersihan Saluran Akar</li>
-      <li>Pengisian Saluran Akar</li>
-      <li>Tambalan Sementara</li>
-      <li>Konsultasi Dokter</li>
-    </ul>
-  </div>
-`,
+      <div class="text-xs text-left">
+        <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
+        <ul class="list-disc pl-4 space-y-1">
+          <li>Pembersihan Saluran Akar</li>
+          <li>Pengisian Saluran Akar</li>
+          <li>Tambalan Sementara</li>
+          <li>Konsultasi Dokter</li>
+        </ul>
+      </div>`,
   },
   {
     judul: 'PSA (Paket)',
-    imgUrl: 'hero.png',
+    imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
     description: `
-  <div class="text-xs text-left text-muted-foreground">
-    <p class="mb-1">
-      Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.
-    </p>
-    <ul class="list-disc pl-4 space-y-1">
-      <li>Pembersihan Saluran Akar</li>
-      <li>Pengisian Saluran Akar</li>
-      <li>Tambalan Sementara</li>
-      <li>Konsultasi Dokter</li>
-    </ul>
-  </div>
-`,
+      <div class="text-xs text-left">
+        <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
+        <ul class="list-disc pl-4 space-y-1">
+          <li>Pembersihan Saluran Akar</li>
+          <li>Pengisian Saluran Akar</li>
+          <li>Tambalan Sementara</li>
+          <li>Konsultasi Dokter</li>
+        </ul>
+      </div>`,
+  },
+  {
+    judul: 'PSA (Paket)',
+    imgUrl: '/hero.png',
+    hargaAwal: 4200000,
+    hargaDiskon: 3000000,
+    description: `
+      <div class="text-xs text-left">
+        <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
+        <ul class="list-disc pl-4 space-y-1">
+          <li>Pembersihan Saluran Akar</li>
+          <li>Pengisian Saluran Akar</li>
+          <li>Tambalan Sementara</li>
+          <li>Konsultasi Dokter</li>
+        </ul>
+      </div>`,
   },
 ]
