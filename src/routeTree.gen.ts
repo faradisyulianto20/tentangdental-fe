@@ -17,6 +17,8 @@ import { Route as LayananRouteImport } from './routes/layanan'
 import { Route as ErrorPageRouteImport } from './routes/error-page'
 import { Route as ArtikelRouteImport } from './routes/artikel'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as Login_layoutRouteImport } from './routes/login/__layout'
 
 const ReservasiRoute = ReservasiRouteImport.update({
   id: '/reservasi',
@@ -58,6 +60,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Login_layoutRoute = Login_layoutRouteImport.update({
+  id: '/login/__layout',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +80,8 @@ export interface FileRoutesByFullPath {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
+  '/login': typeof Login_layoutRoute
+  '/login/': typeof LoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +92,7 @@ export interface FileRoutesByTo {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
+  '/login': typeof LoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +104,8 @@ export interface FileRoutesById {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
+  '/login/__layout': typeof Login_layoutRoute
+  '/login/': typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +118,8 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
+    | '/login'
+    | '/login/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +130,7 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
+    | '/login'
   id:
     | '__root__'
     | '/'
@@ -121,6 +141,8 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
+    | '/login/__layout'
+    | '/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +154,8 @@ export interface RootRouteChildren {
   ProfilDokterRoute: typeof ProfilDokterRoute
   PromoRoute: typeof PromoRoute
   ReservasiRoute: typeof ReservasiRoute
+  Login_layoutRoute: typeof Login_layoutRoute
+  LoginIndexRoute: typeof LoginIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +216,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login/__layout': {
+      id: '/login/__layout'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof Login_layoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +242,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProfilDokterRoute: ProfilDokterRoute,
   PromoRoute: PromoRoute,
   ReservasiRoute: ReservasiRoute,
+  Login_layoutRoute: Login_layoutRoute,
+  LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
