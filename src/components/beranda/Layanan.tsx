@@ -24,8 +24,8 @@ export function LayananCard({
   onClick,
 }: {
   layanan: LayananItem
-  variants: typeof itemVariants
-  onClick: () => void
+  variants?: typeof itemVariants
+  onClick?: () => void
 }) {
   return (
     <motion.button

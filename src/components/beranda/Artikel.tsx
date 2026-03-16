@@ -93,7 +93,7 @@ export function ArtikelCard({
   onClick,
 }: {
   artikel: (typeof berita)[0]
-  onClick: () => void
+  onClick?: () => void
 }) {
   return (
     <motion.div
