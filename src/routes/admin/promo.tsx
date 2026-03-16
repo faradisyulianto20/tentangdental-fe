@@ -10,7 +10,7 @@ export const Route = createFileRoute('/admin/promo')({
 function RouteComponent() {
   return <div>
     <PromoForm />
-    <div className='grid grid-cols-4 space-y-6'>
+    <div className='flex flex-wrap gap-6 justify-center'>
       {
         promos.map((promo, index) => (
           <PromoCard key={index} promo={promo} variants={null} />

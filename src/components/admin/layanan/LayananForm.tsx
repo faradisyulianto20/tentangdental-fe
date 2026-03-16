@@ -26,7 +26,7 @@ export default function LayananForm() {
                   className="h-32 resize-none"
                 />
               </Field>
-              <FieldGroup className="grid grid-cols-2">
+              <FieldGroup className="grid md:grid-cols-2">
                 <Field>
                   <FieldLabel>Gambar</FieldLabel>
                   <FileUpload label="Unggah Gambar" />

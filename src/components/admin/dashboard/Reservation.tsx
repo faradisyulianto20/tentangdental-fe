@@ -35,12 +35,12 @@ const reservations = [
 export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
   return (
     <div className="border rounded-lg p-4 mb-4 bg-[#E0F4FB]">
-      <div className="flex justify-between">
+      <div className="flex flex-col-reverse lg:flex-row justify-between">
         <div>
           <h2 className="text-lg font-bold">{res.namaPasien}</h2>
           <p className="text-sm text-muted-foreground">{res.layanan}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 mb-3">
           <Button
             variant={'default'}
             className=" text-white bg-[#A8C24A] mt-2 rounded-2xl text-sm"

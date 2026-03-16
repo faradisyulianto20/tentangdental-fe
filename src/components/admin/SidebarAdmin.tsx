@@ -1,4 +1,4 @@
-import { SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/admin/AppSidebar'
 import HeaderAdmin from './HeaderAdmin'
 import { LayoutDashboard, HelpCircle, Stethoscope, Newspaper, Tag, UserRound, Images, MessageSquareQuote, ClipboardList, Calendar } from 'lucide-react'
@@ -24,8 +24,8 @@ export default function SidebarAdmin({
   return (
     <SidebarProvider>
       <AppSidebar navigations={navigations} />
-      <main className='w-full'>
-        {/* <SidebarTrigger /> */}
+      <main className='w-full relative'>
+        <SidebarTrigger className='fixed sm:hidden bg-[#0A4864]/80 text-white text-4xl top-16 rounded-l-none p-3 z-10' size="lg"/>
         <HeaderAdmin navigations={navigations} />
         <div className="p-4 w-full">{children}</div>
       </main>

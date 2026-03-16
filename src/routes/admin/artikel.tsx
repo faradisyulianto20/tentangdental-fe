@@ -10,7 +10,7 @@ function RouteComponent() {
   return (
     <div>
       <ArtikelForm />
-      <div className="grid grid-cols-4 gap-4 mt-6">
+      <div className="flex flex-wrap justify-center gap-6 lg:justify-between mt-6">
         {artikelList.map((item, index) => (
           <ArtikelCard key={index} artikel={item} />
         ))}

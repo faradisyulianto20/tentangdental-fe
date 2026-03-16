@@ -145,8 +145,8 @@ export default function DataPasienTable() {
   }
 
   return (
-    <div className="space-y-4">
-      <InputGroup className='w-1/2'>
+    <div className="space-y-4 w-full">
+      <InputGroup className='w-full md:w-1/2'>
         <InputGroupInput
           placeholder="Cari berdasarkan nomor pasien, nama, layanan, atau nomor telp..."
           value={searchQuery}
@@ -163,57 +163,59 @@ export default function DataPasienTable() {
         </div>
       ) : (
         <>
-          <Table className='rounded-xl'>
-            <TableCaption>Daftar data pasien Tentang Dental ({filteredData.length} dari {dataPasien.length})</TableCaption>
-            <TableHeader className='border-primary bg-[#E0F4FB] rounded-xl'>
-              <TableRow>
-                <TableHead className="w-12.5">No</TableHead>
-                <TableHead>Nomor Pasien</TableHead>
-                <TableHead>Nama Pasien</TableHead>
-                <TableHead>Layanan</TableHead>
-                <TableHead>Tanggal Kunjungan</TableHead>
-                <TableHead>No Telp</TableHead>
-                <TableHead className="text-center">Formulir</TableHead>
-                <TableHead className="text-center">Rontgen</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedData.map((pasien) => (
-                <TableRow key={pasien.nomorPasien}>
-                  <TableCell className="font-medium">{pasien.no}</TableCell>
-                  <TableCell>{pasien.nomorPasien}</TableCell>
-                  <TableCell>{pasien.namaPasien}</TableCell>
-                  <TableCell>{pasien.layanan}</TableCell>
-                  <TableCell>{pasien.tanggal}</TableCell>
-                  <TableCell>{pasien.noTelp}</TableCell>
-                  <TableCell className="text-center">
-                    <Button variant="default" size="sm">
-                      Lihat
-                    </Button>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Button variant="default" size="sm">
-                      Lihat
-                    </Button>
-                  </TableCell>
+          <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
+            <Table className='rounded-xl'>
+              <TableCaption className="text-xs md:text-sm">Daftar data pasien Tentang Dental ({filteredData.length} dari {dataPasien.length})</TableCaption>
+              <TableHeader className='border-primary bg-[#E0F4FB] rounded-xl'>
+                <TableRow>
+                  <TableHead className="w-8 md:w-12 text-xs md:text-sm">No</TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Nomor Pasien</TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Nama Pasien</TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Layanan</TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Tanggal Kunjungan</TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">No Telp</TableHead>
+                  <TableHead className="text-center text-xs md:text-sm">Formulir</TableHead>
+                  <TableHead className="text-center text-xs md:text-sm">Rontgen</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {paginatedData.map((pasien) => (
+                  <TableRow key={pasien.nomorPasien}>
+                    <TableCell className="font-medium text-xs md:text-sm">{pasien.no}</TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.nomorPasien}</TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.namaPasien}</TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.layanan}</TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.tanggal}</TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.noTelp}</TableCell>
+                    <TableCell className="text-center">
+                      <Button variant="default" size="sm" className="text-xs md:text-sm">
+                        Lihat
+                      </Button>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button variant="default" size="sm" className="text-xs md:text-sm">
+                        Lihat
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Pagination Controls */}
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-600">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 p-4 border border-gray-200 rounded-lg bg-white">
+            <div className="text-xs md:text-sm text-gray-600">
               Halaman {currentPage} dari {totalPages || 1}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-2 sm:pb-0">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={16} />
               </Button>
 
               {/* Page Numbers */}
@@ -224,7 +226,7 @@ export default function DataPasienTable() {
                     variant={currentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => goToPage(page)}
-                    className="w-10 h-10 p-0"
+                    className="w-8 h-8 md:w-10 md:h-10 p-0 text-xs md:text-sm"
                   >
                     {page}
                   </Button>
@@ -237,7 +239,7 @@ export default function DataPasienTable() {
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
-                <ChevronRight size={18} />
+                <ChevronRight size={16} />
               </Button>
             </div>
           </div>

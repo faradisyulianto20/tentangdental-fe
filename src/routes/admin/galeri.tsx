@@ -16,7 +16,7 @@ function RouteComponent() {
         <FileUpload />
       </Field>
       <Button className="mt-4">Tambahkan Gambar</Button>
-      <div className="grid grid-cols-4 gap-4 mt-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {galeriList.map((item, index) => (
           <div className="group relative" key={index}>
             <img

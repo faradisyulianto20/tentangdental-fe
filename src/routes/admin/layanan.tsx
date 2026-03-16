@@ -9,7 +9,7 @@ export const Route = createFileRoute('/admin/layanan')({
 function RouteComponent() {
   return <div>
     <LayananForm />
-    <div className='grid grid-cols-4 gap-4 mt-6'>
+    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6'>
       {
         layananList.map((layanan, index) => (
           <LayananCard key={index} layanan={layanan} />

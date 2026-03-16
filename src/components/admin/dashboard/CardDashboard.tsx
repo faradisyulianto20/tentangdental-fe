@@ -20,7 +20,7 @@ const content = [
 
 export default function CardDashboard() {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {content.map((item, index) => (
         <div key={index} className="bg-[#E0F4FB] rounded-lg shadow p-4">
           <div className="flex items-center gap-4">
