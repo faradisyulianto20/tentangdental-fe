@@ -3,7 +3,6 @@ import { Field, FieldLabel } from '#/components/ui/field'
 import { FileUpload } from '#/components/ui/file-upload'
 import { Input } from '#/components/ui/input'
 import { Textarea } from '#/components/ui/textarea'
-import { FileUp } from 'lucide-react'
 import { Star } from 'lucide-react'
 import { useState } from 'react'
 
