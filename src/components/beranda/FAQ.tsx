@@ -44,41 +44,61 @@ export default function FAQ() {
         viewport={{ once: true, amount: 0.2 }}
       >
         {faq.map((item, index) => (
-          <motion.div
+          <FAQItem
             key={index}
-            variants={itemVariants}
-            className="p-4 rounded-lg border border-primary flex flex-col gap-2 text-primary cursor-pointer"
+            item={item}
+            index={index}
+            isOpen={openIndex === index}
             onClick={() => setOpenIndex(openIndex === index ? null : index)}
-          >
-            <div className="flex justify-between">
-              <p
-                className={`font-bold text-sm md:text-base ${openIndex === index ? 'line-clamp-none' : 'line-clamp-1'}`}
-              >
-                {item.pertanyaan}
-              </p>
-              <ChevronRight
-                className={`text-muted-foreground transition-transform duration-300 ${openIndex === index ? 'rotate-90' : ''}`}
-              />
-            </div>
-
-            <AnimatePresence initial={false}>
-              {openIndex === index && (
-                <motion.p
-                  key="jawaban"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="text-muted-foreground text-sm md:text-base overflow-hidden"
-                >
-                  {item.jawaban}
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          />
         ))}
       </motion.div>
     </div>
+  )
+}
+
+export function FAQItem({
+  item,
+  isOpen,
+  onClick,
+}: {
+  item: (typeof faq)[0]
+  index: number
+  isOpen: boolean
+  onClick: () => void
+}) {
+  return (
+    <motion.div
+      variants={itemVariants}
+      className="p-4 rounded-lg border border-primary flex flex-col gap-2 text-primary cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="flex justify-between">
+        <p
+          className={`font-bold text-sm md:text-base ${isOpen ? 'line-clamp-none' : 'line-clamp-1'}`}
+        >
+          {item.pertanyaan}
+        </p>
+        <ChevronRight
+          className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}
+        />
+      </div>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.p
+            key="jawaban"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="text-muted-foreground text-sm md:text-base overflow-hidden"
+          >
+            {item.jawaban}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 

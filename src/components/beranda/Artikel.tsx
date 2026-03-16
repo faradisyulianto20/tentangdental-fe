@@ -69,7 +69,6 @@ export default function Berita() {
             <ArtikelCard
               key={index}
               artikel={item}
-              index={index}
               onClick={() => navigateBerita(item.title)}
             />
           ))}
@@ -91,11 +90,9 @@ export default function Berita() {
 
 export function ArtikelCard({
   artikel,
-  index,
   onClick,
 }: {
   artikel: (typeof berita)[0]
-  index: number
   onClick: () => void
 }) {
   return (
