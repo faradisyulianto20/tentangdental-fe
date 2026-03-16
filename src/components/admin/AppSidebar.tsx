@@ -10,10 +10,8 @@ import {
 } from '@/components/ui/sidebar'
 import { LogOut } from 'lucide-react'
 import { useLocation } from '@tanstack/react-router'
-import { useState } from 'react'
 
 export function AppSidebar({navigations }: { navigations: { name: string; url: string; icon: React.ComponentType }[] }) {
-  const [currentPath, setCurrentPath] = useState('')
   const { pathname } = useLocation()
 
   return (
@@ -28,7 +26,6 @@ export function AppSidebar({navigations }: { navigations: { name: string; url: s
             {navigations.map((menu) => (
               <SidebarMenuItem
                 key={menu.name}
-                onClick={() => setCurrentPath(menu.name)}
               >
                 <SidebarMenuButton
                   asChild
