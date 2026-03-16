@@ -19,6 +19,16 @@ import { Route as ArtikelRouteImport } from './routes/artikel'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminTestimoniRouteImport } from './routes/admin/testimoni'
+import { Route as AdminReservasiRouteImport } from './routes/admin/reservasi'
+import { Route as AdminPromoRouteImport } from './routes/admin/promo'
+import { Route as AdminProfilDokterRouteImport } from './routes/admin/profil-dokter'
+import { Route as AdminLayananRouteImport } from './routes/admin/layanan'
+import { Route as AdminGaleriRouteImport } from './routes/admin/galeri'
+import { Route as AdminFaqRouteImport } from './routes/admin/faq'
+import { Route as AdminDataPasienRouteImport } from './routes/admin/data-pasien'
+import { Route as AdminArtikelRouteImport } from './routes/admin/artikel'
+import { Route as Admin_layoutRouteImport } from './routes/admin/__layout'
 
 const ReservasiRoute = ReservasiRouteImport.update({
   id: '/reservasi',
@@ -70,6 +80,56 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTestimoniRoute = AdminTestimoniRouteImport.update({
+  id: '/admin/testimoni',
+  path: '/admin/testimoni',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReservasiRoute = AdminReservasiRouteImport.update({
+  id: '/admin/reservasi',
+  path: '/admin/reservasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPromoRoute = AdminPromoRouteImport.update({
+  id: '/admin/promo',
+  path: '/admin/promo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminProfilDokterRoute = AdminProfilDokterRouteImport.update({
+  id: '/admin/profil-dokter',
+  path: '/admin/profil-dokter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLayananRoute = AdminLayananRouteImport.update({
+  id: '/admin/layanan',
+  path: '/admin/layanan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminGaleriRoute = AdminGaleriRouteImport.update({
+  id: '/admin/galeri',
+  path: '/admin/galeri',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFaqRoute = AdminFaqRouteImport.update({
+  id: '/admin/faq',
+  path: '/admin/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDataPasienRoute = AdminDataPasienRouteImport.update({
+  id: '/admin/data-pasien',
+  path: '/admin/data-pasien',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminArtikelRoute = AdminArtikelRouteImport.update({
+  id: '/admin/artikel',
+  path: '/admin/artikel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Admin_layoutRoute = Admin_layoutRouteImport.update({
+  id: '/admin/__layout',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,6 +140,16 @@ export interface FileRoutesByFullPath {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
+  '/admin': typeof Admin_layoutRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/data-pasien': typeof AdminDataPasienRoute
+  '/admin/faq': typeof AdminFaqRoute
+  '/admin/galeri': typeof AdminGaleriRoute
+  '/admin/layanan': typeof AdminLayananRoute
+  '/admin/profil-dokter': typeof AdminProfilDokterRoute
+  '/admin/promo': typeof AdminPromoRoute
+  '/admin/reservasi': typeof AdminReservasiRoute
+  '/admin/testimoni': typeof AdminTestimoniRoute
   '/admin/': typeof AdminIndexRoute
   '/login/': typeof LoginIndexRoute
 }
@@ -93,6 +163,15 @@ export interface FileRoutesByTo {
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/data-pasien': typeof AdminDataPasienRoute
+  '/admin/faq': typeof AdminFaqRoute
+  '/admin/galeri': typeof AdminGaleriRoute
+  '/admin/layanan': typeof AdminLayananRoute
+  '/admin/profil-dokter': typeof AdminProfilDokterRoute
+  '/admin/promo': typeof AdminPromoRoute
+  '/admin/reservasi': typeof AdminReservasiRoute
+  '/admin/testimoni': typeof AdminTestimoniRoute
   '/login': typeof LoginIndexRoute
 }
 export interface FileRoutesById {
@@ -105,6 +184,16 @@ export interface FileRoutesById {
   '/profil-dokter': typeof ProfilDokterRoute
   '/promo': typeof PromoRoute
   '/reservasi': typeof ReservasiRoute
+  '/admin/__layout': typeof Admin_layoutRoute
+  '/admin/artikel': typeof AdminArtikelRoute
+  '/admin/data-pasien': typeof AdminDataPasienRoute
+  '/admin/faq': typeof AdminFaqRoute
+  '/admin/galeri': typeof AdminGaleriRoute
+  '/admin/layanan': typeof AdminLayananRoute
+  '/admin/profil-dokter': typeof AdminProfilDokterRoute
+  '/admin/promo': typeof AdminPromoRoute
+  '/admin/reservasi': typeof AdminReservasiRoute
+  '/admin/testimoni': typeof AdminTestimoniRoute
   '/admin/': typeof AdminIndexRoute
   '/login/': typeof LoginIndexRoute
 }
@@ -119,6 +208,16 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
+    | '/admin'
+    | '/admin/artikel'
+    | '/admin/data-pasien'
+    | '/admin/faq'
+    | '/admin/galeri'
+    | '/admin/layanan'
+    | '/admin/profil-dokter'
+    | '/admin/promo'
+    | '/admin/reservasi'
+    | '/admin/testimoni'
     | '/admin/'
     | '/login/'
   fileRoutesByTo: FileRoutesByTo
@@ -132,6 +231,15 @@ export interface FileRouteTypes {
     | '/promo'
     | '/reservasi'
     | '/admin'
+    | '/admin/artikel'
+    | '/admin/data-pasien'
+    | '/admin/faq'
+    | '/admin/galeri'
+    | '/admin/layanan'
+    | '/admin/profil-dokter'
+    | '/admin/promo'
+    | '/admin/reservasi'
+    | '/admin/testimoni'
     | '/login'
   id:
     | '__root__'
@@ -143,6 +251,16 @@ export interface FileRouteTypes {
     | '/profil-dokter'
     | '/promo'
     | '/reservasi'
+    | '/admin/__layout'
+    | '/admin/artikel'
+    | '/admin/data-pasien'
+    | '/admin/faq'
+    | '/admin/galeri'
+    | '/admin/layanan'
+    | '/admin/profil-dokter'
+    | '/admin/promo'
+    | '/admin/reservasi'
+    | '/admin/testimoni'
     | '/admin/'
     | '/login/'
   fileRoutesById: FileRoutesById
@@ -156,6 +274,16 @@ export interface RootRouteChildren {
   ProfilDokterRoute: typeof ProfilDokterRoute
   PromoRoute: typeof PromoRoute
   ReservasiRoute: typeof ReservasiRoute
+  Admin_layoutRoute: typeof Admin_layoutRoute
+  AdminArtikelRoute: typeof AdminArtikelRoute
+  AdminDataPasienRoute: typeof AdminDataPasienRoute
+  AdminFaqRoute: typeof AdminFaqRoute
+  AdminGaleriRoute: typeof AdminGaleriRoute
+  AdminLayananRoute: typeof AdminLayananRoute
+  AdminProfilDokterRoute: typeof AdminProfilDokterRoute
+  AdminPromoRoute: typeof AdminPromoRoute
+  AdminReservasiRoute: typeof AdminReservasiRoute
+  AdminTestimoniRoute: typeof AdminTestimoniRoute
   AdminIndexRoute: typeof AdminIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
@@ -232,6 +360,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/testimoni': {
+      id: '/admin/testimoni'
+      path: '/admin/testimoni'
+      fullPath: '/admin/testimoni'
+      preLoaderRoute: typeof AdminTestimoniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reservasi': {
+      id: '/admin/reservasi'
+      path: '/admin/reservasi'
+      fullPath: '/admin/reservasi'
+      preLoaderRoute: typeof AdminReservasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/promo': {
+      id: '/admin/promo'
+      path: '/admin/promo'
+      fullPath: '/admin/promo'
+      preLoaderRoute: typeof AdminPromoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/profil-dokter': {
+      id: '/admin/profil-dokter'
+      path: '/admin/profil-dokter'
+      fullPath: '/admin/profil-dokter'
+      preLoaderRoute: typeof AdminProfilDokterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/layanan': {
+      id: '/admin/layanan'
+      path: '/admin/layanan'
+      fullPath: '/admin/layanan'
+      preLoaderRoute: typeof AdminLayananRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/galeri': {
+      id: '/admin/galeri'
+      path: '/admin/galeri'
+      fullPath: '/admin/galeri'
+      preLoaderRoute: typeof AdminGaleriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/faq': {
+      id: '/admin/faq'
+      path: '/admin/faq'
+      fullPath: '/admin/faq'
+      preLoaderRoute: typeof AdminFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/data-pasien': {
+      id: '/admin/data-pasien'
+      path: '/admin/data-pasien'
+      fullPath: '/admin/data-pasien'
+      preLoaderRoute: typeof AdminDataPasienRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/artikel': {
+      id: '/admin/artikel'
+      path: '/admin/artikel'
+      fullPath: '/admin/artikel'
+      preLoaderRoute: typeof AdminArtikelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/__layout': {
+      id: '/admin/__layout'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof Admin_layoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -244,6 +442,16 @@ const rootRouteChildren: RootRouteChildren = {
   ProfilDokterRoute: ProfilDokterRoute,
   PromoRoute: PromoRoute,
   ReservasiRoute: ReservasiRoute,
+  Admin_layoutRoute: Admin_layoutRoute,
+  AdminArtikelRoute: AdminArtikelRoute,
+  AdminDataPasienRoute: AdminDataPasienRoute,
+  AdminFaqRoute: AdminFaqRoute,
+  AdminGaleriRoute: AdminGaleriRoute,
+  AdminLayananRoute: AdminLayananRoute,
+  AdminProfilDokterRoute: AdminProfilDokterRoute,
+  AdminPromoRoute: AdminPromoRoute,
+  AdminReservasiRoute: AdminReservasiRoute,
+  AdminTestimoniRoute: AdminTestimoniRoute,
   AdminIndexRoute: AdminIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
 }

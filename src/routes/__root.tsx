@@ -17,6 +17,7 @@ import ErrorPage from '../components/error/ErrorPage'
 import Pending from '../components/error/Pending'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
+import SidebarAdmin from '../components/admin/SidebarAdmin'
 
 import appCss from '../styles.css?url'
 
@@ -54,7 +55,7 @@ export const Route = createRootRoute({
   notFoundComponent: () => <NotFound />,
 })
 
-// 
+//
 // interface RootErrorProps {
 //   error: Error
 //   info: {
@@ -84,12 +85,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
         </head>
-        <body className="font-sans antialiased">
+        <body className="antialiased" suppressHydrationWarning  >
           {showHeaderFooter && <Header />}
-
-          <div className={showHeaderFooter ? 'pt-16' : ''}>
-            {children}
-          </div>
+          {isAdminRoute ? (
+            <SidebarAdmin children={children} />
+          ) : (
+            <div className={showHeaderFooter ? 'pt-16' : ''}>{children}</div>
+          )}
           {showHeaderFooter && <Footer />}
           <TanStackDevtools
             config={{
