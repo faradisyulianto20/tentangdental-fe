@@ -3,7 +3,12 @@ import { useState } from 'react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createQueryClient } from '../lib/queryClient'
 
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Scripts,
+  createRootRoute,
+  useLocation,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
@@ -33,6 +38,11 @@ export const Route = createRootRoute({
     ],
     links: [
       {
+        rel: 'icon',
+        href: '/logo.svg',
+        type: 'image/svg+xml',
+      },
+      {
         rel: 'stylesheet',
         href: appCss,
       },
@@ -44,20 +54,28 @@ export const Route = createRootRoute({
   notFoundComponent: () => <NotFound />,
 })
 
-interface RootErrorProps {
-  error: Error
-  info: {
-    componentStack: string
-  }
-  reset: () => void
-}
+// 
+// interface RootErrorProps {
+//   error: Error
+//   info: {
+//     componentStack: string
+//   }
+//   reset: () => void
+// }
 
-function RootErrorComponent({ error, reset }: RootErrorProps) {
-  return <ErrorPage error={error} resetError={reset} />
-}
+// Error component untuk menangani error di root route, seperti error saat fetch data user
+// function RootErrorComponent({ error, reset }: RootErrorProps) {
+//   return <ErrorPage error={error} resetError={reset} />
+// }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => createQueryClient())
+  const location = useLocation()
+
+  // Hide header/footer untuk auth routes
+  const isAuthRoute = location.pathname.startsWith('/login')
+  const isAdminRoute = location.pathname.startsWith('/admin')
+  const showHeaderFooter = !isAuthRoute && !isAdminRoute
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -67,9 +85,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <HeadContent />
         </head>
         <body className="font-sans antialiased">
-          <Header />
-          <div className="pt-16">{children}</div>
-          <Footer />
+          {showHeaderFooter && <Header />}
+
+          <div className={showHeaderFooter ? 'pt-16' : ''}>
+            {children}
+          </div>
+          {showHeaderFooter && <Footer />}
           <TanStackDevtools
             config={{
               position: 'bottom-right',

@@ -12,6 +12,7 @@ export default function ErrorPage({ error, resetError }: ErrorPageProps) {
             resetError();
         } else {
             window.location.reload();
+            console.error('Error:', error);
         }
     };
 

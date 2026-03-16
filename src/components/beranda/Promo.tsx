@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '../ui/button'
-import { Triangle } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const containerVariants = {
