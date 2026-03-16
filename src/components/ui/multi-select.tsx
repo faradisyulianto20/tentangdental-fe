@@ -52,7 +52,7 @@ export function MultiSelect({
     <div ref={containerRef} className="relative">
       {/* Trigger box */}
       <div
-        className="border-primary min-h-9 w-full flex flex-wrap gap-1 items-center px-3 py-1.5 border border-input rounded-md bg-background cursor-pointer text-sm hover:bg-accent/50 transition-colors"
+        className="border-primary min-h-9 w-full flex flex-wrap gap-1 items-center px-3 py-1.5 border rounded-md bg-background cursor-pointer text-sm hover:bg-accent/50 transition-colors"
         onClick={() => setOpen((o) => !o)}
       >
         {value.length === 0 && (
