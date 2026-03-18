@@ -2,7 +2,7 @@ import { Instagram, Mail, MapPin, MessageCircle } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
 export default function Footer() {
-  const year = new Date().getFullYear()
+  // const year = new Date().getFullYear()
 
   return (
     <footer className="bg-(--footer-bg) text-center text-sm text-(--text-muted) border mt-6">
@@ -21,24 +21,23 @@ export default function Footer() {
             Sab, Min, Sen, Kam:{' '}
             <span className="text-primary">08:00 - 21:00</span> (dg reservasi){' '}
             <br></br>
-            Rab & Jum: <span className="text-primary">14:00 - 21:00 </span>(dg reservasi) <br></br>
+            Rab & Jum: <span className="text-primary">14:00 - 21:00 </span>(dg
+            reservasi) <br></br>
             Sel : <span className="text-primary">Libur</span>
           </div>
           <div className="flex gap-1">
             {socialMedia.map((item, index) => {
               const Icon = item.icon
               return (
-                <>
-                  <a
-                    href={item.url}
-                    key={index}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-black border border-black rounded-full p-1.5 hover:text-primary hover:border-primary"
-                  >
-                    <Icon className="w-4 h-4" />
-                  </a>
-                </>
+                <a
+                  href={item.url}
+                  key={index}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-black border border-black rounded-full p-1.5 hover:text-primary hover:border-primary"
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
               )
             })}
           </div>
@@ -58,7 +57,7 @@ export default function Footer() {
             ))}
           </ul>
         </div>
-        <div className='flex flex-col justify-center items-center'>
+        <div className="flex flex-col justify-center items-center">
           <p className="font-bold text-xl mb-2">Alamat</p>
           <div className="w-37.5 md:w-75 h-37.5 rounded-xl overflow-hidden">
             <iframe
@@ -73,7 +72,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <p className="m-0">&copy; {year} Tentang Dental. All rights reserved.</p>
+      <p className="m-0">&copy; 2026 Tentang Dental. All rights reserved.</p>
     </footer>
   )
 }

@@ -66,7 +66,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
         </head>
-        <body className="font-sans antialiased">
+        <body className="font-sans antialiased" suppressHydrationWarning>
           <Header />
           <div className="pt-16">{children}</div>
           <Footer />
