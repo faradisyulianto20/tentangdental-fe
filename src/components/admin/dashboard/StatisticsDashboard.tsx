@@ -286,10 +286,10 @@ export default function StatisticsDashboard() {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-auto min-h-[280px] md:min-h-[400px] overflow-x-auto">
+      <div className="w-full h-auto min-h-70 md:min-h-100 overflow-x-auto">
         <ChartContainer
           config={chartConfig}
-          className="min-h-[280px] md:min-h-[400px] w-full"
+          className="min-h-70 md:min-h-100 w-full"
         >
           <BarChart
             data={currentMonthData.data}
