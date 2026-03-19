@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-  Field,
   FieldContent,
   FieldDescription,
   FieldGroup,
@@ -22,6 +21,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useForm } from '@tanstack/react-form'
+import { z } from 'zod'
+
 const dokter = ['Dr. Andi', 'Dr. Budi', 'Dr. Citra']
 
 const layanan = [
@@ -49,11 +50,31 @@ const badgeColors = [
   'bg-teal-100 text-teal-700 border-teal-200',
 ]
 
+// Zod Validation
+const formSchema = z.object({
+  namaLengkap: z.string().min(1, 'Nama lengkap harus diisi'),
+  nomorHandphone: z.string().min(1, 'Nomor handphone harus diisi'),
+  tanggalLahir: z
+    .date({ required_error: 'Tanggal lahir harus diisi' })
+    .nullable()
+    .refine((val) => val !== null, { message: 'Tanggal lahir harus diisi' }),
+  umur: z.string().min(1, 'Umur harus diisi'),
+  jadwalPeriksa: z
+    .date({ required_error: 'Jadwal periksa harus diisi' })
+    .nullable()
+    .refine((val) => val !== null, { message: 'Jadwal periksa harus diisi' }),
+  jamReservasi: z.string().min(1, 'Jam reservasi harus diisi'),
+  pilihanDokter: z.string().min(1, 'Pilihan dokter harus diisi'),
+  layanan: z.array(z.string()).min(1, 'Layanan harus dipilih'),
+  nomorPasien: z.string().optional(),
+  keluhan: z.string().min(1, 'Keluhan harus diisi'),
+})
+
 export default function FormReservasi() {
   const [checked, setChecked] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
-  const form = useForm({
+  const { Field, handleSubmit, reset, setFieldValue } = useForm({
     defaultValues: {
       namaLengkap: '' as string,
       nomorHandphone: '' as string,
@@ -66,8 +87,38 @@ export default function FormReservasi() {
       nomorPasien: '' as string,
       keluhan: '' as string,
     },
+    // Validasi menggunakan Zod, jika submit dan ada error, akan mengembalikan object dengan field yang error beserta pesan errornya
+    validators: {
+      onSubmit: ({ value }) => {
+        const result = formSchema.safeParse(value)
+        if (!result.success) {
+          return {
+            fields: Object.fromEntries(
+              Object.entries(result.error.flatten().fieldErrors).map(
+                ([key, val]) => [key, val?.[0]], // ambil error pertama per field
+              ),
+            ),
+          }
+        }
+        return undefined
+      },
+      // Validasi real-time saat field berubah, bisa diaktifkan jika ingin langsung validasi saat user input, tapi bisa jadi mengganggu UX kalau terlalu sensitif
+      onBlur: ({ value }) => {
+        const result = formSchema.safeParse(value)
+        if (!result.success) {
+          return {
+            fields: Object.fromEntries(
+              Object.entries(result.error.flatten().fieldErrors).map(
+                ([key, val]) => [key, val?.[0]], // ambil error pertama per field
+              ),
+            ),
+          }
+        }
+        return undefined
+      },
+    },
     onSubmit: async ({ value }) => {
-      form.reset() // Reset form setelah submit
+      reset()
       console.log('Submitting reservasi:', value)
     },
   })
@@ -79,173 +130,205 @@ export default function FormReservasi() {
           // Pastikan onSubmit dari react-hook-form terpanggil dengan benar
           e.preventDefault()
           // Otomatis punya handleSubmit()
-          form.handleSubmit()
+          handleSubmit()
         }}
       >
         <FieldGroup>
           <FieldSet>
             <FieldGroup className="grid grid-cols-1">
-              <form.Field name="namaLengkap">
+              <Field name="namaLengkap">
                 {(field) => (
-                  <Field data-invalid={field.state.meta.errors.length > 0}>
-                    <FieldLabel htmlFor="namaLengkap">Nama Lengkap</FieldLabel>
-                    <Input
-                      id="namaLengkap"
-                      placeholder="Nama Lengkap"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </Field>
+                  <TextField
+                    id="namaLengkap"
+                    label="Nama Lengkap"
+                    placeholder="Masukkan nama lengkap Anda"
+                    field={field}
+                  />
                 )}
-              </form.Field>
+              </Field>
             </FieldGroup>
 
             <FieldGroup className="grid sm:grid-cols-2">
               {/* ===== Tanggal Lahir ===== */}
-              <form.Field name="tanggalLahir">
-                {(field) => (
-                  <Field>
-                    <FieldLabel>Tanggal Lahir</FieldLabel>
-                    <DatePicker
-                      value={field.state.value}
-                      onChange={(date: Date) => {
-                        field.handleChange(date)
-                        const today = new Date()
-                        let age = today.getFullYear() - date.getFullYear()
-                        const m = today.getMonth() - date.getMonth()
-                        if (
-                          m < 0 ||
-                          (m === 0 && today.getDate() < date.getDate())
-                        )
-                          age--
-                        form.setFieldValue('umur', age >= 0 ? String(age) : '')
-                      }}
-                      placeholder="Pilih tanggal lahir"
-                    />
-                  </Field>
-                )}
-              </form.Field>
+              <Field name="tanggalLahir">
+                {(field) => {
+                  const { errors, isTouched } = field.state.meta
+
+                  return (
+                    <div className="space-y-4">
+                      <FieldLabel>Tanggal Lahir</FieldLabel>
+                      <DatePicker
+                        value={field.state.value}
+                        onChange={(date: Date) => {
+                          field.handleChange(date)
+                          const today = new Date()
+                          let age = today.getFullYear() - date.getFullYear()
+                          const m = today.getMonth() - date.getMonth()
+                          if (
+                            m < 0 ||
+                            (m === 0 && today.getDate() < date.getDate())
+                          )
+                            age--
+                          setFieldValue('umur', age >= 0 ? String(age) : '')
+                        }}
+                        onBlur={field.handleBlur}
+                        placeholder="Pilih tanggal lahir"
+                      />
+                      {errors.length > 0 && isTouched && (
+                        <FieldDescription className="text-destructive">
+                          {String(errors[0])}
+                        </FieldDescription>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
 
               {/* ===== Umur ===== */}
-              <form.Field name="umur">
+              <Field name="umur">
                 {(field) => (
-                  <Field>
-                    <FieldLabel>Umur</FieldLabel>
-                    <Input
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="Masukkan umur Anda"
-                    />
-                  </Field>
+                  <TextField
+                    id="umur"
+                    label="Umur"
+                    placeholder="Masukkan umur Anda"
+                    field={field}
+                  />
                 )}
-              </form.Field>
+              </Field>
 
               {/* ===== Nomor Handphone ===== */}
-              <form.Field name="nomorHandphone">
+              <Field name="nomorHandphone">
                 {(field) => (
-                  <Field>
-                    <FieldLabel>Nomor Handphone</FieldLabel>
-                    <Input
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder="Masukkan nomor handphone Anda"
-                    />
-                  </Field>
+                  <TextField
+                    id="nomorHandphone"
+                    label="Nomor Handphone"
+                    placeholder="Masukkan nomor handphone Anda"
+                    field={field}
+                  />
                 )}
-              </form.Field>
+              </Field>
 
               {/* ===== Jadwal Periksa ===== */}
-              <form.Field name="jadwalPeriksa">
-                {(field) => (
-                  <Field>
-                    <FieldLabel>Jadwal Periksa</FieldLabel>
-                    <DatePicker
-                      value={field.state.value}
-                      onChange={(date: Date) => field.handleChange(date)}
-                      placeholder="Pilih jadwal periksa"
-                    />
-                  </Field>
-                )}
-              </form.Field>
+              <Field name="jadwalPeriksa">
+                {(field) => {
+                  const { errors, isTouched } = field.state.meta
+
+                  return (
+                    <div className="space-y-4">
+                      <FieldLabel>Jadwal Periksa</FieldLabel>
+                      <DatePicker
+                        value={field.state.value}
+                        onChange={(date: Date) => field.handleChange(date)}
+                        onBlur={field.handleBlur}
+                        placeholder="Pilih jadwal periksa"
+                      />
+                      {errors.length > 0 && isTouched && (
+                        <FieldDescription className="text-destructive">
+                          {String(errors[0])}
+                        </FieldDescription>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
 
               {/* ===== Jam Reservasi ===== */}
-              <form.Field name="jamReservasi">
+              <Field name="jamReservasi">
                 {(field) => (
-                  <Field>
-                    <FieldLabel>Jam Reservasi</FieldLabel>
-                    <Input
-                      placeholder="Masukkan jam reservasi Anda"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </Field>
+                  <TextField
+                    id="jamReservasi"
+                    label="Jam Reservasi"
+                    placeholder="Masukkan jam reservasi (misal: 14:30)"
+                    field={field}
+                  />
                 )}
-              </form.Field>
+              </Field>
 
               {/* ===== Pilihan Dokter ===== */}
-              <form.Field name="pilihanDokter">
-                {(field) => (
-                  <Field>
-                    <FieldLabel>Pilihan Dokter</FieldLabel>
-                    <DropdownMenu
-                      open={dropdownOpen}
-                      onOpenChange={setDropdownOpen}
-                    >
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-between"
-                        >
-                          <span
-                            className={
-                              field.state.value ? '' : 'text-muted-foreground'
-                            }
+              <Field name="pilihanDokter">
+                {(field) => {
+                  const { errors, isTouched } = field.state.meta
+
+                  return (
+                    <div className="space-y-4">
+                      <FieldLabel>Pilihan Dokter</FieldLabel>
+                      <DropdownMenu
+                        open={dropdownOpen}
+                        onOpenChange={setDropdownOpen}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between"
+                            onBlur={field.handleBlur}
                           >
-                            {field.state.value || 'Pilih dokter'}{' '}
-                          </span>
-                          {dropdownOpen ? (
-                            <ChevronUp className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                        {dokter.map((d) => (
-                          <DropdownMenuItem
-                            key={d}
-                            onSelect={() => field.handleChange(d)}
-                          >
-                            {d}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </Field>
-                )}
-              </form.Field>
+                            <span
+                              className={
+                                field.state.value ? '' : 'text-muted-foreground'
+                              }
+                            >
+                              {field.state.value || 'Pilih dokter'}{' '}
+                            </span>
+                            {dropdownOpen ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                          {dokter.map((d) => (
+                            <DropdownMenuItem
+                              key={d}
+                              onSelect={() => field.handleChange(d)}
+                            >
+                              {d}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      {errors.length > 0 && isTouched && (
+                        <FieldDescription className="text-destructive">
+                          {String(errors[0])}
+                        </FieldDescription>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
 
               {/* ===== Layanan ===== */}
-              <form.Field name="layanan">
-                {(field) => (
-                  <Field>
-                    <FieldLabel>Layanan</FieldLabel>
-                    <LayananMultiSelect
-                      value={field.state.value}
-                      onChange={(val) => field.handleChange(val)}
-                    />
-                  </Field>
-                )}
-              </form.Field>
+              <Field name="layanan">
+                {(field) => {
+                  const { errors, isTouched } = field.state.meta
+
+                  return (
+                    <div className="space-y-4">
+                      <FieldLabel>Layanan</FieldLabel>
+                      <LayananMultiSelect
+                        value={field.state.value}
+                        onChange={(val) => field.handleChange(val)}
+                        onBlur={field.handleBlur}
+                      />
+                      {errors.length > 0 && isTouched && (
+                        <FieldDescription className="text-destructive">
+                          {String(errors[0])}
+                        </FieldDescription>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
             </FieldGroup>
 
             <FieldSeparator />
 
             <FieldGroup>
-              <Field orientation="horizontal" className="max-w-2xl">
+              <div className="flex items-center gap-2 max-w-2xl">
                 <div>
                   <Checkbox
                     id="pasien-lama"
+                    className="cursor-pointer"
                     checked={checked}
                     onCheckedChange={(state: CheckedState) => {
                       if (typeof state === 'boolean') setChecked(state)
@@ -257,48 +340,52 @@ export default function FormReservasi() {
                     Saya merupakan pasien lama dan ingin menggunakan nomor
                     pasien saya untuk reservasi ini.
                   </FieldLabel>
-                  <FieldDescription>
-                    Jika Anda merupakan pasien lama, silakan centang kotak ini
-                    dan masukkan nomor pasien Anda pada kolom yang tersedia.
-                  </FieldDescription>
                 </FieldContent>
-              </Field>
+              </div>
               {checked && (
-                <form.Field name="nomorPasien">
+                <Field name="nomorPasien">
                   {(field) => (
-                    <>
-                      <FieldLabel>Nomor Pasien</FieldLabel>
-                      <Input
-                        placeholder="Masukkan nomor pasien Anda"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </>
+                    <TextField
+                      id="nomorPasien"
+                      label="Nomor Pasien"
+                      placeholder="Masukkan nomor pasien Anda"
+                      field={field}
+                    />
                   )}
-                </form.Field>
+                </Field>
               )}
             </FieldGroup>
 
             <FieldGroup>
-              <form.Field name="keluhan">
-                {(field) => (
-                  <>
-                    <FieldLabel>Keluhan</FieldLabel>
-                    <Textarea
-                      placeholder="Masukkan keluhan Anda"
-                      className="resize-none"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </>
-                )}
-              </form.Field>
+              <Field name="keluhan">
+                {(field) => {
+                  const { errors, isTouched } = field.state.meta
+
+                  return (
+                    <div className="space-y-4">
+                      <FieldLabel>Keluhan</FieldLabel>
+                      <Textarea
+                        placeholder="Masukkan keluhan Anda"
+                        className="resize-none"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                      />
+                      {errors.length > 0 && isTouched && (
+                        <FieldDescription className="text-destructive">
+                          {String(errors[0])}
+                        </FieldDescription>
+                      )}
+                    </div>
+                  )
+                }}
+              </Field>
             </FieldGroup>
           </FieldSet>
 
-          <Field orientation="horizontal">
+          <div>
             <Button type="submit">Submit</Button>
-          </Field>
+          </div>
         </FieldGroup>
       </form>
     </div>
@@ -308,9 +395,11 @@ export default function FormReservasi() {
 function LayananMultiSelect({
   value,
   onChange,
+  onBlur,
 }: {
   value: string[]
   onChange: (val: string[]) => void
+  onBlur: () => void
 }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -328,11 +417,14 @@ function LayananMultiSelect({
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setOpen(false)
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setOpen(false)
+        onBlur()
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  }, [onBlur])
 
   return (
     <div ref={containerRef} className="relative">
@@ -377,6 +469,38 @@ function LayananMultiSelect({
             </div>
           ))}
         </div>
+      )}
+    </div>
+  )
+}
+
+type TextFieldProps = {
+  id?: string
+  label: string
+  placeholder: string
+  field: {
+    state: { value: string; meta: { errors: unknown[]; isTouched: boolean } }
+    handleChange: (val: string) => void
+    handleBlur: () => void
+  }
+}
+
+function TextField({ id, label, placeholder, field }: TextFieldProps) {
+  const { errors, isTouched } = field.state.meta
+  return (
+    <div className="space-y-4">
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <Input
+        id={id}
+        placeholder={placeholder}
+        value={field.state.value}
+        onChange={(e) => field.handleChange(e.target.value)}
+        onBlur={field.handleBlur}
+      />
+      {errors.length > 0 && isTouched && (
+        <FieldDescription className="text-destructive">
+          {String(errors[0])}
+        </FieldDescription>
       )}
     </div>
   )
