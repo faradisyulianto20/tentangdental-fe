@@ -8,7 +8,6 @@ import {
   FieldLabel,
   FieldSeparator,
   FieldSet,
-  FieldError,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,10 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { reservasiSchema, type ReservasiForm } from '@/types/reservasi'
-
+import { useForm } from '@tanstack/react-form'
 const dokter = ['Dr. Andi', 'Dr. Budi', 'Dr. Citra']
 
 const layanan = [
@@ -57,61 +53,63 @@ export default function FormReservasi() {
   const [checked, setChecked] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
-  const form = useForm<ReservasiForm>({
-    resolver: zodResolver(reservasiSchema),
+  const form = useForm({
     defaultValues: {
-      namaLengkap: '',
-      nomorHandphone: '',
-      tanggalLahir: undefined,
-      umur: '',
-      jadwalPeriksa: undefined,
-      jamReservasi: '',
-      pilihanDokter: '',
-      layanan: [],
-      nomorPasien: '',
-      keluhan: '',
+      namaLengkap: '' as string,
+      nomorHandphone: '' as string,
+      tanggalLahir: null as Date | null,
+      umur: '' as string,
+      jadwalPeriksa: null as Date | null,
+      jamReservasi: '' as string,
+      pilihanDokter: '' as string,
+      layanan: [] as string[],
+      nomorPasien: '' as string,
+      keluhan: '' as string,
+    },
+    onSubmit: async ({ value }) => {
+      form.reset() // Reset form setelah submit
+      console.log('Submitting reservasi:', value)
     },
   })
 
-  async function onSubmit(data: ReservasiForm) {
-    console.log('Submitting reservasi:', data)
-  }
-
   return (
     <div className="w-full mt-6">
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={(e) => {
+          // Pastikan onSubmit dari react-hook-form terpanggil dengan benar
+          e.preventDefault()
+          // Otomatis punya handleSubmit()
+          form.handleSubmit()
+        }}
+      >
         <FieldGroup>
           <FieldSet>
             <FieldGroup className="grid grid-cols-1">
-              <Field data-invalid={!!form.formState.errors.namaLengkap}>
-                <FieldLabel htmlFor="namaLengkap">Nama Lengkap</FieldLabel>
-                <Input
-                  id="namaLengkap"
-                  placeholder="Nama Lengkap"
-                  aria-invalid={!!form.formState.errors.namaLengkap}
-                  {...form.register('namaLengkap')}
-                />
-                {form.formState.errors.namaLengkap && (
-                  <FieldError>
-                    {form.formState.errors.namaLengkap.message}
-                  </FieldError>
+              <form.Field name="namaLengkap">
+                {(field) => (
+                  <Field data-invalid={field.state.meta.errors.length > 0}>
+                    <FieldLabel htmlFor="namaLengkap">Nama Lengkap</FieldLabel>
+                    <Input
+                      id="namaLengkap"
+                      placeholder="Nama Lengkap"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  </Field>
                 )}
-              </Field>
+              </form.Field>
             </FieldGroup>
 
             <FieldGroup className="grid sm:grid-cols-2">
-              {/* ✅ Fix #5: DatePicker dihubungkan ke field.onChange */}
-              <Controller
-                name="tanggalLahir"
-                control={form.control}
-                render={({ field }) => (
-                  <Field data-invalid={!!form.formState.errors.tanggalLahir}>
+              {/* ===== Tanggal Lahir ===== */}
+              <form.Field name="tanggalLahir">
+                {(field) => (
+                  <Field>
                     <FieldLabel>Tanggal Lahir</FieldLabel>
                     <DatePicker
-                      value={field.value}
+                      value={field.state.value}
                       onChange={(date: Date) => {
-                        field.onChange(date)
-                        // Auto-hitung umur
+                        field.handleChange(date)
                         const today = new Date()
                         let age = today.getFullYear() - date.getFullYear()
                         const m = today.getMonth() - date.getMonth()
@@ -120,84 +118,74 @@ export default function FormReservasi() {
                           (m === 0 && today.getDate() < date.getDate())
                         )
                           age--
-                        form.setValue('umur', age >= 0 ? String(age) : '')
+                        form.setFieldValue('umur', age >= 0 ? String(age) : '')
                       }}
                       placeholder="Pilih tanggal lahir"
                     />
-                    {form.formState.errors.tanggalLahir && (
-                      <FieldError>
-                        {form.formState.errors.tanggalLahir.message}
-                      </FieldError>
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
 
-              {/* ✅ Fix #4: umur pakai register, auto-terisi dari tanggal lahir */}
-              <Field>
-                <FieldLabel>Umur</FieldLabel>
-                <Input
-                  placeholder="Masukkan umur Anda"
-                  {...form.register('umur')}
-                />
-              </Field>
-
-              {/* ✅ Fix #2: hapus duplikat, pakai register */}
-              <Field data-invalid={!!form.formState.errors.nomorHandphone}>
-                <FieldLabel>Nomor Handphone</FieldLabel>
-                <Input
-                  placeholder="Masukkan nomor handphone Anda"
-                  aria-invalid={!!form.formState.errors.nomorHandphone}
-                  {...form.register('nomorHandphone')}
-                />
-                {form.formState.errors.nomorHandphone && (
-                  <FieldError>
-                    {form.formState.errors.nomorHandphone.message}
-                  </FieldError>
+              {/* ===== Umur ===== */}
+              <form.Field name="umur">
+                {(field) => (
+                  <Field>
+                    <FieldLabel>Umur</FieldLabel>
+                    <Input
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Masukkan umur Anda"
+                    />
+                  </Field>
                 )}
-              </Field>
+              </form.Field>
 
-              {/* ✅ Fix #5: DatePicker dihubungkan ke field.onChange */}
-              <Controller
-                name="jadwalPeriksa"
-                control={form.control}
-                render={({ field }) => (
-                  <Field data-invalid={!!form.formState.errors.jadwalPeriksa}>
+              {/* ===== Nomor Handphone ===== */}
+              <form.Field name="nomorHandphone">
+                {(field) => (
+                  <Field>
+                    <FieldLabel>Nomor Handphone</FieldLabel>
+                    <Input
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="Masukkan nomor handphone Anda"
+                    />
+                  </Field>
+                )}
+              </form.Field>
+
+              {/* ===== Jadwal Periksa ===== */}
+              <form.Field name="jadwalPeriksa">
+                {(field) => (
+                  <Field>
                     <FieldLabel>Jadwal Periksa</FieldLabel>
                     <DatePicker
-                      value={field.value}
-                      onChange={(date: Date) => field.onChange(date)}
+                      value={field.state.value}
+                      onChange={(date: Date) => field.handleChange(date)}
                       placeholder="Pilih jadwal periksa"
                     />
-                    {form.formState.errors.jadwalPeriksa && (
-                      <FieldError>
-                        {form.formState.errors.jadwalPeriksa.message}
-                      </FieldError>
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
 
-              <Field data-invalid={!!form.formState.errors.jamReservasi}>
-                <FieldLabel>Jam Reservasi</FieldLabel>
-                <Input
-                  placeholder="Masukkan jam reservasi Anda"
-                  aria-invalid={!!form.formState.errors.jamReservasi}
-                  {...form.register('jamReservasi')}
-                />
-                {form.formState.errors.jamReservasi && (
-                  <FieldError>
-                    {form.formState.errors.jamReservasi.message}
-                  </FieldError>
+              {/* ===== Jam Reservasi ===== */}
+              <form.Field name="jamReservasi">
+                {(field) => (
+                  <Field>
+                    <FieldLabel>Jam Reservasi</FieldLabel>
+                    <Input
+                      placeholder="Masukkan jam reservasi Anda"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  </Field>
                 )}
-              </Field>
+              </form.Field>
 
-              {/* ✅ Fix #5: DropdownMenu dihubungkan ke field.onChange */}
-              <Controller
-                name="pilihanDokter"
-                control={form.control}
-                render={({ field }) => (
-                  <Field data-invalid={!!form.formState.errors.pilihanDokter}>
+              {/* ===== Pilihan Dokter ===== */}
+              <form.Field name="pilihanDokter">
+                {(field) => (
+                  <Field>
                     <FieldLabel>Pilihan Dokter</FieldLabel>
                     <DropdownMenu
                       open={dropdownOpen}
@@ -210,10 +198,10 @@ export default function FormReservasi() {
                         >
                           <span
                             className={
-                              field.value ? '' : 'text-muted-foreground'
+                              field.state.value ? '' : 'text-muted-foreground'
                             }
                           >
-                            {field.value || 'Pilih dokter'}
+                            {field.state.value || 'Pilih dokter'}{' '}
                           </span>
                           {dropdownOpen ? (
                             <ChevronUp className="w-4 h-4" />
@@ -226,41 +214,29 @@ export default function FormReservasi() {
                         {dokter.map((d) => (
                           <DropdownMenuItem
                             key={d}
-                            onSelect={() => field.onChange(d)}
+                            onSelect={() => field.handleChange(d)}
                           >
                             {d}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    {form.formState.errors.pilihanDokter && (
-                      <FieldError>
-                        {form.formState.errors.pilihanDokter.message}
-                      </FieldError>
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
 
-              {/* ✅ Fix #5: LayananMultiSelect dihubungkan ke field.onChange */}
-              <Controller
-                name="layanan"
-                control={form.control}
-                render={({ field }) => (
-                  <Field data-invalid={!!form.formState.errors.layanan}>
+              {/* ===== Layanan ===== */}
+              <form.Field name="layanan">
+                {(field) => (
+                  <Field>
                     <FieldLabel>Layanan</FieldLabel>
                     <LayananMultiSelect
-                      value={field.value}
-                      onChange={field.onChange}
+                      value={field.state.value}
+                      onChange={(val) => field.handleChange(val)}
                     />
-                    {form.formState.errors.layanan && (
-                      <FieldError>
-                        {form.formState.errors.layanan.message}
-                      </FieldError>
-                    )}
                   </Field>
                 )}
-              />
+              </form.Field>
             </FieldGroup>
 
             <FieldSeparator />
@@ -288,25 +264,35 @@ export default function FormReservasi() {
                 </FieldContent>
               </Field>
               {checked && (
-                <Field>
-                  <FieldLabel>Nomor Pasien</FieldLabel>
-                  <Input
-                    placeholder="Masukkan nomor pasien Anda"
-                    {...form.register('nomorPasien')}
-                  />
-                </Field>
+                <form.Field name="nomorPasien">
+                  {(field) => (
+                    <>
+                      <FieldLabel>Nomor Pasien</FieldLabel>
+                      <Input
+                        placeholder="Masukkan nomor pasien Anda"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                    </>
+                  )}
+                </form.Field>
               )}
             </FieldGroup>
 
             <FieldGroup>
-              <Field>
-                <FieldLabel>Keluhan</FieldLabel>
-                <Textarea
-                  placeholder="Masukkan keluhan Anda"
-                  className="resize-none"
-                  {...form.register('keluhan')}
-                />
-              </Field>
+              <form.Field name="keluhan">
+                {(field) => (
+                  <>
+                    <FieldLabel>Keluhan</FieldLabel>
+                    <Textarea
+                      placeholder="Masukkan keluhan Anda"
+                      className="resize-none"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                  </>
+                )}
+              </form.Field>
             </FieldGroup>
           </FieldSet>
 
