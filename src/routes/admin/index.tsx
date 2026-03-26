@@ -25,8 +25,8 @@ function RouteComponent() {
 
   return <div>
     <div>
-      <h1 className='font-bold text-xl'>Selamat Datang, Admin Klinik</h1>
-      <p className='text-muted-foreground my-3'>{formatDate(now)}</p>
+      <h1 className='font-bold text-xl'>Selamat Datang, <span className='text-transparent bg-clip-text bg-linear-to-r from-[#01C7FE] to-[#89FBA4] font-bold text-2xl leading-10 '>Admin Klinik</span></h1>
+      <p className='text-muted-foreground mb-6'>{formatDate(now)}</p>
 
       <CardDashboard />
 

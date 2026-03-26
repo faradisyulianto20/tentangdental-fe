@@ -7,6 +7,8 @@ import {
   Heart,
   Smile,
   FileText,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import {
@@ -48,10 +50,43 @@ import {
 } from '@/components/ui/select'
 import { useState } from 'react'
 import type { CheckedState } from '@radix-ui/react-checkbox'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { DatePicker } from '@/components/ui/date-picker'
+import { MultiSelect } from '@/components/ui/multi-select'
 
-const reservations = [
+interface Reservation {
+  namaPasien: string
+  namaPanggilan: string
+  layanan: string
+  tanggalReservasi: string
+  nomorHandphone: string
+  jamReservasi: string
+  dokter: string
+  status: string
+  nomorPasien: string
+  jenisKelamin: string
+  umur: string
+  pekerjaan: string
+  tanggalLahir: string
+  namaOrangTua: string
+  kotaKabupaten: string
+  kecamatan: string
+  kelurahan: string
+  alamatLengkap: string
+  tinggiBadan: string
+  beratBadan: string
+  keluhan: string
+}
+
+const reservations: Reservation[] = [
   {
     namaPasien: 'John Doe',
+    namaPanggilan: 'John',
     layanan: 'Pembersihan Gigi',
     tanggalReservasi: 'Sabtu, 15 Maret 2024',
     nomorHandphone: '081234567890',
@@ -59,9 +94,22 @@ const reservations = [
     dokter: 'Dr. Smith',
     status: 'reservasi',
     nomorPasien: 'P001',
+    jenisKelamin: 'Laki-laki',
+    umur: '28',
+    pekerjaan: 'Software Engineer',
+    tanggalLahir: '1996-03-15',
+    namaOrangTua: 'Robert Doe',
+    kotaKabupaten: 'Sleman',
+    kecamatan: 'Depok',
+    kelurahan: 'Caturtunggal',
+    alamatLengkap: 'Jl. Kaliurang No. 10',
+    tinggiBadan: '175',
+    beratBadan: '70',
+    keluhan: 'Gigi berlubang dan sering sakit saat makan manis.',
   },
   {
     namaPasien: 'Jane Smith',
+    namaPanggilan: 'Jane',
     layanan: 'Pemeriksaan Gigi',
     tanggalReservasi: 'Minggu, 16 Maret 2024',
     nomorHandphone: '081234567891',
@@ -69,9 +117,22 @@ const reservations = [
     dokter: 'Dr. Johnson',
     status: 'hadir',
     nomorPasien: 'P002',
+    jenisKelamin: 'Perempuan',
+    umur: '32',
+    pekerjaan: 'Dokter',
+    tanggalLahir: '1992-06-20',
+    namaOrangTua: 'Michael Smith',
+    kotaKabupaten: 'Yogyakarta',
+    kecamatan: 'Gondokusuman',
+    kelurahan: 'Demangan',
+    alamatLengkap: 'Jl. Suroto No. 5',
+    tinggiBadan: '162',
+    beratBadan: '55',
+    keluhan: 'Gusi berdarah saat menyikat gigi dan bau mulut.',
   },
   {
     namaPasien: 'Alice Johnson',
+    namaPanggilan: 'Alice',
     layanan: 'Tambal Gigi',
     tanggalReservasi: 'Senin, 17 Maret 2024',
     nomorHandphone: '081234567892',
@@ -79,10 +140,22 @@ const reservations = [
     dokter: 'Dr. Lee',
     status: 'selesai',
     nomorPasien: 'P003',
+    jenisKelamin: 'Perempuan',
+    umur: '25',
+    pekerjaan: 'Mahasiswa',
+    tanggalLahir: '1999-11-03',
+    namaOrangTua: 'David Johnson',
+    kotaKabupaten: 'Bantul',
+    kecamatan: 'Kasihan',
+    kelurahan: 'Tirtonirmolo',
+    alamatLengkap: 'Jl. Bantul No. 22',
+    tinggiBadan: '158',
+    beratBadan: '50',
+    keluhan: 'Gigi berlubang di bagian belakang dan terasa ngilu.',
   },
 ]
 
-export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
+export function ReservationCard({ res }: { res: Reservation }) {
   const [hasAlergi, setHasAlergi] = useState(false)
   const [hasPenyakitSistemik, setHasPenyakitSistemik] = useState(false)
   const [isKonsumsiObat, setIsKonsumsiObat] = useState(false)
@@ -101,9 +174,49 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
   const [isRutinKontrol, setIsRutinKontrol] = useState(false)
   const [frekuensiSikatGigi, setFrekuensiSikatGigi] = useState('')
   const [frekuensiCheckup, setFrekuensiCheckup] = useState('')
+  const [dropdownJenisKelaminOpen, setDropdownJenisKelaminOpen] =
+    useState(false)
+  const [selectedJenisKelamin, setSelectedJenisKelamin] = useState<
+    string | null
+  >(null)
+  const [tanggalLahir, setTanggalLahir] = useState<Date | null>(
+    res.tanggalLahir ? new Date(res.tanggalLahir) : null,
+  )
+  const [dropdownDokterOpen, setDropdownDokterOpen] = useState(false)
+  const [selectedDokter, setSelectedDokter] = useState<string | null>(
+    res.dokter ?? null,
+  )
+  const [selectedLayanan, setSelectedLayanan] = useState<string[]>(
+    res.layanan ? [res.layanan] : [],
+  )
+  const dokterList = [
+    'Dr. Smith',
+    'Dr. Johnson',
+    'Dr. Lee',
+    'Dr. Andi',
+    'Dr. Budi',
+    'Dr. Citra',
+  ]
+
+  const layananList = [
+    'Scaling',
+    'Oral Profilaksis',
+    'Tambal Gigi',
+    'Desensitasi Gigi',
+    'Perawatan Saluran Akar',
+    'Cabut Gigi',
+    'Perawatan Gigi Anak',
+    'Bleaching',
+    'Veneer',
+    'Aligner Gigi',
+    'Crown',
+    'Gigi Tiruan',
+    'Pembersihan Gigi',
+    'Pemeriksaan Gigi',
+  ]
 
   return (
-    <div className="border rounded-lg p-4 mb-4 bg-[#E0F4FB]">
+    <div className="rounded-lg p-4 mb-4 bg-[#E0F4FB]">
       <div className="flex flex-col-reverse lg:flex-row justify-between">
         <div>
           <h2 className="text-lg font-bold">{res.namaPasien}</h2>
@@ -126,7 +239,7 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
               <AlertDialogTrigger asChild>
                 <Button
                   variant={'default'}
-                  className="bg-[#B9D654] text-white hover:bg-[#A8C24A] mt-2 text-sm"
+                  className="bg-[#B9D654] text-white hover:bg-[#A8C24A] mt-2 text-sm rounded-2xl"
                 >
                   Konfirmasi Pemeriksaan
                 </Button>
@@ -137,8 +250,7 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                   <AlertDialogDescription>
                     Apakah Pasien{' '}
                     <span className="font-bold">{res.namaPasien}</span> sudah
-                    melakukan pemeriksaan? Pastikan semua informasi sudah benar
-                    sebelum mengonfirmasi.
+                    melakukan pemeriksaan?
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -154,35 +266,33 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                 <DialogTrigger asChild>
                   <Button
                     variant={'default'}
-                    className="bg-[#B9D654] text-white hover:bg-[#A8C24A] mt-2 text-sm"
+                    className="bg-[#B9D654] text-white hover:bg-[#A8C24A] mt-2 text-sm rounded-2xl"
                   >
                     Lihat Detail
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto no-scrollbar">
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-sm p-8">
                   <FieldGroup className="flex">
                     <FieldLegend className="flex gap-2">
-                      {' '}
                       <User className="w-12 h-12  text-primary" />
                       <div>
                         <FieldTitle className="font-bold text-lg">
-                          {' '}
                           Data Pasien
                         </FieldTitle>
                         <FieldDescription>
-                          Nomor Pasien:{' '}
+                          Nomor Pasien:
                           <span className="font-medium">{res.nomorPasien}</span>
                         </FieldDescription>
                       </div>
                     </FieldLegend>
                   </FieldGroup>
-                  <FieldSeparator />
-                  <FieldGroup className="grid md:grid-cols-2 gap-4">
+                  <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
                     <Field>
                       <FieldLabel>Nama Pasien</FieldLabel>
                       <Input
                         id="name-1"
                         name="name"
+                        placeholder="Masukkan nama pasien"
                         defaultValue={res.namaPasien}
                       />
                     </Field>
@@ -191,38 +301,56 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       <Input
                         id="namapanggilan-1"
                         name="namapanggilan"
-                        defaultValue="Nama Panggilan Contoh"
-                      />
-                    </Field>
-                    <Field>
-                      <FieldLabel>Kecamatan</FieldLabel>
-                      <Input
-                        id="kecamatan-1"
-                        name="kecamatan"
-                        defaultValue="Kecamatan Contoh"
-                      />
-                    </Field>
-                    <Field>
-                      <FieldLabel>Kota/Kabupaten</FieldLabel>
-                      <Input
-                        id="kotakabupaten-1"
-                        name="kotakabupaten"
-                        defaultValue="Kota/Kabupaten Contoh"
+                        className="text-muted-foreground"
+                        placeholder="Masukkan nama panggilan pasien"
+                        defaultValue={res.namaPanggilan}
                       />
                     </Field>
                     <Field>
                       <FieldLabel>Jenis Kelamin</FieldLabel>
-                      <Input
-                        id="jeniskelamin-1"
-                        name="jeniskelamin"
-                        defaultValue="Jenis Kelamin Contoh"
-                      />
+                      <DropdownMenu
+                        open={dropdownJenisKelaminOpen}
+                        onOpenChange={setDropdownJenisKelaminOpen}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between border-primary"
+                          >
+                            <span
+                              className={
+                                selectedJenisKelamin
+                                  ? ''
+                                  : 'text-muted-foreground'
+                              }
+                            >
+                              {selectedJenisKelamin ?? 'Pilih jenis kelamin'}
+                            </span>
+                            {dropdownJenisKelaminOpen ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                          {['Laki-laki', 'Perempuan'].map((jk) => (
+                            <DropdownMenuItem
+                              key={jk}
+                              onSelect={() => setSelectedJenisKelamin(jk)}
+                            >
+                              {jk}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </Field>
                     <Field>
                       <FieldLabel>Nomor Handphone</FieldLabel>
                       <Input
                         id="nomorhandphone-1"
                         name="nomorhandphone"
+                        placeholder="Masukkan nomor HP pasien"
                         defaultValue={res.nomorHandphone}
                       />
                     </Field>
@@ -231,7 +359,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       <Input
                         id="umur-1"
                         name="umur"
-                        defaultValue="Umur Contoh"
+                        placeholder="Masukkan Umur Pasien"
+                        defaultValue={res.umur || ''}
                       />
                     </Field>
                     <Field>
@@ -239,15 +368,16 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       <Input
                         id="pekerjaan-1"
                         name="pekerjaan"
-                        defaultValue="Pekerjaan Contoh"
+                        placeholder="Masukkan Pekerjaan Pasien"
+                        defaultValue={res.pekerjaan || ''}
                       />
                     </Field>
                     <Field>
                       <FieldLabel>Tanggal Lahir</FieldLabel>
-                      <Input
-                        id="tanggallahir-1"
-                        name="tanggallahir"
-                        defaultValue="Tanggal Lahir Contoh"
+                      <DatePicker
+                        value={tanggalLahir}
+                        onChange={setTanggalLahir}
+                        placeholder="Pilih tanggal lahir"
                       />
                     </Field>
                     <Field>
@@ -255,23 +385,26 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       <Input
                         id="namaorangtua-1"
                         name="namaorangtua"
-                        defaultValue="Nama Orang Tua Contoh"
+                        placeholder="Masukkan nama orang tua pasien"
+                        defaultValue={res.namaOrangTua || ''}
                       />
                     </Field>
                     <Field>
-                      <FieldLabel>Alamat Lengkap</FieldLabel>
+                      <FieldLabel>Kota/Kabupaten</FieldLabel>
                       <Input
-                        id="alamatlengkap-1"
-                        name="alamatlengkap"
-                        defaultValue="Alamat Lengkap Contoh"
+                        id="kotakabupaten-1"
+                        name="kotakabupaten"
+                        placeholder="Masukkan Kota/Kabupaten pasien"
+                        defaultValue={res.kotaKabupaten || ''}
                       />
                     </Field>
                     <Field>
-                      <FieldLabel>Tinggi Badan (cm)</FieldLabel>
+                      <FieldLabel>Kecamatan</FieldLabel>
                       <Input
-                        id="tinggibadan-1"
-                        name="tinggibadan"
-                        defaultValue="Tinggi Badan Contoh"
+                        id="kecamatan-1"
+                        name="kecamatan"
+                        placeholder="Masukkan Kecamatan pasien"
+                        defaultValue={res.kecamatan || ''}
                       />
                     </Field>
                     <Field>
@@ -279,7 +412,26 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       <Input
                         id="kelurahan-1"
                         name="kelurahan"
-                        defaultValue="Kelurahan Contoh"
+                        placeholder="Masukkan Kelurahan pasien"
+                        defaultValue={res.kelurahan || ''}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Alamat Lengkap</FieldLabel>
+                      <Input
+                        id="alamatlengkap-1"
+                        name="alamatlengkap"
+                        placeholder="Masukkan alamat lengkap pasien"
+                        defaultValue={res.alamatLengkap || ''}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Tinggi Badan (cm)</FieldLabel>
+                      <Input
+                        id="tinggibadan-1"
+                        name="tinggibadan"
+                        placeholder="Masukkan tinggi badan pasien"
+                        defaultValue={res.tinggiBadan || ''}
                       />
                     </Field>
                     <Field>
@@ -287,21 +439,21 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       <Input
                         id="beratbadan-1"
                         name="beratbadan"
-                        defaultValue="Berat Badan Contoh"
+                        placeholder="Masukkan berat badan pasien"
+                        defaultValue={res.beratBadan || ''}
                       />
                     </Field>
                   </FieldGroup>
 
+                  <FieldSeparator />
                   <FieldGroup className="flex">
                     <FieldLegend className="flex gap-2">
-                      {' '}
                       <Heart className="w-12 h-12  text-primary" />
                       <FieldTitle className="font-bold text-lg">
                         Riwayat Kesehatan Umum
                       </FieldTitle>
                     </FieldLegend>
                   </FieldGroup>
-                  <FieldSeparator />
                   <FieldGroup className="flex">
                     <Field className="flex flex-col w-full">
                       <div className="flex flex-row items-center justify-between w-full">
@@ -312,7 +464,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="alergi-1"
                           checked={hasAlergi}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setHasAlergi(checked)
+                            if (typeof checked === 'boolean')
+                              setHasAlergi(checked)
                           }}
                         />
                       </div>
@@ -335,7 +488,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="penyakit-sistemik-1"
                           checked={hasPenyakitSistemik}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setHasPenyakitSistemik(checked)
+                            if (typeof checked === 'boolean')
+                              setHasPenyakitSistemik(checked)
                           }}
                         />
                       </div>
@@ -358,7 +512,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="konsumsi-obat-1"
                           checked={isKonsumsiObat}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsKonsumsiObat(checked)
+                            if (typeof checked === 'boolean')
+                              setIsKonsumsiObat(checked)
                           }}
                         />
                       </div>
@@ -380,7 +535,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="rawat-rumah-sakit-1"
                           checked={isRawatRumahSakit}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsRawatRumahSakit(checked)
+                            if (typeof checked === 'boolean')
+                              setIsRawatRumahSakit(checked)
                           }}
                         />
                       </div>
@@ -402,12 +558,14 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="kebiasaan-1"
                           checked={isKebiasaanRokok}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsKebiasaanRokok(checked)
+                            if (typeof checked === 'boolean')
+                              setIsKebiasaanRokok(checked)
                           }}
                         />
                       </div>
                     </Field>
                   </FieldGroup>
+                  <FieldSeparator />
                   <FieldGroup className="flex">
                     <FieldLegend className="flex gap-2">
                       {' '}
@@ -417,7 +575,6 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       </FieldTitle>
                     </FieldLegend>
                   </FieldGroup>
-                  <FieldSeparator />
                   <FieldGroup>
                     <Field className="flex flex-col w-full">
                       <div className="flex flex-row items-center justify-between w-full">
@@ -428,7 +585,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="sakit-gigi-1"
                           checked={isSakitGigi}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsSakitGigi(checked)
+                            if (typeof checked === 'boolean')
+                              setIsSakitGigi(checked)
                           }}
                         />
                       </div>
@@ -450,9 +608,10 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                         <Checkbox
                           id="berdarah-saat-sikat-gigi-1"
                           checked={isBerdarahSikatGigi}
-                        onCheckedChange={(checked: CheckedState) => {
-                          if (typeof checked === 'boolean') setIsBerdarahSikatGigi(checked)
-                        }}
+                          onCheckedChange={(checked: CheckedState) => {
+                            if (typeof checked === 'boolean')
+                              setIsBerdarahSikatGigi(checked)
+                          }}
                         />
                       </div>
                     </Field>
@@ -466,7 +625,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="perawatan-gigi-sebelumnya-1"
                           checked={isPerawatanGigiSebelumnya}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsPerawatanGigiSebelumnya(checked)
+                            if (typeof checked === 'boolean')
+                              setIsPerawatanGigiSebelumnya(checked)
                           }}
                         />
                       </div>
@@ -510,9 +670,10 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                         <Checkbox
                           id="kebiasaan-kesehatan-mulut-1"
                           checked={isKebisaanKesehatanMulut}
-                        onCheckedChange={(checked: CheckedState) => {
-                          if (typeof checked === 'boolean') setIsKebisaanKesehatanMulut(checked)
-                        }}
+                          onCheckedChange={(checked: CheckedState) => {
+                            if (typeof checked === 'boolean')
+                              setIsKebisaanKesehatanMulut(checked)
+                          }}
                         />
                       </div>
                     </Field>
@@ -526,7 +687,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="kebiasaan-buruk-1"
                           checked={isKebiasaanBuruk}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsKebiasaanBuruk(checked)
+                            if (typeof checked === 'boolean')
+                              setIsKebiasaanBuruk(checked)
                           }}
                         />
                       </div>
@@ -548,7 +710,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="kawat-gigi-1"
                           checked={isKawatGigi}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsKawatGigi(checked)
+                            if (typeof checked === 'boolean')
+                              setIsKawatGigi(checked)
                           }}
                         />
                       </div>
@@ -593,7 +756,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="gigi-palsu-1"
                           checked={isMemilikiGigiPalsu}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsMemilikiGigiPalsu(checked)
+                            if (typeof checked === 'boolean')
+                              setIsMemilikiGigiPalsu(checked)
                           }}
                         />
                       </div>
@@ -607,7 +771,8 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                           id="kontrol-1"
                           checked={isRutinKontrol}
                           onCheckedChange={(checked: CheckedState) => {
-                            if (typeof checked === 'boolean') setIsRutinKontrol(checked)
+                            if (typeof checked === 'boolean')
+                              setIsRutinKontrol(checked)
                           }}
                         />
                       </div>
@@ -645,6 +810,7 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       </Select>
                     </Field>
                   </FieldGroup>
+                  <FieldSeparator />
                   <FieldGroup className="flex">
                     <FieldLegend className="flex gap-2">
                       {' '}
@@ -654,79 +820,117 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       </FieldTitle>
                     </FieldLegend>
                   </FieldGroup>
-                  <FieldSeparator />
-                  <Field>
-                    <FieldLabel>Nama Lengkap</FieldLabel>
-                    <Input
-                      id="nama-lengkap-1"
-                      name="namaLengkap"
-                      defaultValue={res.namaPasien}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Tanggal Lahir</FieldLabel>
-                    <Input
-                      id="tanggal-lahir-1"
-                      name="tanggalLahir"
-                      defaultValue="Tanggal Lahir Contoh"
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Umur</FieldLabel>
-                    <Input
-                      id="umur-1"
-                      name="umur"
-                      defaultValue="Umur Contoh"
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Nomor Handphone</FieldLabel>
-                    <Input
-                      id="nomor-handphone-1"
-                      name="nomorHandphone"
-                      defaultValue={res.nomorHandphone}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Jadwal Periksa</FieldLabel>
-                    <Input
-                      id="jadwal-periksa-1"
-                      name="jadwalPeriksa"
-                      defaultValue={`${res.tanggalReservasi} ${res.jamReservasi}`}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Jam Reservasi</FieldLabel>
-                    <Input
-                      id="jam-reservasi-1"
-                      name="jamReservasi"
-                      defaultValue={res.jamReservasi}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Pilihan Dokter</FieldLabel>
-                    <Input
-                      id="pilihan-dokter-1"
-                      name="pilihanDokter"
-                      defaultValue={res.dokter}
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel>Layanan</FieldLabel>
-                    <Input
-                      id="layanan-1"
-                      name="layanan"
-                      defaultValue={res.layanan}
-                    />
-                  </Field>
+                  <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
+                    <Field>
+                      <FieldLabel>Nama Lengkap</FieldLabel>
+                      <Input
+                        id="nama-lengkap-1"
+                        name="namaLengkap"
+                        placeholder="Masukkan nama pasien"
+                        defaultValue={res.namaPasien}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Tanggal Lahir</FieldLabel>
+                      <DatePicker
+                        value={tanggalLahir}
+                        onChange={setTanggalLahir}
+                        placeholder="Pilih tanggal lahir"
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Umur</FieldLabel>
+                      <Input
+                        id="umur-1"
+                        name="umur"
+                        placeholder="Masukkan umur pasien"
+                        defaultValue={res.umur || ''}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Nomor Handphone</FieldLabel>
+                      <Input
+                        id="nomor-handphone-1"
+                        name="nomorHandphone"
+                        placeholder="Masukkan nomor HP pasien"
+                        defaultValue={res.nomorHandphone}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Jadwal Periksa</FieldLabel>
+                      <Input
+                        id="jadwal-periksa-1"
+                        name="jadwalPeriksa"
+                        placeholder="Masukkan jadwal periksa pasien"
+                        defaultValue={`${res.tanggalReservasi} ${res.jamReservasi}`}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Jam Reservasi</FieldLabel>
+                      <Input
+                        id="jam-reservasi-1"
+                        name="jamReservasi"
+                        placeholder="Masukkan jam reservasi"
+                        defaultValue={res.jamReservasi}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Pilihan Dokter</FieldLabel>
+                      <DropdownMenu
+                        open={dropdownDokterOpen}
+                        onOpenChange={setDropdownDokterOpen}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between border-primary"
+                          >
+                            <span
+                              className={
+                                selectedDokter ? '' : 'text-muted-foreground'
+                              }
+                            >
+                              {selectedDokter ?? 'Pilih dokter'}
+                            </span>
+                            {dropdownDokterOpen ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                          {dokterList.map((d) => (
+                            <DropdownMenuItem
+                              key={d}
+                              onSelect={() => setSelectedDokter(d)}
+                            >
+                              {d}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </Field>
+                    <Field>
+                      <FieldLabel>Layanan</FieldLabel>
+                      <MultiSelect
+                        items={layananList}
+                        value={selectedLayanan}
+                        onChange={setSelectedLayanan}
+                        placeholder="Pilih layanan..."
+                      />
+                    </Field>
+                  </FieldGroup>
                   <Field>
                     <FieldLabel>Keluhan</FieldLabel>
                     <Textarea
                       id="keluhan-1"
                       name="keluhan"
-                      defaultValue="Keluhan Contoh"
+                      placeholder="Masukkan keluhan pasien"
+                      defaultValue={res.keluhan}
                     />
                   </Field>
+                  <FieldSeparator />
                   <FieldGroup className="flex">
                     <FieldLegend className="flex gap-2">
                       {' '}
@@ -736,11 +940,10 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                       </FieldTitle>
                     </FieldLegend>
                   </FieldGroup>
-                  <FieldSeparator />
                   <FieldGroup className="grid md:grid-cols-1 gap-4">
                     <Field>
                       <FieldLabel>Catatan/Rekomendasi Dokter</FieldLabel>
-                      <Input
+                      <Textarea
                         id="catatan-dokter-1"
                         name="catatanDokter"
                         placeholder="Masukkan catatan atau rekomendasi dokter"
@@ -751,6 +954,9 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
                     <DialogClose asChild>
                       <Button variant="outline">Batal</Button>
                     </DialogClose>
+                    <Button className="bg-red-400 hover:bg-red-500">
+                      Batalkan Reservasi
+                    </Button>
                     <Button
                       type="submit"
                       className="bg-[#B9D654] text-white hover:bg-[#A8C24A]"
@@ -764,7 +970,7 @@ export function ReservationCard({ res }: { res: (typeof reservations)[0] }) {
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 text-sm mt-2 gap-2">
+      <div className="grid grid-cols-2 text-sm gap-2 font-bold mt-1">
         <p className="flex gap-2 items-center">
           <Calendar className="w-4 h-4" />
           {res.tanggalReservasi}

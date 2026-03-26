@@ -258,14 +258,14 @@ export default function StatisticsDashboard() {
   }
 
   return (
-    <div className="bg-[#E0F4FB] rounded-lg p-4 md:p-6 space-y-4 md:space-y-6 my-6 w-full overflow-hidden">
+    <div className="bg-[#E0F4FB] rounded-lg p-4 md:p-6 space-y-4 md:space-y-6 my-6 w-full overflow-hidden shadow-sm">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-[#0A4864]">
+          <h2 className="text-xl md:text-3xl font-bold text-[#0A4864]">
             Laporan Pasien
           </h2>
-          <p className="text-sm md:text-base text-gray-600">
+          <p className="text-sm md:text-base font-semibold">
             Bulan {currentMonthData.month} 2026
           </p>
         </div>
@@ -286,10 +286,10 @@ export default function StatisticsDashboard() {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-auto min-h-70 md:min-h-100 overflow-x-auto">
+      <div className="w-full h-auto min-h-50 md:min-h-60 overflow-x-auto">
         <ChartContainer
           config={chartConfig}
-          className="min-h-70 md:min-h-100 w-full"
+          className="min-h-50 md:min-h-60 w-full"
         >
           <BarChart
             data={currentMonthData.data}
@@ -324,11 +324,18 @@ export default function StatisticsDashboard() {
               }}
             />
             <Legend
-              wrapperStyle={{ paddingTop: '20px' }}
+              wrapperStyle={{
+                width: '100%',
+                lineHeight: '24px',
+              }}
               iconType="square"
-              formatter={(value) =>
-                chartConfig[value as keyof typeof chartConfig]?.label
-              }
+              layout="vertical"
+              iconSize={14}
+              formatter={(value) => (
+                <span className="inline-flex items-center text-[12px] text-slate-600 mb-1 ms-1">
+                  {chartConfig[value as keyof typeof chartConfig]?.label}
+                </span>
+              )}
             />
             <Bar
               dataKey="jmlReservasi"

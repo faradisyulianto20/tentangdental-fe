@@ -41,8 +41,8 @@ export function AppSidebar({
               <SidebarMenuItem key={menu.name}>
                 <SidebarMenuButton
                   asChild
-                  className={`h-10 px-4 hover:bg-[#0A4864] hover:text-white rounded-none font-semibold ${
-                    pathname === menu.url ? 'bg-[#0A4864] text-white' : ''
+                  className={`h-10 px-4 hover:bg-[#10658B] hover:text-white rounded-none font-semibold ${
+                    pathname === menu.url ? 'bg-[#0A4864] text-white hover:bg-[#0A4864]' : ''
                   }`}
                 >
                   <a href={menu.url} className="w-full flex items-center gap-2">

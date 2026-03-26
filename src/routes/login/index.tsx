@@ -28,8 +28,8 @@ function RouteComponent() {
       />
       <div className="grid grid-cols-2 items-center max-w-6xl mx-auto">
         <div className="mx-6 max-w-6xl w-3/4 my-32 space-y-4">
-          <h1 className="font-bold text-4xl">Selamat Datang Admin</h1>
-          <p className="text-muted-foreground">
+          <h1 className="font-bold text-4xl text-[#0A4864]">Selamat Datang Admin</h1>
+          <p className="text-muted-foreground text-sm">
             Silahkan melakukan login terlebih dahulu dengan memasukkan username
             dan password yang telah ada untuk bisa mengakses data.
           </p>
@@ -38,11 +38,11 @@ function RouteComponent() {
               <FieldGroup>
                 <FieldSet>
                   <Field>
-                    <FieldLabel>Nama Pengguna</FieldLabel>
+                    <FieldLabel className='text-[#263A43] font-semibold'>Nama Pengguna</FieldLabel>
                     <Input type="text" placeholder="Masukkan nama pengguna Anda" />
                   </Field>
                   <Field>
-                    <FieldLabel>Kata Sandi</FieldLabel>
+                    <FieldLabel className='text-[#263A43] font-semibold'>Kata Sandi</FieldLabel>
                     <Input type="password" placeholder="Masukkan Kata Sandi Anda" />
                   </Field>
                 </FieldSet>
@@ -54,7 +54,7 @@ function RouteComponent() {
                 </Field>
               </FieldGroup>
               <Field orientation="horizontal" className="w-full">
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full bg-[#A2C341] hover:bg-[#8AA83A] text-white">
                   Login
                 </Button>
               </Field>

@@ -5,14 +5,14 @@ import { LayoutDashboard, HelpCircle, Stethoscope, Newspaper, Tag, UserRound, Im
 
 const navigations = [
   { name: 'Dashboard',     url: '/admin',                icon: LayoutDashboard },
-  { name: 'FAQ',           url: '/admin/faq',             icon: HelpCircle },
-  { name: 'Layanan',       url: '/admin/layanan',         icon: Stethoscope },
-  { name: 'Reservasi',     url: '/admin/reservasi',       icon: Calendar },
-  { name: 'Artikel',       url: '/admin/artikel',         icon: Newspaper },
   { name: 'Promo',         url: '/admin/promo',           icon: Tag },
+  { name: 'Layanan',       url: '/admin/layanan',         icon: Stethoscope },
   { name: 'Profil Dokter', url: '/admin/profil-dokter',   icon: UserRound },
   { name: 'Galeri',        url: '/admin/galeri',          icon: Images },
+  { name: 'Reservasi',     url: '/admin/reservasi',       icon: Calendar },
   { name: 'Testimoni',     url: '/admin/testimoni',       icon: MessageSquareQuote },
+  { name: 'Artikel',       url: '/admin/artikel',         icon: Newspaper },
+  { name: 'FAQ',           url: '/admin/faq',             icon: HelpCircle },
   { name: 'Data Pasien',   url: '/admin/data-pasien',     icon: ClipboardList },
 ]
 
