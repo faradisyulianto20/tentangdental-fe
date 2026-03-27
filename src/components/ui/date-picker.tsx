@@ -30,11 +30,13 @@ interface DatePickerProps {
   onChange: (date: Date) => void
   placeholder?: string
   disabled?: boolean
+  onBlur?: () => void
 }
 
 export function DatePicker({
   value,
   onChange,
+  onBlur,
   placeholder = 'Pilih tanggal',
   disabled = false,
 }: DatePickerProps) {
@@ -93,6 +95,7 @@ export function DatePicker({
           placeholder={placeholder}
           className="cursor-pointer pr-9"
           onClick={() => !disabled && setOpen((o) => !o)}
+          onBlur={onBlur}
         />
         <CalendarIcon className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
       </div>
