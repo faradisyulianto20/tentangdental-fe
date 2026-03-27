@@ -12,9 +12,10 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@/components/ui/input-group"
+} from '@/components/ui/input-group'
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
 const dataPasien = [
   {
@@ -88,7 +89,6 @@ const dataPasien = [
     layanan: 'Gigi Tiruan',
     tanggal: '2026-03-07',
     noTelp: '08901234567',
-
   },
   {
     no: 10,
@@ -105,31 +105,36 @@ const dataPasien = [
     layanan: 'Perawatan Gigi Anak',
     tanggal: '2026-03-05',
     noTelp: '08123456780',
-  }
+  },
 ]
 
 export default function DataPasienTable() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+  const navigate = useNavigate()
 
   // Filter data based on search query
   const filteredData = useMemo(() => {
     if (!searchQuery.trim()) return dataPasien
 
     const query = searchQuery.toLowerCase()
-    return dataPasien.filter((pasien) =>
-      pasien.nomorPasien.toLowerCase().includes(query) ||
-      pasien.namaPasien.toLowerCase().includes(query) ||
-      pasien.layanan.toLowerCase().includes(query) ||
-      pasien.noTelp.toLowerCase().includes(query)
+    return dataPasien.filter(
+      (pasien) =>
+        pasien.nomorPasien.toLowerCase().includes(query) ||
+        pasien.namaPasien.toLowerCase().includes(query) ||
+        pasien.layanan.toLowerCase().includes(query) ||
+        pasien.noTelp.toLowerCase().includes(query),
     )
   }, [searchQuery])
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage)
+  const paginatedData = filteredData.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  )
 
   // Reset to first page when search query changes
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,10 +148,17 @@ export default function DataPasienTable() {
       setCurrentPage(page)
     }
   }
+  
+  const handleNavigate = (id: string) => {
+    navigate({
+      to: '/admin/data-pasien/rontgen',
+      search: { id },
+    })
+  }
 
   return (
     <div className="space-y-4 w-full">
-      <InputGroup className='w-full md:w-1/2'>
+      <InputGroup className="w-full md:w-1/2">
         <InputGroupInput
           placeholder="Cari berdasarkan nomor pasien, nama, layanan, atau nomor telp..."
           value={searchQuery}
@@ -159,41 +171,91 @@ export default function DataPasienTable() {
 
       {filteredData.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-500">Tidak ada data pasien yang sesuai dengan pencarian.</p>
+          <p className="text-gray-500">
+            Tidak ada data pasien yang sesuai dengan pencarian.
+          </p>
         </div>
       ) : (
         <>
           <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
-            <Table className='rounded-xl'>
-              <TableCaption className="text-xs md:text-sm">Daftar data pasien Tentang Dental ({filteredData.length} dari {dataPasien.length})</TableCaption>
-              <TableHeader className='border-primary bg-[#E0F4FB] rounded-xl'>
+            <Table className="rounded-xl">
+              <TableCaption className="text-xs md:text-sm">
+                Daftar data pasien Tentang Dental ({filteredData.length} dari{' '}
+                {dataPasien.length})
+              </TableCaption>
+              <TableHeader className="border-primary bg-[#E0F4FB] rounded-xl">
                 <TableRow>
-                  <TableHead className="w-8 md:w-12 text-xs md:text-sm">No</TableHead>
-                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Nomor Pasien</TableHead>
-                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Nama Pasien</TableHead>
-                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Layanan</TableHead>
-                  <TableHead className="text-xs md:text-sm whitespace-nowrap">Tanggal Kunjungan</TableHead>
-                  <TableHead className="text-xs md:text-sm whitespace-nowrap">No Telp</TableHead>
-                  <TableHead className="text-center text-xs md:text-sm">Formulir</TableHead>
-                  <TableHead className="text-center text-xs md:text-sm">Rontgen</TableHead>
+                  <TableHead className="w-8 md:w-12 text-xs md:text-sm">
+                    No
+                  </TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">
+                    Nomor Pasien
+                  </TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">
+                    Nama Pasien
+                  </TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">
+                    Layanan
+                  </TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">
+                    Tanggal Kunjungan
+                  </TableHead>
+                  <TableHead className="text-xs md:text-sm whitespace-nowrap">
+                    No Telp
+                  </TableHead>
+                  <TableHead className="text-center text-xs md:text-sm">
+                    Formulir
+                  </TableHead>
+                  <TableHead className="text-center text-xs md:text-sm">
+                    Rontgen
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.map((pasien) => (
                   <TableRow key={pasien.nomorPasien}>
-                    <TableCell className="font-medium text-xs md:text-sm">{pasien.no}</TableCell>
-                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.nomorPasien}</TableCell>
-                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.namaPasien}</TableCell>
-                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.layanan}</TableCell>
-                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.tanggal}</TableCell>
-                    <TableCell className="text-xs md:text-sm whitespace-nowrap">{pasien.noTelp}</TableCell>
+                    <TableCell className="font-medium text-xs md:text-sm">
+                      {pasien.no}
+                    </TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">
+                      {pasien.nomorPasien}
+                    </TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">
+                      {pasien.namaPasien}
+                    </TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">
+                      {pasien.layanan}
+                    </TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">
+                      {pasien.tanggal}
+                    </TableCell>
+                    <TableCell className="text-xs md:text-sm whitespace-nowrap">
+                      {pasien.noTelp}
+                    </TableCell>
                     <TableCell className="text-center">
-                      <Button variant="default" size="sm" className="text-xs md:text-sm">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="text-xs md:text-sm"
+                        onClick={() =>
+                          navigate({
+                            to: '/admin/data-pasien',
+                            search: { id: pasien.nomorPasien },
+                          })
+                        }
+                      >
                         Lihat
                       </Button>
                     </TableCell>
                     <TableCell className="text-center">
-                      <Button variant="default" size="sm" className="text-xs md:text-sm">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="text-xs md:text-sm"
+                        onClick={() =>
+                          handleNavigate(pasien.nomorPasien)
+                        }
+                      >
                         Lihat
                       </Button>
                     </TableCell>
@@ -220,17 +282,19 @@ export default function DataPasienTable() {
 
               {/* Page Numbers */}
               <div className="flex gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <Button
-                    key={page}
-                    variant={currentPage === page ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => goToPage(page)}
-                    className="w-8 h-8 md:w-10 md:h-10 p-0 text-xs md:text-sm"
-                  >
-                    {page}
-                  </Button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => goToPage(page)}
+                      className="w-8 h-8 md:w-10 md:h-10 p-0 text-xs md:text-sm"
+                    >
+                      {page}
+                    </Button>
+                  ),
+                )}
               </div>
 
               <Button

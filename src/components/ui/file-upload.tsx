@@ -9,11 +9,17 @@ interface FileUploadProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
   (
-    { className, label = 'Unggah Gambar', acceptedFileTypes = 'image/*', ...props },
-    ref
+    {
+      className,
+      label = 'Unggah Gambar',
+      acceptedFileTypes = 'image/*',
+      ...props
+    },
+    ref,
   ) => {
     const [isDragActive, setIsDragActive] = React.useState(false)
     const [fileName, setFileName] = React.useState<string>('')
+    const [previewUrl, setPreviewUrl] = React.useState<string>('')
     const wrapperRef = React.useRef<HTMLDivElement>(null)
 
     const handleDrag = (e: React.DragEvent) => {
@@ -34,9 +40,12 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         const file = e.dataTransfer.files[0]
         setFileName(file.name)
-        
-        // Trigger the input change event
-        const inputElement = wrapperRef.current?.querySelector('input[type="file"]') as HTMLInputElement
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(URL.createObjectURL(file))
+
+        const inputElement = wrapperRef.current?.querySelector(
+          'input[type="file"]',
+        ) as HTMLInputElement
         if (inputElement) {
           const dataTransfer = new DataTransfer()
           dataTransfer.items.add(file)
@@ -48,10 +57,21 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
-        setFileName(e.target.files[0].name)
+        const file = e.target.files[0]
+        setFileName(file.name)
+
+        // Revoke URL lama biar ga memory leak
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(URL.createObjectURL(file))
       }
       props.onChange?.(e)
     }
+
+    React.useEffect(() => {
+      return () => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+      }
+    }, [previewUrl])
 
     return (
       <div
@@ -63,15 +83,29 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         className={cn(
           'relative w-full rounded-xl border-2 border-primary/30 p-8 hover:border-primary/50 transition-colors cursor-pointer',
           isDragActive && 'border-primary/80 bg-primary/5',
-          className
+          className,
         )}
       >
         <div className="flex flex-col items-center justify-center gap-3">
-          {/* Dashed upload area */}
-          <div className="flex flex-col items-center justify-center gap-2 py-6 px-4 border-2 border-dashed rounded-lg">
-            <Upload size={32} className="text-muted-foreground" />
-            <p className="text-sm text-muted-foreground text-center">{label}</p>
-          </div>
+          {previewUrl ? (
+            <div className="relative w-full">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full max-h-64 object-contain rounded-lg"
+              />
+              <p className="text-xs text-center text-muted-foreground mt-2">
+                {fileName}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-2 py-6 px-4 border-2 border-dashed rounded-lg w-full">
+              <Upload size={32} className="text-muted-foreground" />
+              <p className="text-sm text-muted-foreground text-center">
+                {label}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* File input */}
@@ -94,7 +128,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         )}
       </div>
     )
-  }
+  },
 )
 
 FileUpload.displayName = 'FileUpload'
