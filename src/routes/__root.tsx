@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createQueryClient } from '../lib/queryClient'
 
 import {
   HeadContent,
+  Navigate,
   Scripts,
   createRootRoute,
   useLocation,
@@ -18,6 +19,8 @@ import Pending from '../components/error/Pending'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import SidebarAdmin from '../components/admin/SidebarAdmin'
+import { useAuth } from '@/hooks/use-auth'
+import { initializeAuth } from '@/lib/auth-session'
 
 import appCss from '../styles.css?url'
 
@@ -72,11 +75,19 @@ export const Route = createRootRoute({
 function RootDocument({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => createQueryClient())
   const location = useLocation()
+  const auth = useAuth()
+
+  useEffect(() => {
+    void initializeAuth()
+  }, [])
 
   // Hide header/footer untuk auth routes
   const isAuthRoute = location.pathname.startsWith('/login')
   const isAdminRoute = location.pathname.startsWith('/admin')
   const showHeaderFooter = !isAuthRoute && !isAdminRoute
+  const shouldBlockAdmin =
+    isAdminRoute && auth.initialized && auth.status !== 'authenticated'
+  const isCheckingAdminSession = isAdminRoute && !auth.initialized
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -85,10 +96,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
           <HeadContent />
         </head>
-        <body className="antialiased" suppressHydrationWarning  >
+        <body className="antialiased" suppressHydrationWarning>
           {showHeaderFooter && <Header />}
-          {isAdminRoute ? (
-            <SidebarAdmin children={children} />
+          {isCheckingAdminSession ? (
+            <Pending />
+          ) : shouldBlockAdmin ? (
+            <Navigate to="/login" replace />
+          ) : isAdminRoute ? (
+            <SidebarAdmin>{children}</SidebarAdmin>
           ) : (
             <div className={showHeaderFooter ? 'pt-16' : ''}>{children}</div>
           )}

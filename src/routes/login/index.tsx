@@ -1,21 +1,66 @@
+import { useEffect, useState } from 'react'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { FieldGroup, FieldSet, FieldLabel, Field } from '@/components/ui/field'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useAuth } from '@/hooks/use-auth'
+import { ApiError } from '@/lib/api-client'
+import { initializeAuth, loginWithPassword } from '@/lib/auth-session'
 
 export const Route = createFileRoute('/login/')({
   component: RouteComponent,
 })
 
-
-
 function RouteComponent() {
   const navigate = useNavigate()
+  const auth = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    void initializeAuth()
+  }, [])
+
+  useEffect(() => {
+    if (auth.status === 'authenticated') {
+      void navigate({ to: '/admin' })
+    }
+  }, [auth.status, navigate])
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Logika autentikasi di sini (misalnya, validasi form, panggilan API, dll.)
-    navigate({ to: '/admin' })
+    setErrorMessage(null)
+
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Email dan password wajib diisi.')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      await loginWithPassword({
+        email: email.trim(),
+        password,
+      })
+      await navigate({ to: '/admin' })
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.status === 401) {
+          setErrorMessage('Email atau password salah.')
+        } else if (error.status === 422) {
+          setErrorMessage('Validasi gagal. Periksa input Anda.')
+        } else {
+          setErrorMessage(error.message || 'Gagal login.')
+        }
+      } else {
+        setErrorMessage('Terjadi kesalahan jaringan.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -28,34 +73,52 @@ function RouteComponent() {
       />
       <div className="grid grid-cols-2 items-center max-w-6xl mx-auto">
         <div className="mx-6 max-w-6xl w-3/4 my-32 space-y-4">
-          <h1 className="font-bold text-4xl text-[#0A4864]">Selamat Datang Admin</h1>
+          <h1 className="font-bold text-4xl text-[#0A4864]">
+            Selamat Datang Admin
+          </h1>
           <p className="text-muted-foreground text-sm">
-            Silahkan melakukan login terlebih dahulu dengan memasukkan username
-            dan password yang telah ada untuk bisa mengakses data.
+            Silahkan login menggunakan akun admin.
           </p>
           <div>
             <form className="space-y-4" onSubmit={handleLogin}>
               <FieldGroup>
                 <FieldSet>
                   <Field>
-                    <FieldLabel className='text-[#263A43] font-semibold'>Nama Pengguna</FieldLabel>
-                    <Input type="text" placeholder="Masukkan nama pengguna Anda" />
+                    <FieldLabel className="text-[#263A43] font-semibold">
+                      Email
+                    </FieldLabel>
+                    <Input
+                      type="email"
+                      placeholder="Masukkan email admin"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      autoComplete="email"
+                    />
                   </Field>
                   <Field>
-                    <FieldLabel className='text-[#263A43] font-semibold'>Kata Sandi</FieldLabel>
-                    <Input type="password" placeholder="Masukkan Kata Sandi Anda" />
+                    <FieldLabel className="text-[#263A43] font-semibold">
+                      Kata Sandi
+                    </FieldLabel>
+                    <Input
+                      type="password"
+                      placeholder="Masukkan kata sandi"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      autoComplete="current-password"
+                    />
                   </Field>
                 </FieldSet>
-                <Field orientation="horizontal">
-                  <Input type="checkbox" id="remember" className="w-4 h-4" />
-                  <FieldLabel htmlFor="remember" className="text-sm text-muted-foreground">
-                    Ingat Saya
-                  </FieldLabel>
-                </Field>
               </FieldGroup>
+              {errorMessage && (
+                <p className="text-sm text-red-600">{errorMessage}</p>
+              )}
               <Field orientation="horizontal" className="w-full">
-                <Button type="submit" className="w-full bg-[#A2C341] hover:bg-[#8AA83A] text-white">
-                  Login
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#A2C341] hover:bg-[#8AA83A] text-white"
+                >
+                  {loading ? 'Memproses...' : 'Login'}
                 </Button>
               </Field>
             </form>

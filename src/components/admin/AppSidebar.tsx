@@ -10,7 +10,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { LogOut, X } from 'lucide-react'
-import { useLocation } from '@tanstack/react-router'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import { logoutCurrentAdmin } from '@/lib/auth-session'
 
 export function AppSidebar({
   navigations,
@@ -18,7 +20,19 @@ export function AppSidebar({
   navigations: { name: string; url: string; icon: React.ComponentType }[]
 }) {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const { toggleSidebar } = useSidebar()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logoutCurrentAdmin()
+      await navigate({ to: '/login' })
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <Sidebar>
@@ -42,13 +56,18 @@ export function AppSidebar({
                 <SidebarMenuButton
                   asChild
                   className={`h-10 px-4 hover:bg-[#10658B] hover:text-white rounded-none font-semibold ${
-                    pathname === menu.url ? 'bg-[#0A4864] text-white hover:bg-[#0A4864]' : ''
+                    pathname === menu.url
+                      ? 'bg-[#0A4864] text-white hover:bg-[#0A4864]'
+                      : ''
                   }`}
                 >
-                  <a href={menu.url} className="w-full flex items-center gap-2">
+                  <Link
+                    to={menu.url}
+                    className="w-full flex items-center gap-2"
+                  >
                     <menu.icon />
                     <span>{menu.name}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
@@ -59,8 +78,12 @@ export function AppSidebar({
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="bg-[#A2C341] text-white font-bold hover:bg-[#A2C341]/80 hover:text-white cursor-pointer active:bg-[#A2C341]/80 active:text-white/80">
-              <LogOut /> Logout
+            <SidebarMenuButton
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="bg-[#A2C341] text-white font-bold hover:bg-[#A2C341]/80 hover:text-white cursor-pointer active:bg-[#A2C341]/80 active:text-white/80"
+            >
+              <LogOut /> {isLoggingOut ? 'Logout...' : 'Logout'}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
