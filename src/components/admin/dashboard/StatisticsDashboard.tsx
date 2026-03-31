@@ -286,74 +286,76 @@ export default function StatisticsDashboard() {
       </div>
 
       {/* Chart */}
-      <div className="w-full h-auto min-h-50 md:min-h-60 overflow-x-auto">
-        <ChartContainer
-          config={chartConfig}
-          className="min-h-50 md:min-h-60 w-full"
-        >
-          <BarChart
-            data={currentMonthData.data}
-            accessibilityLayer
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+      <div className="w-full overflow-x-auto">
+        <div style={{ minWidth: 600 }}>
+          <ChartContainer
+            config={chartConfig}
+            className="min-h-50 md:min-h-60 w-full"
           >
-            <CartesianGrid
-              horizontal={true}
-              vertical={false}
-              stroke="#d1d5db"
-            />
-            <XAxis
-              dataKey="service"
-              tick={{ fontSize: 11 }}
-              angle={-45}
-              textAnchor="end"
-              height={100}
-              tickLine={false}
-              axisLine={{ stroke: '#d1d5db' }}
-            />
-            <YAxis
-              tick={{ fontSize: 12 }}
-              tickLine={false}
-              axisLine={{ stroke: '#d1d5db' }}
-              domain={[0, 400]}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-              }}
-            />
-            <Legend
-              wrapperStyle={{
-                width: '100%',
-                lineHeight: '24px',
-              }}
-              iconType="square"
-              layout="vertical"
-              iconSize={14}
-              formatter={(value) => (
-                <span className="inline-flex items-center text-[12px] text-slate-600 mb-1 ms-1">
-                  {chartConfig[value as keyof typeof chartConfig]?.label}
-                </span>
-              )}
-            />
-            <Bar
-              dataKey="jmlReservasi"
-              fill={chartConfig.jmlReservasi.color}
-              radius={2}
-            />
-            <Bar
-              dataKey="jmlHadir"
-              fill={chartConfig.jmlHadir.color}
-              radius={2}
-            />
-            <Bar
-              dataKey="jmlTertangani"
-              fill={chartConfig.jmlTertangani.color}
-              radius={2}
-            />
-          </BarChart>
-        </ChartContainer>
+            <BarChart
+              data={currentMonthData.data}
+              accessibilityLayer
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <CartesianGrid
+                horizontal={true}
+                vertical={false}
+                stroke="#d1d5db"
+              />
+              <XAxis
+                dataKey="service"
+                tick={{ fontSize: 11 }}
+                angle={-45}
+                textAnchor="end"
+                height={100}
+                tickLine={false}
+                axisLine={{ stroke: '#d1d5db' }}
+              />
+              <YAxis
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+                axisLine={{ stroke: '#d1d5db' }}
+                domain={[0, 400]}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                }}
+              />
+              <Legend
+                wrapperStyle={{
+                  width: '100%',
+                  lineHeight: '24px',
+                }}
+                iconType="square"
+                layout="vertical"
+                iconSize={14}
+                formatter={(value) => (
+                  <span className="inline-flex items-center text-[12px] text-slate-600 mb-1 ms-1">
+                    {chartConfig[value as keyof typeof chartConfig]?.label}
+                  </span>
+                )}
+              />
+              <Bar
+                dataKey="jmlReservasi"
+                fill={chartConfig.jmlReservasi.color}
+                radius={2}
+              />
+              <Bar
+                dataKey="jmlHadir"
+                fill={chartConfig.jmlHadir.color}
+                radius={2}
+              />
+              <Bar
+                dataKey="jmlTertangani"
+                fill={chartConfig.jmlTertangani.color}
+                radius={2}
+              />
+            </BarChart>
+          </ChartContainer>
+        </div>
       </div>
     </div>
   )
