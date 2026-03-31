@@ -69,11 +69,11 @@ function RouteComponent() {
       <img
         src="/login.svg"
         alt="Login Image"
-        className="absolute right-52 w-md h-122 rounded-xl object-cover top-1/2 -translate-y-1/2 -z-10"
+        className="hidden lg:block absolute right-52 w-md h-122 rounded-xl object-cover top-1/2 -translate-y-1/2 -z-10"
       />
-      <div className="grid grid-cols-2 items-center max-w-6xl mx-auto">
-        <div className="mx-6 max-w-6xl w-3/4 my-32 space-y-4">
-          <h1 className="font-bold text-4xl text-[#0A4864]">
+      <div className="grid lg:grid-cols-2 items-center max-w-6xl mx-auto h-screen">
+        <div className="p-6 sm:p-12 rounded-lg shadow-sm lg:shadow-none bg-white lg:bg-transparent mx-6 max-w-6xl lg:w-3/4 my-auto lg:my-32 space-y-4">
+          <h1 className="font-bold text-2xl sm:text-4xl text-[#0A4864]">
             Selamat Datang Admin
           </h1>
           <p className="text-muted-foreground text-sm">

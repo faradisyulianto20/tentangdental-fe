@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useTestimonials } from '../../hooks/useTestimonials'
 
 const testimonials = [
   {
@@ -49,6 +50,16 @@ const testimonials = [
 
 export default function Testimoni() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const { data: testimonialsData, isLoading, error } = useTestimonials()
+
+  if (isLoading) {
+    return <div>Loading testimonials...</div>
+  }
+  if (error) {
+    return <div>Error loading testimonials: {error.message}</div>
+  }
+  
+  console.log(testimonialsData)
 
   console.log(currentTestimonial)
 
