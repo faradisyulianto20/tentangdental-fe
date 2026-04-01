@@ -2,11 +2,11 @@ import { apiRequest } from '@/lib/api-client'
 
 export type PromoApiItem = {
   id: number
-  title: string
+  name: string
   image_url: string | null
   original_price: number
   promo_price: number
-  description: string
+  detail: string
 }
 
 export async function getPromos(): Promise<PromoApiItem[]> {

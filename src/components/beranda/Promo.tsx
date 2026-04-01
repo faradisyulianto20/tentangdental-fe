@@ -22,7 +22,7 @@ type Promo = {
   imgUrl: string
   hargaAwal: number
   hargaDiskon: number
-  description: string
+  detail: string
 }
 
 export function PromoCard({
@@ -49,7 +49,7 @@ export function PromoCard({
         </div>
       </div>
       <div
-        dangerouslySetInnerHTML={{ __html: promo.description }}
+        dangerouslySetInnerHTML={{ __html: promo.detail }}
         className="font-bold text-primary text-xs text-left"
       />
       <Link to="/reservasi" className="mx-auto">
@@ -82,11 +82,11 @@ export default function Promo() {
     }
 
     return promosData.map((item: PromoApiItem) => ({
-      judul: String(item.title || 'Promo'),
+      judul: String(item.name || 'Promo'),
       imgUrl: resolveImage(item),
       hargaAwal: Number(item.original_price || 0),
       hargaDiskon: Number(item.promo_price || 0),
-      description: String(item.description || ''),
+      detail: String(item.detail || ''),
     }))
   }, [promosData])
 
@@ -134,7 +134,7 @@ const promos: Promo[] = [
     imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
-    description: `
+    detail: `
       <div class="text-xs text-left">
         <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
         <ul class="list-disc pl-4 space-y-1">
@@ -150,7 +150,7 @@ const promos: Promo[] = [
     imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
-    description: `
+    detail: `
       <div class="text-xs text-left">
         <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
         <ul class="list-disc pl-4 space-y-1">
@@ -166,7 +166,7 @@ const promos: Promo[] = [
     imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
-    description: `
+    detail: `
       <div class="text-xs text-left">
         <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
         <ul class="list-disc pl-4 space-y-1">
@@ -182,7 +182,7 @@ const promos: Promo[] = [
     imgUrl: '/hero.png',
     hargaAwal: 4200000,
     hargaDiskon: 3000000,
-    description: `
+    detail: `
       <div class="text-xs text-left">
         <p class="mb-1">Paket perawatan saluran akar untuk membersihkan infeksi dan menjaga kesehatan gigi.</p>
         <ul class="list-disc pl-4 space-y-1">
