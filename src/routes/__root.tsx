@@ -19,7 +19,7 @@ import Pending from '../components/error/Pending'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import SidebarAdmin from '../components/admin/SidebarAdmin'
-import { useAuth } from '@/hooks/use-auth'
+import { useAuth } from '@/hooks/useAuth'
 import { initializeAuth } from '@/lib/auth-session'
 
 import appCss from '../styles.css?url'

@@ -3,7 +3,7 @@ import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import { FieldGroup, FieldSet, FieldLabel, Field } from '@/components/ui/field'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useAuth } from '@/hooks/use-auth'
+import { useAuth } from '@/hooks/useAuth'
 import { ApiError } from '@/lib/api-client'
 import { initializeAuth, loginWithPassword } from '@/lib/auth-session'
 

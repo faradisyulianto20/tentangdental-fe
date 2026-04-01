@@ -1,10 +1,5 @@
 import { ApiError } from '@/lib/api-client'
-import {
-  getCurrentAdmin,
-  loginAdmin,
-  logoutAdmin,
-  refreshAdminToken,
-} from '@/lib/auth-api'
+import { authService } from '@/services/authService'
 import {
   clearStoredSession,
   getStoredToken,
@@ -47,7 +42,7 @@ export function getAuthSnapshot(): AuthSnapshot {
 
 async function resolveSessionFromToken(token: string): Promise<AuthSnapshot> {
   try {
-    const user = await getCurrentAdmin(token)
+    const user = await authService.me(token)
     setStoredToken(token)
     setStoredUser(user)
 
@@ -61,8 +56,8 @@ async function resolveSessionFromToken(token: string): Promise<AuthSnapshot> {
     const apiError = error instanceof ApiError ? error : null
 
     if (apiError && apiError.status === 401) {
-      const nextToken = await refreshAdminToken(token)
-      const user = await getCurrentAdmin(nextToken)
+      const nextToken = await authService.refresh(token)
+      const user = await authService.me(nextToken)
 
       setStoredToken(nextToken)
       setStoredUser(user)
@@ -126,7 +121,7 @@ export async function initializeAuth(): Promise<AuthSnapshot> {
 export async function loginWithPassword(
   payload: LoginPayload,
 ): Promise<AuthSnapshot> {
-  const result = await loginAdmin(payload)
+  const result = await authService.login(payload)
   setStoredToken(result.token)
   setStoredUser(result.user)
 
@@ -143,7 +138,7 @@ export async function logoutCurrentAdmin(): Promise<void> {
 
   try {
     if (token) {
-      await logoutAdmin(token)
+      await authService.logout(token)
     }
   } finally {
     clearStoredSession()

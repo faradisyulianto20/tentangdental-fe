@@ -1,11 +1,17 @@
-const BASE_URL = "http://127.0.0.1:8000/";
+import { apiRequest } from '@/lib/api-client'
 
-const getTestimonials = async () => {
-  const response = await fetch(`${BASE_URL}api/testimonials`);
-    if (!response.ok) {
-        throw new Error("Failed to fetch testimonials");
-    }
-    return response.json();
+export type TestimonialApiItem = {
+  id: number
+  name: string
+  rating: number
+  testimoni: string
+  photo_url: string | null
+  created_at: string
 }
 
-export { getTestimonials }
+export async function getTestimonials(): Promise<TestimonialApiItem[]> {
+  return apiRequest<TestimonialApiItem[]>('testimonials', {
+    method: 'GET',
+    auth: false,
+  })
+}

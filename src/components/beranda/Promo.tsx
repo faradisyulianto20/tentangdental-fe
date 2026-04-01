@@ -1,6 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import { motion } from 'framer-motion'
+import { usePromos } from '@/hooks/usePromo'
+import { useMemo } from 'react'
+import type { PromoApiItem } from '@/services/promoServices'
+import { appEnv } from '@/lib/env'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -21,7 +25,13 @@ type Promo = {
   description: string
 }
 
-export function PromoCard({ promo, variants }: { promo: Promo; variants: any }) {
+export function PromoCard({
+  promo,
+  variants,
+}: {
+  promo: Promo
+  variants: any
+}) {
   return (
     <motion.div
       variants={variants}
@@ -42,7 +52,7 @@ export function PromoCard({ promo, variants }: { promo: Promo; variants: any }) 
         dangerouslySetInnerHTML={{ __html: promo.description }}
         className="font-bold text-primary text-xs text-left"
       />
-      <Link to="/reservasi" className='mx-auto'>
+      <Link to="/reservasi" className="mx-auto">
         <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
           Pesan Sekarang
         </Button>
@@ -52,6 +62,36 @@ export function PromoCard({ promo, variants }: { promo: Promo; variants: any }) 
 }
 
 export default function Promo() {
+  const { data: promosData } = usePromos()
+
+  const fetchedPromos = useMemo(() => {
+    if (!Array.isArray(promosData)) return []
+
+    const resolveImage = (item: PromoApiItem) => {
+      if (typeof item.image_url !== 'string' || item.image_url.length === 0) {
+        return '/hero.png'
+      }
+
+      if (item.image_url.startsWith('http')) {
+        return item.image_url
+      }
+
+      const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+      const cleanPath = item.image_url.replace(/^\/+/, '')
+      return cleanBase + '/' + cleanPath
+    }
+
+    return promosData.map((item: PromoApiItem) => ({
+      judul: String(item.title || 'Promo'),
+      imgUrl: resolveImage(item),
+      hargaAwal: Number(item.original_price || 0),
+      hargaDiskon: Number(item.promo_price || 0),
+      description: String(item.description || ''),
+    }))
+  }, [promosData])
+
+  const promosSource = fetchedPromos.length > 0 ? fetchedPromos : promos
+
   return (
     <div className="text-center max-w-6xl mx-6">
       <motion.h1
@@ -77,7 +117,7 @@ export default function Promo() {
         viewport={{ once: true, amount: 0.2 }}
         className="flex flex-wrap justify-center gap-4 mt-6"
       >
-        {promos.map((promo, index) => (
+        {promosSource.map((promo, index) => (
           <PromoCard key={index} promo={promo} variants={itemVariants} />
         ))}
       </motion.div>

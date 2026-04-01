@@ -23,6 +23,18 @@ const images = [
 
 export default function GalleryCarousel() {
   const [current, setCurrent] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const applyViewport = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    applyViewport()
+    window.addEventListener('resize', applyViewport)
+
+    return () => window.removeEventListener('resize', applyViewport)
+  }, [])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -45,8 +57,6 @@ export default function GalleryCarousel() {
   const getStyle = (offset: number): React.CSSProperties => {
     const absOffset = Math.abs(offset)
     if (absOffset > 2) return { display: 'none' }
-
-    const isMobile = window.innerWidth < 768
 
     const configs: Record<number, React.CSSProperties> = {
       0: {
@@ -93,7 +103,13 @@ export default function GalleryCarousel() {
       </div>
       {/* Carousel */}
       {/* Carousel container - lebih kecil di mobile */}
-      <motion.div variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} className="relative w-full max-w-4xl h-50 md:h-80">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        className="relative w-full max-w-4xl h-50 md:h-80"
+      >
         {images.map((img, index) => {
           const offset = getPosition(index)
           const style = getStyle(offset)
