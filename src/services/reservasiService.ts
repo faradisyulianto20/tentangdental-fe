@@ -1,42 +1,50 @@
-import { apiRequest } from '#/lib/api-client'
+import { apiRequest } from '@/lib/api-client'
 
-export type ReservasiApiItem = {
-  id: number
+export type PatientCategory = 'new' | 'existing'
+
+export type CreatePublicReservationPayload = {
+  patient_category: PatientCategory
+  name: string
+  phone: string
+  gender?: 'male' | 'female'
+  address?: string
+  birth_date?: string
+  age?: number
+  doctor_id: number
+  complain: string
+  reservation_date: string
+  appointment_time: string
+  service_ids: number[]
+}
+
+export type PublicReservationResult = {
+  id: string | number
   patient: {
-    id: number
+    id: string | number
     name: string
     phone: string
   }
   services: string
   doctor: {
-    id: number
+    id: string | number
     name: string
   }
   complain: string
   reservation_date: string
   appointment_time: string
-  birth_date: string
-  age: number
+  birth_date: string | null
+  age: string | number | null
   patient_category: string
   status: string
-  created_at: string | null
+  created_at: string
 }
 
-export type ReservasiPagination = {
-  current_page: number
-  last_page: number
-  per_page: number
-  total: number
-}
-
-export async function getReservasi(): Promise<ReservasiApiItem[]> {
-  const response = await apiRequest<{
-    reservations: ReservasiApiItem[]
-    pagination: ReservasiPagination
-  }>('/admin/reservations', {
-    method: 'GET',
-    auth: true,
+export async function createPublicReservation(
+  payload: CreatePublicReservationPayload,
+): Promise<PublicReservationResult> {
+  return apiRequest<PublicReservationResult>('reservations', {
+    method: 'POST',
+    auth: false,
+    body: payload,
   })
-
-  return response?.reservations ?? []
 }

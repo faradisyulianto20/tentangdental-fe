@@ -11,6 +11,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DatePicker } from '@/components/ui/date-picker'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 // import { MultiSelect } from '@/components/ui/multi-select'
 import { useState, useEffect, useRef } from 'react'
 import type { CheckedState } from '@radix-ui/react-checkbox'
@@ -23,23 +31,13 @@ import {
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
+import { useNavigate } from '@tanstack/react-router'
+import { useDokter } from '@/hooks/useDokter'
+import { useLayanan } from '@/hooks/useLayanan'
+import { useCreatePublicReservation } from '#/hooks/useReservasi'
+import { ApiError } from '@/lib/api-client'
 
-const dokter = ['Dr. Andi', 'Dr. Budi', 'Dr. Citra']
-
-const layanan = [
-  'Scaling',
-  'Oral Profilaksis',
-  'Tambal Gigi',
-  'Desensitasi Gigi',
-  'Perawatan Saluran Akar',
-  'Cabut Gigi',
-  'Perawatan Gigi Anak',
-  'Bleaching',
-  'Veneer',
-  'Aligner Gigi',
-  'Crown',
-  'Gigi Tiruan',
-]
+type ServerFieldErrors = Partial<Record<string, string>>
 
 const badgeColors = [
   'bg-purple-100 text-purple-700 border-purple-200',
@@ -55,25 +53,89 @@ const badgeColors = [
 const formSchema = z.object({
   namaLengkap: z.string().min(1, 'Nama lengkap harus diisi'),
   nomorHandphone: z.string().min(1, 'Nomor handphone harus diisi'),
-  tanggalLahir: z
-    .date({ required_error: 'Tanggal lahir harus diisi' })
-    .nullable()
-    .refine((val) => val !== null, { message: 'Tanggal lahir harus diisi' }),
-  umur: z.string().min(1, 'Umur harus diisi'),
+  tanggalLahir: z.date().nullable(),
+  umur: z.string().optional(),
   jadwalPeriksa: z
     .date({ required_error: 'Jadwal periksa harus diisi' })
     .nullable()
     .refine((val) => val !== null, { message: 'Jadwal periksa harus diisi' }),
-  jamReservasi: z.string().min(1, 'Jam reservasi harus diisi'),
+  jamReservasi: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format jam harus HH:MM'),
   pilihanDokter: z.string().min(1, 'Pilihan dokter harus diisi'),
-  layanan: z.array(z.string()).min(1, 'Layanan harus dipilih'),
+  layanan: z
+    .array(z.string())
+    .min(1, 'Layanan harus dipilih')
+    .max(3, 'Maksimal 3 layanan'),
   nomorPasien: z.string().optional(),
   keluhan: z.string().min(1, 'Keluhan harus diisi'),
 })
 
 export default function FormReservasi() {
+  const navigate = useNavigate()
+  const { data: doctorsData } = useDokter()
+  const { data: servicesData } = useLayanan()
+  const createReservation = useCreatePublicReservation()
   const [checked, setChecked] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [submitError, setSubmitError] = useState<string>('')
+  const [serverErrors, setServerErrors] = useState<ServerFieldErrors>({})
+  const [successOpen, setSuccessOpen] = useState(false)
+  const [createdPatientId, setCreatedPatientId] = useState<string>('')
+
+  const doctors = Array.isArray(doctorsData)
+    ? doctorsData.map((doctor) => ({
+        id: String(doctor.id),
+        name: doctor.name,
+      }))
+    : []
+
+  const services = Array.isArray(servicesData)
+    ? servicesData.map((service) => ({
+        id: String(service.id),
+        name: service.name,
+      }))
+    : []
+
+  const mapServerFieldErrors = (
+    input: Record<string, unknown>,
+  ): ServerFieldErrors => {
+    const mapped: ServerFieldErrors = {}
+    const mappings: Record<string, string> = {
+      name: 'namaLengkap',
+      phone: 'nomorHandphone',
+      birth_date: 'tanggalLahir',
+      age: 'umur',
+      doctor_id: 'pilihanDokter',
+      complain: 'keluhan',
+      reservation_date: 'jadwalPeriksa',
+      appointment_time: 'jamReservasi',
+      service_ids: 'layanan',
+      patient_category: 'nomorPasien',
+    }
+
+    Object.entries(input).forEach(([key, value]) => {
+      const mappedKey = mappings[key]
+      const messages = Array.isArray(value)
+        ? value
+        : typeof value === 'string'
+          ? [value]
+          : []
+
+      if (mappedKey && messages.length > 0) {
+        mapped[mappedKey] = String(messages[0])
+      }
+    })
+
+    return mapped
+  }
+
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
 
   const { Field, handleSubmit, reset, setFieldValue } = useForm({
     defaultValues: {
@@ -88,7 +150,6 @@ export default function FormReservasi() {
       nomorPasien: '' as string,
       keluhan: '' as string,
     },
-    // Validasi menggunakan Zod, jika submit dan ada error, akan mengembalikan object dengan field yang error beserta pesan errornya
     validators: {
       onSubmit: ({ value }) => {
         const result = formSchema.safeParse(value)
@@ -96,21 +157,20 @@ export default function FormReservasi() {
           return {
             fields: Object.fromEntries(
               Object.entries(result.error.flatten().fieldErrors).map(
-                ([key, val]) => [key, val?.[0]], // ambil error pertama per field
+                ([key, val]) => [key, val?.[0]],
               ),
             ),
           }
         }
         return undefined
       },
-      // Validasi real-time saat field berubah, bisa diaktifkan jika ingin langsung validasi saat user input, tapi bisa jadi mengganggu UX kalau terlalu sensitif
       onBlur: ({ value }) => {
         const result = formSchema.safeParse(value)
         if (!result.success) {
           return {
             fields: Object.fromEntries(
               Object.entries(result.error.flatten().fieldErrors).map(
-                ([key, val]) => [key, val?.[0]], // ambil error pertama per field
+                ([key, val]) => [key, val?.[0]],
               ),
             ),
           }
@@ -119,8 +179,60 @@ export default function FormReservasi() {
       },
     },
     onSubmit: async ({ value }) => {
-      reset()
-      console.log('Submitting reservasi:', value)
+      setSubmitError('')
+      setServerErrors({})
+
+      try {
+        const payload = {
+          patient_category: checked ? 'existing' : 'new',
+          name: value.namaLengkap,
+          phone: value.nomorHandphone,
+          gender: 'male' as const,
+          address: '-',
+          birth_date: value.tanggalLahir
+            ? formatDate(value.tanggalLahir)
+            : undefined,
+          age: value.umur ? Number(value.umur) : undefined,
+          doctor_id: Number(value.pilihanDokter),
+          complain: value.keluhan,
+          reservation_date:
+            value.jadwalPeriksa !== null
+              ? formatDate(value.jadwalPeriksa)
+              : formatDate(new Date()),
+          appointment_time: value.jamReservasi,
+          service_ids: value.layanan.map((item) => Number(item)),
+        }
+
+        const result = await createReservation.mutateAsync(payload)
+        setCreatedPatientId(String(result.patient.id))
+        setSuccessOpen(true)
+        reset()
+        setChecked(false)
+      } catch (error) {
+        if (error instanceof ApiError) {
+          const payload =
+            typeof error.payload === 'object' && error.payload !== null
+              ? (error.payload as Record<string, unknown>)
+              : null
+
+          const message =
+            payload && typeof payload.message === 'string'
+              ? payload.message
+              : error.message
+
+          setSubmitError(message)
+
+          if (payload && typeof payload.errors === 'object' && payload.errors) {
+            setServerErrors(
+              mapServerFieldErrors(payload.errors as Record<string, unknown>),
+            )
+          }
+
+          return
+        }
+
+        setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
+      }
     },
   })
 
@@ -128,10 +240,8 @@ export default function FormReservasi() {
     <div className="w-full mt-6">
       <form
         onSubmit={(e) => {
-          // Pastikan onSubmit dari react-hook-form terpanggil dengan benar
           e.preventDefault()
-          // Otomatis punya handleSubmit()
-          handleSubmit()
+          void handleSubmit()
         }}
       >
         <FieldGroup>
@@ -144,13 +254,13 @@ export default function FormReservasi() {
                     label="Nama Lengkap"
                     placeholder="Masukkan nama lengkap Anda"
                     field={field}
+                    serverError={serverErrors.namaLengkap}
                   />
                 )}
               </Field>
             </FieldGroup>
 
             <FieldGroup className="grid sm:grid-cols-2">
-              {/* ===== Tanggal Lahir ===== */}
               <Field name="tanggalLahir">
                 {(field) => {
                   const { errors, isTouched } = field.state.meta
@@ -175,9 +285,10 @@ export default function FormReservasi() {
                         onBlur={field.handleBlur}
                         placeholder="Pilih tanggal lahir"
                       />
-                      {errors.length > 0 && isTouched && (
+                      {((errors.length > 0 && isTouched) ||
+                        serverErrors.tanggalLahir) && (
                         <FieldDescription className="text-destructive">
-                          {String(errors[0])}
+                          {serverErrors.tanggalLahir || String(errors[0])}
                         </FieldDescription>
                       )}
                     </div>
@@ -185,7 +296,6 @@ export default function FormReservasi() {
                 }}
               </Field>
 
-              {/* ===== Umur ===== */}
               <Field name="umur">
                 {(field) => (
                   <TextField
@@ -193,11 +303,11 @@ export default function FormReservasi() {
                     label="Umur"
                     placeholder="Masukkan umur Anda"
                     field={field}
+                    serverError={serverErrors.umur}
                   />
                 )}
               </Field>
 
-              {/* ===== Nomor Handphone ===== */}
               <Field name="nomorHandphone">
                 {(field) => (
                   <TextField
@@ -205,11 +315,11 @@ export default function FormReservasi() {
                     label="Nomor Handphone"
                     placeholder="Masukkan nomor handphone Anda"
                     field={field}
+                    serverError={serverErrors.nomorHandphone}
                   />
                 )}
               </Field>
 
-              {/* ===== Jadwal Periksa ===== */}
               <Field name="jadwalPeriksa">
                 {(field) => {
                   const { errors, isTouched } = field.state.meta
@@ -223,9 +333,10 @@ export default function FormReservasi() {
                         onBlur={field.handleBlur}
                         placeholder="Pilih jadwal periksa"
                       />
-                      {errors.length > 0 && isTouched && (
+                      {((errors.length > 0 && isTouched) ||
+                        serverErrors.jadwalPeriksa) && (
                         <FieldDescription className="text-destructive">
-                          {String(errors[0])}
+                          {serverErrors.jadwalPeriksa || String(errors[0])}
                         </FieldDescription>
                       )}
                     </div>
@@ -233,7 +344,6 @@ export default function FormReservasi() {
                 }}
               </Field>
 
-              {/* ===== Jam Reservasi ===== */}
               <Field name="jamReservasi">
                 {(field) => (
                   <TextField
@@ -241,11 +351,11 @@ export default function FormReservasi() {
                     label="Jam Reservasi"
                     placeholder="Masukkan jam reservasi (misal: 14:30)"
                     field={field}
+                    serverError={serverErrors.jamReservasi}
                   />
                 )}
               </Field>
 
-              {/* ===== Pilihan Dokter ===== */}
               <Field name="pilihanDokter">
                 {(field) => {
                   const { errors, isTouched } = field.state.meta
@@ -278,19 +388,20 @@ export default function FormReservasi() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                          {dokter.map((d) => (
+                          {doctors.map((doctor) => (
                             <DropdownMenuItem
-                              key={d}
-                              onSelect={() => field.handleChange(d)}
+                              key={doctor.id}
+                              onSelect={() => field.handleChange(doctor.id)}
                             >
-                              {d}
+                              {doctor.name}
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      {errors.length > 0 && isTouched && (
+                      {((errors.length > 0 && isTouched) ||
+                        serverErrors.pilihanDokter) && (
                         <FieldDescription className="text-destructive">
-                          {String(errors[0])}
+                          {serverErrors.pilihanDokter || String(errors[0])}
                         </FieldDescription>
                       )}
                     </div>
@@ -298,7 +409,6 @@ export default function FormReservasi() {
                 }}
               </Field>
 
-              {/* ===== Layanan ===== */}
               <Field name="layanan">
                 {(field) => {
                   const { errors, isTouched } = field.state.meta
@@ -308,12 +418,14 @@ export default function FormReservasi() {
                       <FieldLabel>Layanan</FieldLabel>
                       <LayananMultiSelect
                         value={field.state.value}
+                        items={services}
                         onChange={(val) => field.handleChange(val)}
                         onBlur={field.handleBlur}
                       />
-                      {errors.length > 0 && isTouched && (
+                      {((errors.length > 0 && isTouched) ||
+                        serverErrors.layanan) && (
                         <FieldDescription className="text-destructive">
-                          {String(errors[0])}
+                          {serverErrors.layanan || String(errors[0])}
                         </FieldDescription>
                       )}
                     </div>
@@ -351,6 +463,7 @@ export default function FormReservasi() {
                       label="Nomor Pasien"
                       placeholder="Masukkan nomor pasien Anda"
                       field={field}
+                      serverError={serverErrors.nomorPasien}
                     />
                   )}
                 </Field>
@@ -372,9 +485,10 @@ export default function FormReservasi() {
                         onChange={(e) => field.handleChange(e.target.value)}
                         onBlur={field.handleBlur}
                       />
-                      {errors.length > 0 && isTouched && (
+                      {((errors.length > 0 && isTouched) ||
+                        serverErrors.keluhan) && (
                         <FieldDescription className="text-destructive">
-                          {String(errors[0])}
+                          {serverErrors.keluhan || String(errors[0])}
                         </FieldDescription>
                       )}
                     </div>
@@ -384,21 +498,60 @@ export default function FormReservasi() {
             </FieldGroup>
           </FieldSet>
 
+          {submitError && (
+            <FieldDescription className="text-destructive">
+              {submitError}
+            </FieldDescription>
+          )}
+
           <div>
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={createReservation.isPending}>
+              {createReservation.isPending ? 'Mengirim...' : 'Submit'}
+            </Button>
           </div>
         </FieldGroup>
       </form>
+
+      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reservasi Berhasil</DialogTitle>
+            <DialogDescription>
+              Data reservasi Anda berhasil dikirim dan sedang menunggu
+              konfirmasi admin.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+            <p className="text-sm text-muted-foreground">Nomor Pasien</p>
+            <p className="text-lg font-bold text-primary">{createdPatientId}</p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              onClick={async () => {
+                setSuccessOpen(false)
+                await navigate({ to: '/reservasi' })
+              }}
+              className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4]"
+            >
+              Kembali ke Reservasi
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
 
 function LayananMultiSelect({
   value,
+  items,
   onChange,
   onBlur,
 }: {
   value: string[]
+  items: Array<{ id: string; name: string }>
   onChange: (val: string[]) => void
   onBlur: () => void
 }) {
@@ -436,35 +589,39 @@ function LayananMultiSelect({
         {value.length === 0 && (
           <span className="text-muted-foreground">Pilih layanan...</span>
         )}
-        {value.map((item, i) => (
-          <span
-            key={item}
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${badgeColors[i % badgeColors.length]}`}
-          >
-            {item}
-            <X
-              className="w-3 h-3 cursor-pointer opacity-60 hover:opacity-100"
-              onClick={(e) => remove(item, e)}
-            />
-          </span>
-        ))}
+        {value.map((item, i) => {
+          const label =
+            items.find((service) => service.id === item)?.name || item
+          return (
+            <span
+              key={item}
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium border ${badgeColors[i % badgeColors.length]}`}
+            >
+              {label}
+              <X
+                className="w-3 h-3 cursor-pointer opacity-60 hover:opacity-100"
+                onClick={(e) => remove(item, e)}
+              />
+            </span>
+          )
+        })}
       </div>
 
       {open && (
         <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-md shadow-md max-h-52 overflow-y-auto">
-          {layanan.map((item) => (
+          {items.map((item) => (
             <div
-              key={item}
+              key={item.id}
               onMouseDown={(e) => {
                 e.preventDefault()
-                toggle(item)
+                toggle(item.id)
               }}
               className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground ${
-                value.includes(item) ? 'bg-accent/40 font-medium' : ''
+                value.includes(item.id) ? 'bg-accent/40 font-medium' : ''
               }`}
             >
-              {item}
-              {value.includes(item) && (
+              {item.name}
+              {value.includes(item.id) && (
                 <span className="text-xs text-muted-foreground">✓</span>
               )}
             </div>
@@ -479,6 +636,7 @@ type TextFieldProps = {
   id?: string
   label: string
   placeholder: string
+  serverError?: string
   field: {
     state: { value: string; meta: { errors: unknown[]; isTouched: boolean } }
     handleChange: (val: string) => void
@@ -486,7 +644,13 @@ type TextFieldProps = {
   }
 }
 
-function TextField({ id, label, placeholder, field }: TextFieldProps) {
+function TextField({
+  id,
+  label,
+  placeholder,
+  field,
+  serverError,
+}: TextFieldProps) {
   const { errors, isTouched } = field.state.meta
   return (
     <div className="space-y-4">
@@ -498,9 +662,9 @@ function TextField({ id, label, placeholder, field }: TextFieldProps) {
         onChange={(e) => field.handleChange(e.target.value)}
         onBlur={field.handleBlur}
       />
-      {errors.length > 0 && isTouched && (
+      {((errors.length > 0 && isTouched) || serverError) && (
         <FieldDescription className="text-destructive">
-          {String(errors[0])}
+          {serverError || String(errors[0])}
         </FieldDescription>
       )}
     </div>

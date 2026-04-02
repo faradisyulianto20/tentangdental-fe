@@ -148,7 +148,8 @@ const reservations: Reservation[] = [
     tanggalLahir: '1999-11-03',
     namaOrangTua: 'David Johnson',
     kotaKabupaten: 'Bantul',
-    kecamatan:KasihanTirtonirmolo    kelurahan: '',
+    kecamatan: 'Kasihan',
+    kelurahan: 'Tirtonirmolo',
     alamatLengkap: 'Jl. Bantul No. 22',
     tinggiBadan: '158',
     beratBadan: '50',
@@ -221,7 +222,9 @@ export function ReservationCard({ res }: { res: ReservasiApiItem }) {
       <div className="flex flex-col-reverse lg:flex-row justify-between">
         <div>
           <h2 className="text-lg font-bold">{res?.patient?.name}</h2>
-          <p className="text-sm text-muted-foreground">{res.services?.[0]?.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {res.services?.[0]?.name}
+          </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 mb-3">
           <Button
@@ -1007,7 +1010,9 @@ export default function Reservation() {
     day: 'numeric',
   })
 
-  const reservationFiltered = reservasiData?.filter((r) => r.status !== 'completed')
+  const reservationFiltered = reservasiData?.filter(
+    (r) => r.status !== 'completed',
+  )
 
   return (
     <div className="flex flex-col p-4 shadow-md rounded-lg">
