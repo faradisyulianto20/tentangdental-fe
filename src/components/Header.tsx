@@ -2,21 +2,7 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { Button } from './ui/button'
 import { useState, useRef, useEffect } from 'react'
 import { Menu, X, ChevronDown } from 'lucide-react'
-
-const layanan = [
-  'Scaling',
-  'Oral Profilaksis',
-  'Tambal Gigi',
-  'Desensitasi Gigi',
-  'Perawatan Saluran Akar',
-  'Cabut Gigi',
-  'Perawatan Gigi Anak',
-  'Bleaching',
-  'Veneer',
-  'Aligner Gigi',
-  'Crown',
-  'Gigi Tiruan',
-]
+import { useLayanan } from '#/hooks/useLayanan'
 
 const navigation = [
   { name: 'Beranda', href: '/' },
@@ -27,6 +13,7 @@ const navigation = [
 ] as const
 
 export default function Header() {
+  const { data: layananData = [], isLoading, isError } = useLayanan()
   const { location } = useRouterState()
   const currentPath = location.pathname
   const [menuOpen, setMenuOpen] = useState(false)
@@ -94,15 +81,15 @@ export default function Header() {
 
                     {layananOpen && (
                       <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-105 bg-white rounded-xl shadow-lg border border-gray-100 p-4 grid grid-cols-3 gap-2 z-50">
-                        {layanan.map((name) => (
+                        {layananData.map((item) => (
                           <Link
-                            key={name}
+                            key={item.name}
                             to="/layanan"
-                            search={{ id: name.toLowerCase().replace(/ /g, '-') }}
+                            search={{ id: String(item.id) }}
                             onClick={() => setLayananOpen(false)}
                             className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg p-2 transition"
                           >
-                            {name}
+                            {item.name}
                           </Link>
                         ))}
                       </div>
@@ -163,18 +150,18 @@ export default function Header() {
 
                     {layananOpen && (
                       <div className="grid grid-cols-2 gap-1 pl-4 pb-2">
-                        {layanan.map((name) => (
+                        {layananData.map((item) => (
                           <Link
-                            key={name}
+                            key={item.name}
                             to="/layanan"
-                            search={{ id: name.toLowerCase().replace(/ /g, '-') }}
+                            search={{ id: String(item.id) }}
                             onClick={() => {
                               setLayananOpen(false)
                               setMenuOpen(false)
                             }}
                             className="text-sm text-gray-700 hover:text-[#58C4EC] rounded-lg py-2 transition"
                           >
-                            {name}
+                            {item.name}
                           </Link>
                         ))}
                       </div>

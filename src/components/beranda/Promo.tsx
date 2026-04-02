@@ -3,7 +3,7 @@ import { Button } from '../ui/button'
 import { motion } from 'framer-motion'
 import { usePromos } from '@/hooks/usePromo'
 import { useMemo } from 'react'
-import type { PromoApiItem } from '@/services/promoServices'
+import type { PromoApiItem } from '#/services/promoService'
 import { appEnv } from '@/lib/env'
 
 const containerVariants = {
@@ -50,9 +50,9 @@ export function PromoCard({
       </div>
       <div
         dangerouslySetInnerHTML={{ __html: promo.detail }}
-        className="font-bold text-primary text-xs text-left"
+        className="font-bold text-primary text-xs text-left overflow-auto h-32"
       />
-      <Link to="/reservasi" className="mx-auto">
+      <Link to="/reservasi" className="mx-auto items-justify-end mt-auto">
         <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
           Pesan Sekarang
         </Button>
@@ -90,7 +90,8 @@ export default function Promo() {
     }))
   }, [promosData])
 
-  const promosSource = fetchedPromos.length > 0 ? fetchedPromos : promos
+  const promosSource =
+    fetchedPromos.length > 0 ? fetchedPromos : promos
 
   return (
     <div className="text-center max-w-6xl mx-6">

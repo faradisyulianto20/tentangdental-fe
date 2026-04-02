@@ -1,13 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
 import { useState, useEffect } from 'react'
+import { useLayananById, useLayanan } from '@/hooks/useLayanan'
 
 export const Route = createFileRoute('/layanan')({
-  validateSearch: (search) => {
+  validateSearch: (search: Record<string, unknown>) => {
     return {
-      id: search.id,
+      id: typeof search.id === 'string' ? search.id : '',
     }
   },
   component: RouteComponent,
@@ -41,18 +41,29 @@ function RouteComponent() {
     setTotalLayanan(4)
   }, [id])
 
+  const { data: artikel, isLoading: isArtikelLoading, isError: isArtikelError } = useLayananById(id)
+  const { data: layanan = [], isLoading: isLayananLoading, isError: isLayananError } = useLayanan()
+
   const handleNavigate = (id: string) => {
     navigate({
       to: '/layanan',
-      search: { id },
+      search: { id: id },
     })
   }
+  
 
   const layananFiltered = layanan
-    .filter((item) => item.title.toLocaleLowerCase() !== id)
+    .filter((item) => item.id !== parseInt(id))
     .slice(0, totalLayanan)
 
-  console.log(totalLayanan)
+  if (isArtikelLoading || isLayananLoading) {
+    return <div className="flex justify-center items-center h-64">Loading...</div>
+  }
+
+  if (isArtikelError || isLayananError) {
+    return <div className="flex justify-center items-center h-64">Error loading data</div>
+  }
+
 
   return (
     <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto">
@@ -63,7 +74,7 @@ function RouteComponent() {
         animate="visible"
         className="text-primary text-xl md:text-3xl font-bold"
       >
-        {artikel.title}
+        {artikel?.name}
       </motion.h1>
 
       <motion.p
@@ -73,7 +84,7 @@ function RouteComponent() {
         animate="visible"
         className="text-muted-foreground text-sm md:text-base mt-3"
       >
-        {artikel.subtitle}
+        {artikel?.detail}
       </motion.p>
 
       <motion.div
@@ -84,8 +95,8 @@ function RouteComponent() {
         className="w-full my-12 rounded-xl max-w-290.75 h-111.75 overflow-hidden"
       >
         <img
-          src={artikel.imgPath}
-          alt={artikel.title}
+          src={artikel?.support_img_url || '/layanan-default.png'}
+          alt={artikel?.name ?? ''}
           className="object-cover w-full h-full"
         />
       </motion.div>
@@ -96,11 +107,13 @@ function RouteComponent() {
           custom={0.4}
           initial="hidden"
           animate="visible"
-          className="prose prose-sm md:prose-base max-w-none text-muted-foreground"
-          dangerouslySetInnerHTML={{ __html: artikel.content }}
+          className="prose prose-sm md:prose-base max-w-none text-muted-foreground flex-1"
+          dangerouslySetInnerHTML={{
+            __html: artikel?.article_content ?? '',
+          }}
         />
 
-        <div className="w-2/4">
+        <div className="w-full md:w-1/2">
           <motion.h2
             variants={fadeUp}
             custom={0.45}
@@ -117,20 +130,20 @@ function RouteComponent() {
             animate="visible"
             className="flex flex-col gap-3 mt-6"
           >
-            {layananFiltered.map((item, index) => (
+            {layananFiltered.map((item) => (
               <motion.button
-                key={index}
+                key={item.id}
                 variants={itemVariants}
-                onClick={() => handleNavigate(item.title)}
-                className="flex items-left text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
+                onClick={() => handleNavigate(String(item.id))}
+                className="flex items-center text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
               >
                 <img
-                  src={`/${item.icon}`}
-                  alt={item.title}
+                  src={`/${item.icon_url}`}
+                  alt={item.name}
                   className="w-8 h-8"
                 />
                 <div>
-                  <h2 className="text-base font-bold">{item.title}</h2>
+                  <h2 className="text-base font-bold">{item.name}</h2>
                 </div>
               </motion.button>
             ))}
@@ -145,7 +158,7 @@ function RouteComponent() {
           >
             <Button
               className="mt-6"
-              onClick={() => setTotalLayanan(totalLayanan + 5)}
+              onClick={() => setTotalLayanan((prev) => prev + 5)}
             >
               Lebih Banyak
             </Button>
@@ -155,54 +168,3 @@ function RouteComponent() {
     </div>
   )
 }
-
-const artikel = {
-  title: 'Scaling',
-  subtitle:
-    'Scaling gigi adalah prosedur untuk membersihkan plak dan karang gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  imgPath: 'berita1.png',
-  content: `
-    <h2>Apa itu Scaling Gigi?</h2>
-    <p>
-      Scaling gigi adalah prosedur untuk membersihkan atau menghilangkan karang (mineral yang mengeras) 
-      yang menempel di garis gusi. Perawatan ini umum bisa kamu lakukan untuk melindungi enamel gigi 
-      di bawah gusi dan jaringan gusi dari penyakit periodontal.
-    </p>
-    <p>
-      Selain itu, dengan gigi dan gusi yang sehat, kamu juga bisa terhindar dari masalah mulut lainnya 
-      dan kehilangan gigi.
-    </p>
-    <p>
-      Prosedur ini juga sering dilakukan bersamaan dengan <strong>root planing</strong> atau kerap juga 
-      disebut sebagai <em>deep cleaning</em>. Jika scaling menghilangkan karang dari permukaan gigi yang 
-      terlihat saat tersenyum, root planing menghilangkan karang gigi dari akar gigi di bawah garis gusi.
-    </p>
-
-    <h2>Tujuan Scaling Gigi</h2>
-    <p>Prosedur scaling memiliki beberapa tujuan, yaitu:</p>
-    <ul>
-      <li>Untuk menghilangkan plak dan karang dari area yang tidak dapat sikat gigi jangkau.</li>
-      <li>Menghindari atau mencegah penyakit gusi.</li>
-      <li>
-        Mencegah pembentukan poket — kantong yang terbentuk ketika penumpukan plak terus menerus 
-        menyebabkan gusi kehilangan kontak eratnya dengan gigi, yang mendukung lebih banyak plak 
-        untuk disimpan. Semakin dalam kantong, semakin parah penyakit gusi berkembang.
-      </li>
-    </ul>
-  `,
-}
-
-const layanan = [
-  { title: 'Scaling', icon: 'gigi.svg' },
-  { title: 'Oral Profilaksis', icon: 'gigi.svg' },
-  { title: 'Tambal Gigi', icon: 'gigi.svg' },
-  { title: 'Desentisasi Gigi', icon: 'gigi.svg' },
-  { title: 'Perawatan Saluran Akar', icon: 'gigi.svg' },
-  { title: 'Cabut Gigi', icon: 'gigi.svg' },
-  { title: 'Perawatan Gigi Anak', icon: 'gigi.svg' },
-  { title: 'Bleaching', icon: 'gigi.svg' },
-  { title: 'Veneer', icon: 'gigi.svg' },
-  { title: 'Aligner Gigi', icon: 'gigi.svg' },
-  { title: 'Crown', icon: 'gigi.svg' },
-  { title: 'Gigi Tiruan', icon: 'gigi.svg' },
-]

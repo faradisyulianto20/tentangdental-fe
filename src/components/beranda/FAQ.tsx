@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useFaq } from '@/hooks/useFaq'
+import type { FaqApiItem } from '#/services/faqService'
 
 const containerVariants = {
   hidden: {},
@@ -13,6 +15,7 @@ const itemVariants = {
 }
 
 export default function FAQ() {
+  const { data: faqData = [], isLoading, isError } = useFaq()  
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
@@ -43,7 +46,7 @@ export default function FAQ() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        {faq.map((item, index) => (
+        {faqData.map((item, index) => (
           <FAQItem
             key={index}
             item={item}
@@ -62,7 +65,7 @@ export function FAQItem({
   isOpen,
   onClick,
 }: {
-  item: (typeof faq)[0]
+  item: FaqApiItem
   index: number
   isOpen: boolean
   onClick: () => void
@@ -77,7 +80,7 @@ export function FAQItem({
         <p
           className={`font-bold text-sm md:text-base ${isOpen ? 'line-clamp-none' : 'line-clamp-1'}`}
         >
-          {item.pertanyaan}
+          {item.question}
         </p>
         <ChevronRight
           className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}
@@ -94,33 +97,10 @@ export function FAQItem({
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="text-muted-foreground text-sm md:text-base overflow-hidden"
           >
-            {item.jawaban}
+            {item.answer}
           </motion.p>
         )}
       </AnimatePresence>
     </motion.div>
   )
 }
-
-const faq = [
-  {
-    pertanyaan: 'Apakah Tentang Dental menerima pasien baru?',
-    jawaban:
-      'Ya, kami dengan senang hati menerima pasien baru. Anda dapat menghubungi kami untuk membuat janji atau konsultasi.',
-  },
-  {
-    pertanyaan: 'Apa saja layanan yang ditawarkan oleh Tentang Dental?',
-    jawaban:
-      'Kami menawarkan berbagai layanan perawatan gigi, termasuk pemeriksaan rutin, pembersihan, perawatan saluran akar, pemasangan gigi palsu, dan banyak lagi.',
-  },
-  {
-    pertanyaan: 'Apakah Tentang Dental menerima asuransi kesehatan?',
-    jawaban:
-      'Ya, kami menerima berbagai jenis asuransi kesehatan. Silakan hubungi kami untuk informasi lebih lanjut tentang asuransi yang kami terima.',
-  },
-  {
-    pertanyaan: 'Bagaimana cara membuat janji dengan Tentang Dental?',
-    jawaban:
-      'Anda dapat membuat janji dengan menghubungi kami melalui telepon, email, atau menggunakan formulir online di situs web kami.',
-  },
-]

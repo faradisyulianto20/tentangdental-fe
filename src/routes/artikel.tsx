@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import Artikel from '../components/beranda/Artikel'
+import { useArticles, useArticleBySlug } from '@/hooks/useArticles'
 
 export const Route = createFileRoute('/artikel')({
   validateSearch: (search) => {
@@ -21,9 +22,17 @@ const fadeUp = {
 }
 
 function RouteComponent() {
-  const { id } = Route.useSearch()
-
-  console.log(id)
+  let { id } = Route.useSearch()
+  const { data: artikel} = useArticles()
+  const lastArticleId = artikel?.length ? artikel[artikel.length - 1].id : null
+  if (!id) {
+    id = String(lastArticleId)
+  }
+  const currentArticle = artikel?.find((item) => String(item.id) === String(id))
+  const slug = currentArticle?.slug || ''
+  console.log(slug)
+  const { data: currentArtikel} = useArticleBySlug(slug)
+  console.log(currentArtikel)
 
   return (
     <div className='mx-6 max-w-6xl flex flex-col justify-center items-center xl:mx-auto'>
@@ -36,8 +45,8 @@ function RouteComponent() {
           className="w-full my-12 rounded-xl max-w-290.65 h-111.75 overflow-hidden"
         >
           <img
-            src={berita.imgPath}
-            alt={berita.title}
+            src={currentArtikel?.image_url || 'placeholder.png'}
+            alt={currentArtikel?.title}
             className="object-cover w-full h-full"
           />
         </motion.div>
@@ -50,7 +59,7 @@ function RouteComponent() {
             animate="visible"
             className="text-xl md:text-3xl font-bold"
           >
-            {berita.title}
+            {currentArtikel?.title}
           </motion.h1>
 
           <motion.p
@@ -60,7 +69,7 @@ function RouteComponent() {
             animate="visible"
             className="text-muted-foreground text-sm md:text-base mt-3"
           >
-            {berita.penulis} - {berita.tanggal}
+            {currentArtikel?.writer} - {currentArtikel?.published_at}
           </motion.p>
         </div>
 
@@ -70,24 +79,10 @@ function RouteComponent() {
           initial="hidden"
           animate="visible"
           className="prose prose-sm md:prose-base max-w-none text-muted-foreground my-6"
-          dangerouslySetInnerHTML={{ __html: berita.content }}
+          dangerouslySetInnerHTML={{ __html: currentArtikel?.content || '' }}
         />
       </div>
       <Artikel />
     </div>
   )
-}
-
-const berita = {
-  title: 'Apa Pentingnya Menjaga Kesehatan Gigi?',
-  penulis: 'Dr. John Doe',
-  tanggal: '12 Oktober 2023',
-  subtitle:
-    'Menjaga kesehatan gigi sangat penting untuk kesehatan secara keseluruhan. Gigi yang sehat tidak hanya membantu dalam mengunyah makanan dengan baik, tetapi juga berperan dalam menjaga kesehatan mulut dan mencegah berbagai masalah kesehatan lainnya.',
-  imgPath: 'berita1.png',
-  content: `
-    <p>Menjaga kesehatan gigi melibatkan beberapa langkah penting, seperti menyikat gigi secara teratur, menggunakan benang gigi, dan rutin memeriksakan gigi ke dokter gigi. Dengan melakukan perawatan yang tepat, kita dapat mencegah kerusakan gigi, infeksi, dan masalah kesehatan mulut lainnya.</p>
-    <p>Selain itu, menjaga kesehatan gigi juga dapat meningkatkan kepercayaan diri dan kualitas hidup. Gigi yang sehat dapat memberikan senyuman yang indah dan membantu dalam berkomunikasi dengan lebih baik.</p>
-    <p>Oleh karena itu, penting bagi kita untuk memberikan perhatian khusus pada kesehatan gigi dan mulut kita. Dengan menjaga kebersihan gigi dan rutin memeriksakan gigi, kita dapat memastikan bahwa gigi kita tetap sehat dan kuat sepanjang hidup.</p>
-  `,
 }

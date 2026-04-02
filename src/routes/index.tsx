@@ -21,7 +21,9 @@ function App() {
         <Heroes />
         <Testimoni />
         <Promo />
-        <Layanan />
+        <div id='layanan'>
+          <Layanan />
+        </div>
         <div className="bg-linear-to-r from-[#01C8FF] to-[#6DDFFF] w-full mt-6 py-6">
           <Separator />
         </div>

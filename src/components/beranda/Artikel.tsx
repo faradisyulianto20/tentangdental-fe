@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useArticles } from '@/hooks/useArticles'
+import type { ArticleApiItem } from '#/services/articlesService'
 
 const containerVariants = {
   hidden: {},
@@ -18,7 +20,8 @@ const itemVariants = {
 export default function Berita() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
-
+  const { data: articlesData, isLoading, isError } = useArticles()
+  
   const navigateBerita = (id: string) => {
     navigate({
       to: '/artikel',
@@ -65,11 +68,11 @@ export default function Berita() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {berita.map((item, index) => (
+          {articlesData?.map((item, index) => (
             <ArtikelCard
               key={index}
               artikel={item}
-              onClick={() => navigateBerita(item.title)}
+              onClick={() => navigateBerita(item.id)}
             />
           ))}
         </motion.div>
@@ -92,7 +95,7 @@ export function ArtikelCard({
   artikel,
   onClick,
 }: {
-  artikel: (typeof berita)[0]
+  artikel: ArticleApiItem
   onClick?: () => void
 }) {
   return (
@@ -103,7 +106,7 @@ export function ArtikelCard({
     >
       <div className="hover:shadow-md cursor-pointer">
         <img
-          src={artikel.imgPath}
+          src={artikel.image_url || '/default-article.jpg'}
           alt={artikel.title}
           className="rounded-t-xl w-64 h-44 object-cover"
         />
@@ -113,54 +116,9 @@ export function ArtikelCard({
           {artikel.title}
         </h2>
         <p className="text-gray-600 mt-2 line-clamp-3 text-sm">
-          {artikel.subtitle}
+          {artikel.writer} • {artikel.published_at}
         </p>
       </div>
     </motion.div>
   )
 }
-
-const berita = [
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-  {
-    title: 'Pentingnya Perawatan Gigi Rutin untuk Kesehatan Mulut',
-    subtitle:
-      'Perawatan gigi rutin sangat penting untuk menjaga kesehatan mulut dan mencegah masalah gigi yang serius. Berikut adalah beberapa alasan mengapa perawatan gigi rutin sangat penting.',
-    imgPath: 'berita1.png',
-  },
-]

@@ -1,5 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
+import { useLayanan } from '@/hooks/useLayanan'
+import type { LayananApiItem } from '@/services/layananService'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -12,18 +14,12 @@ const itemVariants = {
   transition: { duration: 0.5 },
 }
 
-type LayananItem = {
-  imgPath: string
-  title: string
-  subTitle: string
-}
-
 export function LayananCard({
   layanan,
   variants,
   onClick,
 }: {
-  layanan: LayananItem
+  layanan: LayananApiItem
   variants?: typeof itemVariants
   onClick?: () => void
 }) {
@@ -34,19 +30,21 @@ export function LayananCard({
       className="flex flex-col items-center gap-2 border p-6 border-primary rounded-lg cursor-pointer hover:shadow-md"
     >
       <img
-        src={`/${layanan.imgPath}`}
-        alt={layanan.title}
+        src={`/${layanan.icon_url}`}
+        alt={layanan.name}
         className="w-12 h-12"
       />
-      <h2 className="text-2xl font-bold">{layanan.title}</h2>
-      <p className="text-muted-foreground text-center text-sm">
-        {layanan.subTitle}
+      <h2 className="text-2xl font-bold">{layanan.name}</h2>
+      <p className="text-muted-foreground text-center text-sm line-clamp-3">
+        {layanan.detail}
       </p>
     </motion.button>
   )
 }
 
 export default function Layanan() {
+  const { data: layananData } = useLayanan()
+
   const navigate = useNavigate()
 
   const handleNavigate = (id: string) => {
@@ -82,90 +80,15 @@ export default function Layanan() {
         viewport={{ once: true, amount: 0.2 }}
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6"
       >
-        {layananList.map((item, index) => (
+        {layananData?.map((item: LayananApiItem, index) => (
           <LayananCard
             key={index}
             layanan={item}
             variants={itemVariants}
-            onClick={() => handleNavigate(item.title)}
+            onClick={() => handleNavigate(String(item.id))}
           />
         ))}
       </motion.div>
     </div>
   )
 }
-
-const layananList: LayananItem[] = [
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-  {
-    imgPath: 'gigi.svg',
-    title: 'Scaling',
-    subTitle:
-      'Scaling gigi adalah prosedur untuk membersihkan plak dan karang  gigi. Prosedur ini perlu dilakukan secara rutin untuk mencegah kerusakan gigi dan gusi.',
-  },
-]

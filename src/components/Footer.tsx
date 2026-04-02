@@ -107,7 +107,11 @@ const menu = [
   },
   {
     title: 'Layanan',
-    url: '/layanan',
+    url: '/#layanan',
+  },
+  {
+    title: 'Artikel',
+    url: '/artikel',
   },
   {
     title: 'Profil Dokter',

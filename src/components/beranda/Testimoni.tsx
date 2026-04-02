@@ -223,14 +223,14 @@ export default function Testimoni() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5 }}
-          className="bg-[#E0F4FB] p-4 gap-2 rounded-lg flex flex-col h-97.5 md:h-105"
+          className="bg-[#E0F4FB] p-4 gap-2 rounded-lg flex flex-col w-142 h-72 mt-6"
         >
           <img
             src="/icons/petik.svg"
             alt="Testimoni Image"
             className="w-6 h-6 object-cover"
           />
-          <p className="text-muted-foreground max-w-md text-sm md:text-lg mt-6 h-37.5 md:h-42.5 overflow-y-auto pr-1">
+          <p className="text-muted-foreground text-sm md:text-lg mt-3 overflow-y-auto pr-1">
             {testimonial.description}
           </p>
           <div className="mt-auto flex flex-col md:flex-row gap-6 md:items-end justify-between">

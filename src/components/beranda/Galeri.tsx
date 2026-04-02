@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useGallery } from '@/hooks/useGallery'
 
 const containerVariants = {
   hidden: {},
@@ -13,50 +14,41 @@ const containerVariants = {
 //   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 // }
 
-const images = [
-  { src: '/hero.png', alt: 'Ruang Klinik' },
-  { src: '/hero1.png', alt: 'Kursi Dental' },
-  { src: '/hero2.png', alt: 'Alat Dental' },
-  { src: '/hero3.png', alt: 'Gedung Klinik' },
-  { src: '/hero4.png', alt: 'Fasilitas' },
-]
-
 export default function GalleryCarousel() {
+  const { data: galleryData, isLoading, isError } = useGallery()
+
+  const galleries = Array.isArray(galleryData) ? galleryData : []
+
   const [current, setCurrent] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const applyViewport = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    applyViewport()
-    window.addEventListener('resize', applyViewport)
-
-    return () => window.removeEventListener('resize', applyViewport)
-  }, [])
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % images.length)
+      setCurrent((prev) => (prev + 1) % (galleries?.length || 1))
     }, 4000)
     return () => clearInterval(timer)
-  }, [])
+  }, [galleries])
 
-  const prev = () => setCurrent((c) => (c - 1 + images.length) % images.length)
-  const next = () => setCurrent((c) => (c + 1) % images.length)
+  const prev = () =>
+    setCurrent(
+      (c) => (c - 1 + (galleries?.length || 1)) % (galleries?.length || 1),
+    )
+  const next = () => setCurrent((c) => (c + 1) % (galleries?.length || 1))
 
   // Hitung posisi relatif tiap card dari center
   const getPosition = (index: number) => {
     let offset = index - current
-    if (offset > images.length / 2) offset -= images.length
-    if (offset < -images.length / 2) offset += images.length
+    if (offset > (galleries?.length || 1) / 2)
+      offset -= galleries?.length || 1
+    if (offset < -(galleries?.length || 1) / 2)
+      offset += galleries?.length || 1
     return offset
   }
 
   const getStyle = (offset: number): React.CSSProperties => {
     const absOffset = Math.abs(offset)
     if (absOffset > 2) return { display: 'none' }
+
+    const isMobile = window.innerWidth < 768
 
     const configs: Record<number, React.CSSProperties> = {
       0: {
@@ -110,41 +102,43 @@ export default function GalleryCarousel() {
         viewport={{ once: true, amount: 0.2 }}
         className="relative w-full max-w-4xl h-50 md:h-80"
       >
-        {images.map((img, index) => {
-          const offset = getPosition(index)
-          const style = getStyle(offset)
+        {galleries?.map(
+          (img: { src: string; alt: string }, index: number) => {
+            const offset = getPosition(index)
+            const style = getStyle(offset)
 
-          return (
-            <div
-              key={index}
-              className="absolute transition-all duration-500 ease-in-out rounded-2xl overflow-hidden shadow-xl cursor-pointer"
-              style={style}
-              onClick={() => setCurrent(index)}
-            >
-              <img
-                src={img.src}
-                alt={img.alt}
-                className="w-full h-full object-cover"
-              />
-              {offset !== 0 && (
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
-              )}
-            </div>
-          )
-        })}
+            return (
+              <div
+                key={index}
+                className="absolute transition-all duration-500 ease-in-out rounded-2xl overflow-hidden shadow-xl cursor-pointer"
+                style={style}
+                onClick={() => setCurrent(index)}
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover"
+                />
+                {offset !== 0 && (
+                  <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+                )}
+              </div>
+            )
+          },
+        )}
       </motion.div>
 
       {/* Controls */}
       <div className="flex items-center gap-2 md:gap-4">
         <button
           onClick={prev}
-          className="w-7 h-7 md:w-9 md:h-9 rounded-full border border-[#58C4EC] flex items-center justify-center text-[#58C4EC] hover:bg-[#58C4EC] hover:text-white transition"
+          className="w-7 h-7 md:w-9 md:h-9 rounded-full border border-[#58C4EC] flex items-center justify-center text-[#58C4EC] hover:bg-[#58C4EC] hover:text-white transition cursor-pointer"
         >
-          <ChevronLeft size={16} className="cursor-pointer" />
+          <ChevronLeft size={16} />
         </button>
 
         <div className="flex gap-1 md:gap-2">
-          {images.map((_, i) => (
+          {galleries?.map((_: { src: string; alt: string }, i: number) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
@@ -159,9 +153,9 @@ export default function GalleryCarousel() {
 
         <button
           onClick={next}
-          className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-[#58C4EC] flex items-center justify-center text-white hover:bg-[#58C4EC]/80 transition"
+          className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-[#58C4EC] flex items-center justify-center text-white hover:bg-[#58C4EC]/80 transition cursor-pointer"
         >
-          <ChevronRight size={16} className="cursor-pointer" />
+          <ChevronRight size={16} />
         </button>
       </div>
     </div>

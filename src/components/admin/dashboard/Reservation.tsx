@@ -58,6 +58,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DatePicker } from '@/components/ui/date-picker'
 import { MultiSelect } from '@/components/ui/multi-select'
+import { useReservasi } from '@/hooks/useReservasi'
+import type { ReservasiApiItem } from '@/services/reservasiService'
 
 interface Reservation {
   namaPasien: string
@@ -146,8 +148,7 @@ const reservations: Reservation[] = [
     tanggalLahir: '1999-11-03',
     namaOrangTua: 'David Johnson',
     kotaKabupaten: 'Bantul',
-    kecamatan: 'Kasihan',
-    kelurahan: 'Tirtonirmolo',
+    kecamatan:KasihanTirtonirmolo    kelurahan: '',
     alamatLengkap: 'Jl. Bantul No. 22',
     tinggiBadan: '158',
     beratBadan: '50',
@@ -155,7 +156,7 @@ const reservations: Reservation[] = [
   },
 ]
 
-export function ReservationCard({ res }: { res: Reservation }) {
+export function ReservationCard({ res }: { res: ReservasiApiItem }) {
   const [hasAlergi, setHasAlergi] = useState(false)
   const [hasPenyakitSistemik, setHasPenyakitSistemik] = useState(false)
   const [isKonsumsiObat, setIsKonsumsiObat] = useState(false)
@@ -219,8 +220,8 @@ export function ReservationCard({ res }: { res: Reservation }) {
     <div className="rounded-lg p-4 mb-4 bg-[#E0F4FB]">
       <div className="flex flex-col-reverse lg:flex-row justify-between">
         <div>
-          <h2 className="text-lg font-bold">{res.namaPasien}</h2>
-          <p className="text-sm text-muted-foreground">{res.layanan}</p>
+          <h2 className="text-lg font-bold">{res?.patient?.name}</h2>
+          <p className="text-sm text-muted-foreground">{res.services?.[0]?.name}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 mb-3">
           <Button
@@ -993,6 +994,9 @@ export function ReservationCard({ res }: { res: Reservation }) {
 }
 
 export default function Reservation() {
+  const { data: reservasiData, isLoading, isError } = useReservasi()
+  console.log(reservasiData)
+
   const navigate = useNavigate()
 
   const now = new Date()
@@ -1003,14 +1007,14 @@ export default function Reservation() {
     day: 'numeric',
   })
 
-  const reservationFiltered = reservations.filter((r) => r.status !== 'selesai')
+  const reservationFiltered = reservasiData?.filter((r) => r.status !== 'completed')
 
   return (
     <div className="flex flex-col p-4 shadow-md rounded-lg">
       <h1 className="text-2xl font-bold">Permintaan Reservasi</h1>
       <p className="text-sm text-muted-foreground">{formattedDate}</p>
       <div className="mt-4">
-        {reservationFiltered.map((res, index) => (
+        {reservationFiltered?.map((res, index) => (
           <ReservationCard key={index} res={res} />
         ))}
       </div>

@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion'
+import { useDokter } from '@/hooks/useDokter'
+import type { DoctorApiItem } from '#/services/dokterService'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -11,18 +13,11 @@ const itemVariants = {
   transition: { duration: 2 },
 }
 
-type Dokter = {
-  imgUrl: string
-  nama: string
-  spesialis: string
-  deskripsi: string
-}
-
 export function ProfilDokterCard({
   dokter,
   index,
 }: {
-  dokter: Dokter
+  dokter: DoctorApiItem
   index: number
 }) {
   return (
@@ -34,13 +29,13 @@ export function ProfilDokterCard({
         className={`${index % 2 === 0 ? 'flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} flex w-full rounded-[6px] bg-white dark:bg-zinc-950`}
       >
         <div className="p-4">
-          <p className="text-muted-foreground text-sm">{dokter.deskripsi}</p>
-          <p className="font-bold text-lg mt-6">{dokter.nama}</p>
-          <p className="font-bold text-muted-foreground">{dokter.spesialis}</p>
+          <p className="text-muted-foreground text-sm">{dokter?.statement}</p>
+          <p className="font-bold text-lg mt-6">{dokter?.name}</p>
+          <p className="font-bold text-muted-foreground">{dokter.specialization}</p>
         </div>
         <div className="w-full md:relative h-fit md:h-auto flex justify-center">
           <img
-            src={dokter.imgUrl}
+            src={dokter?.photo_url}
             className="md:w-92 object-cover md:absolute md:right-0 z-10 -bottom-4 max-h-100"
           />
         </div>
@@ -50,6 +45,8 @@ export function ProfilDokterCard({
 }
 
 export default function ProfilDokter() {
+  const { data: doctors } = useDokter()
+
   return (
     <div className="max-w-6xl relative mx-6 mt-12">
       <img
@@ -77,27 +74,10 @@ export default function ProfilDokter() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        {listDokter.map((dokter, index) => (
+        {doctors?.map((dokter, index) => (
           <ProfilDokterCard key={index} dokter={dokter} index={index} />
         ))}
       </motion.div>
     </div>
   )
 }
-
-const listDokter: Dokter[] = [
-  {
-    imgUrl: '/dokter.png',
-    nama: 'Drg. Sania Dara Afiati, Sp.KG',
-    spesialis: 'Spesialis Konversi Gigi',
-    deskripsi:
-      'Sebagai spesialis konservasi gigi, perhatian utama saya adalah menjaga serta merawat gigi alami Anda agar tetap sehat dan berfungsi optimal dalam jangka panjang, melalui perawatan yang tepat, modern, dan berstandar tinggi.',
-  },
-  {
-    imgUrl: '/dokter.png',
-    nama: 'Drg. Sania Dara Afiati, Sp.KG',
-    spesialis: 'Spesialis Konversi Gigi',
-    deskripsi:
-      'Sebagai spesialis konservasi gigi, perhatian utama saya adalah menjaga serta merawat gigi alami Anda agar tetap sehat dan berfungsi optimal dalam jangka panjang, melalui perawatan yang tepat, modern, dan berstandar tinggi.',
-  },
-]

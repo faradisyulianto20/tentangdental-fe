@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getPromos } from '@/services/promoServices'
+import { getPromos } from '#/services/promoService'
 
 export function usePromos() {
   return useQuery({
