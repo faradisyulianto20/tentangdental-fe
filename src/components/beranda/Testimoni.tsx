@@ -92,6 +92,15 @@ export default function Testimoni() {
     [fetchedTestimonials],
   )
 
+  const decodeHtmlEntities = (input: string) => {
+    return input
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&')
+  }
+
   useEffect(() => {
     if (testimonialsSource.length === 0) return
     setCurrentTestimonial((prev) => prev % testimonialsSource.length)
@@ -230,9 +239,12 @@ export default function Testimoni() {
             alt="Testimoni Image"
             className="w-6 h-6 object-cover"
           />
-          <p className="text-muted-foreground text-sm md:text-lg mt-3 overflow-y-auto pr-1">
-            {testimonial.description}
-          </p>
+          <div
+            className="text-muted-foreground text-sm md:text-lg mt-3 overflow-y-auto pr-1 leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-xl [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            dangerouslySetInnerHTML={{
+              __html: decodeHtmlEntities(testimonial.description),
+            }}
+          />
           <div className="mt-auto flex flex-col md:flex-row gap-6 md:items-end justify-between">
             <div className="flex gap-1 mt-6">
               <img

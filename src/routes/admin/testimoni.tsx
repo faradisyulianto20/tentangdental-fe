@@ -1,110 +1,231 @@
 import TestimoniForm from '@/components/admin/testimoni/TestimoniForm'
 import { createFileRoute } from '@tanstack/react-router'
 import { Star } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog'
 import { Button } from '#/components/ui/button'
-import { Field, FieldLabel } from '#/components/ui/field'
-import { FileUpload } from '#/components/ui/file-upload'
-import { Input } from '#/components/ui/input'
-import { Textarea } from '#/components/ui/textarea'
+import {
+  useAdminTestimonials,
+  useCreateAdminTestimonial,
+  useDeleteAdminTestimonial,
+  useUpdateAdminTestimonial,
+} from '@/hooks/useTestimonials'
+import type { TestimonialApiItem } from '@/services/testimonialService'
+import { ApiError } from '@/lib/api-client'
+import { appEnv } from '@/lib/env'
 
 export const Route = createFileRoute('/admin/testimoni')({
   component: RouteComponent,
 })
 
+function mapPhoto(url: string | null) {
+  if (!url) return '/muka.svg'
+  if (url.startsWith('http')) return url
+  const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+  const cleanPath = url.replace(/^\/+/, '')
+  return cleanBase + '/' + cleanPath
+}
+
+function decodeHtmlEntities(input: string) {
+  return input
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+}
+
+function readApiErrorMessage(error: unknown, fallback: string) {
+  if (!(error instanceof ApiError)) return fallback
+
+  const payload =
+    typeof error.payload === 'object' && error.payload !== null
+      ? (error.payload as Record<string, unknown>)
+      : null
+
+  if (
+    payload &&
+    typeof payload.message === 'string' &&
+    payload.message.length > 0
+  ) {
+    return payload.message
+  }
+
+  return error.message || fallback
+}
+
 function RouteComponent() {
-  const [selectedTestimoni, setSelectedTestimoni] = useState<typeof testimoniList[0] | null>(null)
+  const [selectedTestimoni, setSelectedTestimoni] =
+    useState<TestimonialApiItem | null>(null)
+  const [createError, setCreateError] = useState('')
+  const [updateError, setUpdateError] = useState('')
+  const [createFormKey, setCreateFormKey] = useState(0)
+
+  const testimonialsQuery = useAdminTestimonials()
+  const createTestimonial = useCreateAdminTestimonial()
+  const updateTestimonial = useUpdateAdminTestimonial()
+  const deleteTestimonial = useDeleteAdminTestimonial()
+
+  const testimonialList = useMemo(
+    () => testimonialsQuery.data?.testimonials || [],
+    [testimonialsQuery.data],
+  )
+
+  const handleCreate = async (values: {
+    name: string
+    rating: number
+    testimoni: string
+    photoFile: File | null
+  }) => {
+    setCreateError('')
+
+    await createTestimonial.mutateAsync({
+      name: values.name,
+      rating: values.rating,
+      testimoni: values.testimoni,
+      photo: values.photoFile,
+    })
+
+    setCreateFormKey((prev) => prev + 1)
+  }
+
+  const handleUpdate = async (values: {
+    name: string
+    rating: number
+    testimoni: string
+    photoFile: File | null
+  }) => {
+    if (!selectedTestimoni) return
+
+    setUpdateError('')
+
+    await updateTestimonial.mutateAsync({
+      id: selectedTestimoni.id,
+      name: values.name,
+      rating: values.rating,
+      testimoni: values.testimoni,
+      photo: values.photoFile,
+    })
+
+    setSelectedTestimoni(null)
+  }
+
+  const handleDelete = async () => {
+    if (!selectedTestimoni) return
+    await deleteTestimonial.mutateAsync(selectedTestimoni.id)
+    setSelectedTestimoni(null)
+  }
 
   return (
     <div>
-      <TestimoniForm />
+      <div className="mb-6">
+        <TestimoniForm
+          key={createFormKey}
+          submitLabel="Tambah Testimoni"
+          isSubmitting={createTestimonial.isPending}
+          submitError={createError}
+          onSubmit={async (values) => {
+            try {
+              await handleCreate(values)
+            } catch (error) {
+              setCreateError(
+                readApiErrorMessage(error, 'Gagal menambahkan testimoni.'),
+              )
+            }
+          }}
+        />
+      </div>
+
+      {testimonialsQuery.isError ? (
+        <p className="text-sm text-destructive mb-4">
+          Gagal memuat daftar testimoni.
+        </p>
+      ) : null}
+
       <div className="flex flex-col gap-4 mt-6">
-        {testimoniList.map((testimoni, index) => (
+        {testimonialList.map((testimoni) => (
           <TestimoniCard
-            key={index}
+            key={testimoni.id}
             testimoni={testimoni}
-            onClick={() => setSelectedTestimoni(testimoni)}
+            onClick={() => {
+              setUpdateError('')
+              setSelectedTestimoni(testimoni)
+            }}
           />
         ))}
       </div>
 
-      <Dialog open={!!selectedTestimoni} onOpenChange={(open) => !open && setSelectedTestimoni(null)}>
+      <Dialog
+        open={!!selectedTestimoni}
+        onOpenChange={(open) => !open && setSelectedTestimoni(null)}
+      >
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
-          <form className="space-y-4">
-            <Field>
-              <FieldLabel>Foto</FieldLabel>
-              <FileUpload label="Unggah Foto" />
-            </Field>
-            <Field>
-              <FieldLabel>Nama</FieldLabel>
-              <Input
-                type="text"
-                placeholder="Masukkan Nama"
-                defaultValue={selectedTestimoni?.name}
-              />
-            </Field>
-            <Field className="gap-0">
-              <FieldLabel>Rating</FieldLabel>
-              <RatingInput defaultValue={selectedTestimoni?.rating ?? 0} />
-            </Field>
-            <Field>
-              <FieldLabel>Deskripsi</FieldLabel>
-              <Textarea
-                placeholder="Masukkan Deskripsi"
-                defaultValue={selectedTestimoni?.description}
-              />
-            </Field>
-            <DialogFooter className="gap-2">
-              <DialogClose asChild>
-                <Button variant="outline" >Batal</Button>
-              </DialogClose>
-              <Button type="button" className='bg-red-400 hover:bg-red-500'>Hapus Testimoni</Button>
-              <Button type="submit" className="bg-[#B9D654] text-white hover:bg-[#A8C24A]">
-                Simpan Perubahan
-              </Button>
-            </DialogFooter>
-          </form>
+          {selectedTestimoni ? (
+            <TestimoniForm
+              submitLabel="Simpan Perubahan"
+              isSubmitting={updateTestimonial.isPending}
+              submitError={updateError}
+              initialValues={{
+                name: selectedTestimoni.name,
+                rating: selectedTestimoni.rating,
+                testimoni: selectedTestimoni.testimoni,
+              }}
+              onSubmit={async (values) => {
+                try {
+                  await handleUpdate(values)
+                } catch (error) {
+                  setUpdateError(
+                    readApiErrorMessage(error, 'Gagal memperbarui testimoni.'),
+                  )
+                }
+              }}
+            />
+          ) : null}
+
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Batal</Button>
+            </DialogClose>
+            <Button
+              type="button"
+              className="bg-red-400 hover:bg-red-500"
+              disabled={deleteTestimonial.isPending}
+              onClick={async () => {
+                try {
+                  await handleDelete()
+                } catch {
+                  setUpdateError('Gagal menghapus testimoni.')
+                }
+              }}
+            >
+              {deleteTestimonial.isPending ? 'Menghapus...' : 'Hapus Testimoni'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   )
 }
 
-function RatingInput({ defaultValue = 0 }: { defaultValue?: number }) {
-  const [rating, setRating] = useState(defaultValue)
-
-  return (
-    <div className="flex gap-1 mt-2">
-      {Array.from({ length: 5 }, (_, i) => (
-        <span
-          key={i}
-          className={`cursor-pointer ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
-          onClick={() => setRating(i + 1)}
-        >
-          <Star fill={i < rating ? 'currentColor' : 'none'} />
-        </span>
-      ))}
-    </div>
-  )
-}
-
-export function TestimoniCard({
+function TestimoniCard({
   testimoni,
   onClick,
 }: {
-  testimoni: (typeof testimoniList)[0]
+  testimoni: TestimonialApiItem
   onClick?: () => void
 }) {
   return (
-    <div onClick={onClick} className="flex border rounded-lg p-4 gap-2 cursor-pointer">
+    <div
+      onClick={onClick}
+      className="flex border rounded-lg p-4 gap-2 cursor-pointer"
+    >
       <img
-        src={testimoni.imgUrl}
+        src={mapPhoto(testimoni.photo_url)}
         alt={testimoni.name}
         className="w-16 h-16 rounded-full object-cover shrink-0"
       />
@@ -120,49 +241,13 @@ export function TestimoniCard({
             />
           ))}
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {testimoni.description}
-        </p>
+        <div
+          className="text-sm text-muted-foreground line-clamp-2 [&_strong]:font-bold [&_em]:italic"
+          dangerouslySetInnerHTML={{
+            __html: decodeHtmlEntities(testimoni.testimoni || ''),
+          }}
+        />
       </div>
     </div>
   )
 }
-
-const testimoniList = [
-  {
-    name: 'Budi Santoso',
-    description: 'Pelayanan di Tentang Dental sangat profesional. Proses scaling giginya cepat dan tidak sakit sama sekali. Ruang tunggunya juga nyaman banget!',
-    imgUrl: '/muka.svg',
-    rating: 5,
-  },
-  {
-    name: 'Siti Aminah',
-    description: 'Dokternya sangat sabar menjelaskan detail kesehatan gigi saya. Fasilitasnya modern dan sangat bersih. Sangat direkomendasikan untuk keluarga.',
-    imgUrl: '/muka2.svg',
-    rating: 5,
-  },
-  {
-    name: 'Rian Hidayat',
-    description: 'Tempat praktik gigi terbaik di kota ini. Harganya cukup terjangkau dengan kualitas pelayanan bintang lima. Staf administrasinya juga ramah.',
-    imgUrl: '/muka3.svg',
-    rating: 4,
-  },
-  {
-    name: 'Dewi Lestari',
-    description: 'Baru pertama kali ke sini untuk cabut gigi bungsu dan pengalamannya luar biasa minim rasa sakit. Alat-alatnya terlihat sangat steril.',
-    imgUrl: '/muka4.svg',
-    rating: 5,
-  },
-  {
-    name: 'Andi Wijaya',
-    description: 'Sistem booking-nya sangat mudah via WhatsApp. Tidak perlu antre lama karena jadwalnya sangat on-time. Dokter giginya sangat berpengalaman.',
-    imgUrl: '/muka5.svg',
-    rating: 4,
-  },
-  {
-    name: 'Farah Quinnisa',
-    description: 'Sangat puas dengan hasil pemutihan gigi (bleaching) di sini. Hasilnya natural dan konsultasinya sangat mendalam. Sukses terus Tentang Dental!',
-    imgUrl: '/muka6.svg',
-    rating: 5,
-  },
-]
