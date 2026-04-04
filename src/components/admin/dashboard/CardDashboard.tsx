@@ -1,24 +1,34 @@
 import { Users, UserCheck, UserX } from 'lucide-react'
 
-const content = [
-  {
-    icon: Users,
-    title: 'Reservasi Pasien',
-    total: 120,
-  },
-  {
-    icon: UserCheck,
-    title: 'Pasien Hadir',
-    total: 120,
-  },
-  {
-    icon: UserX,
-    title: 'Pasien Tidak Hadir',
-    total: 120,
-  },
-]
+type CardDashboardProps = {
+  totalReservations: number
+  validatedReservations: number
+  pendingReservations: number
+}
 
-export default function CardDashboard() {
+export default function CardDashboard({
+  totalReservations,
+  validatedReservations,
+  pendingReservations,
+}: CardDashboardProps) {
+  const content = [
+    {
+      icon: Users,
+      title: 'Reservasi Pasien',
+      total: totalReservations,
+    },
+    {
+      icon: UserCheck,
+      title: 'Reservasi Tervalidasi',
+      total: validatedReservations,
+    },
+    {
+      icon: UserX,
+      title: 'Reservasi Pending',
+      total: pendingReservations,
+    },
+  ]
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {content.map((item, index) => (
