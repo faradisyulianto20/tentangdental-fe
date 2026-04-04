@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { FileUpload } from '@/components/ui/file-upload'
 import { useEffect, useState } from 'react'
 import { MultiSelect } from '@/components/ui/multi-select'
+import RichTextEditor from '@/components/admin/RichTextEditor'
 
 export type ProfilDokterFormValues = {
   name: string
@@ -36,7 +36,7 @@ export default function ProfilDokterForm({
   const [values, setValues] = useState<ProfilDokterFormValues>({
     name: initialValues?.name || '',
     specialization: initialValues?.specialization || '',
-    statement: initialValues?.statement || '',
+    statement: initialValues?.statement || '<p></p>',
     schedule: initialValues?.schedule || [],
     photoFile: initialValues?.photoFile || null,
   })
@@ -45,7 +45,7 @@ export default function ProfilDokterForm({
     setValues({
       name: initialValues?.name || '',
       specialization: initialValues?.specialization || '',
-      statement: initialValues?.statement || '',
+      statement: initialValues?.statement || '<p></p>',
       schedule: initialValues?.schedule || [],
       photoFile: initialValues?.photoFile || null,
     })
@@ -88,15 +88,10 @@ export default function ProfilDokterForm({
             </Field>
             <Field>
               <FieldLabel>Pernyataan</FieldLabel>
-              <Textarea
-                placeholder="Masukkan Pernyataan Dokter"
-                className="h-32 resize-none"
+              <RichTextEditor
                 value={values.statement}
-                onChange={(event) =>
-                  setValues((prev) => ({
-                    ...prev,
-                    statement: event.target.value,
-                  }))
+                onChange={(next) =>
+                  setValues((prev) => ({ ...prev, statement: next }))
                 }
               />
             </Field>

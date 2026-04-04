@@ -21,6 +21,15 @@ export function ProfilDokterCard({
   dokter: DoctorApiItem
   index: number
 }) {
+  const decodeHtmlEntities = (input: string) => {
+    return input
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&')
+  }
+
   const photoUrl = (() => {
     if (!dokter.photo_url) return '/dokter.png'
     if (dokter.photo_url.startsWith('http')) return dokter.photo_url
@@ -39,7 +48,12 @@ export function ProfilDokterCard({
         className={`${index % 2 === 0 ? 'flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} flex w-full rounded-[6px] bg-white dark:bg-zinc-950`}
       >
         <div className="p-4">
-          <p className="text-muted-foreground text-sm">{dokter?.statement}</p>
+          <div
+            className="text-muted-foreground text-sm leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            dangerouslySetInnerHTML={{
+              __html: decodeHtmlEntities(String(dokter?.statement || '')),
+            }}
+          />
           <p className="font-bold text-lg mt-6">{dokter?.name}</p>
           <p className="font-bold text-muted-foreground">
             {dokter.specialization}
