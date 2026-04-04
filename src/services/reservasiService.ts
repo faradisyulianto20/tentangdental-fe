@@ -1,4 +1,66 @@
-import { apiRequest } from '@/lib/api-client'
+import { apiRequest } from '#/lib/api-client'
+
+export type AdminReservationStatus =
+  | 'pending'
+  | 'validated'
+  | 'completed'
+  | 'cancelled'
+
+export type ReservationMedicalHistoryForm = {
+  has_allergy?: string
+  allergy_detail?: string
+  has_systemic_disease?: string
+  systemic_disease_detail?: string
+  undergoing_treatment?: string
+  treatment_detail?: string
+  ever_hospitalized?: string
+  hospitalized_reason?: string
+  smoking_or_alcohol?: string
+}
+
+export type ReservationDentalHistoryForm = {
+  frequent_tooth_pain?: string
+  tooth_pain_detail?: string
+  bleeding_gums?: string
+  ever_dental_treatment?: string
+  dental_treatment_detail?: string
+  brushing_frequency?: string
+  use_floss_or_mouthwash?: string
+  bad_habits?: string
+  bad_habits_detail?: string
+  ever_braces?: string
+  braces_years?: string
+  root_canal_treatment?: string
+  root_canal_detail?: string
+  dentures?: string
+  routine_checkup?: string
+  dental_checkup_frequency?: string
+  doctor_notes?: string
+}
+
+export type ReservationPatientForm = {
+  patient_id: string
+  name: string
+  nickname: string | null
+  gender: string | null
+  age: string | null
+  birth_place: string | null
+  birth_date: string | null
+  address: string | null
+  village: string | null
+  district: string | null
+  city: string | null
+  phone: string
+  occupation: string | null
+  parent_name: string | null
+  height: string | null
+  weight: string | null
+}
+
+export type serviceItem = {
+  id: number
+  name: string
+}
 
 export type ReservasiApiItem = {
   id: number | string
@@ -6,44 +68,20 @@ export type ReservasiApiItem = {
     id: number | string
     name: string
     phone: string
-  }
-  services: Array<{
-    id: number | string
-    name: string
-  }>
+  } | null
+  services: serviceItem[]
   doctor: {
     id: number | string
     name: string
-  }
-  complain: string
-  reservation_date: string
-  appointment_time: string
+  } | null
+  complain: string | null
+  reservation_date: string | null
+  appointment_time: string | null
   birth_date: string | null
-  age: number | null
-  patient_category: string
-  status: string
+  age: string | null
+  patient_category: string | null
+  status: AdminReservationStatus | string
   created_at: string | null
-
-  namaPasien?: string
-  namaPanggilan?: string
-  layanan?: string
-  tanggalReservasi?: string
-  nomorHandphone?: string
-  jamReservasi?: string
-  dokter?: string
-  nomorPasien?: string
-  jenisKelamin?: string
-  umur?: string
-  pekerjaan?: string
-  tanggalLahir?: string
-  namaOrangTua?: string
-  kotaKabupaten?: string
-  kecamatan?: string
-  kelurahan?: string
-  alamatLengkap?: string
-  tinggiBadan?: string
-  beratBadan?: string
-  keluhan?: string
 }
 
 export type ReservasiPagination = {
@@ -53,16 +91,178 @@ export type ReservasiPagination = {
   total: number
 }
 
-export async function getReservasi(): Promise<ReservasiApiItem[]> {
-  const response = await apiRequest<{
-    reservations: ReservasiApiItem[]
-    pagination: ReservasiPagination
-  }>('/admin/reservations', {
+type AdminReservationsResponse = {
+  reservations: ReservasiApiItem[]
+  pagination: ReservasiPagination
+}
+
+export type AdminReservationDetail = ReservasiApiItem & {
+  patient_form?: ReservationPatientForm
+  medical_history_form?: ReservationMedicalHistoryForm
+  dental_history_form?: ReservationDentalHistoryForm
+}
+
+export type ReservationPatientDetailsPayload = {
+  patient_id: number
+  name: string
+  nickname?: string | null
+  gender?: 'male' | 'female' | null
+  age?: number | null
+  birth_place?: string | null
+  birth_date?: string | null
+  address?: string | null
+  village?: string | null
+  district?: string | null
+  city?: string | null
+  phone: string
+  occupation?: string | null
+  parent_name?: string | null
+  height?: number | null
+  weight?: number | null
+  medical_history?: ReservationMedicalHistoryForm
+  dental_history?: ReservationDentalHistoryForm
+}
+
+export type UpdateAdminReservationStatusPayload = {
+  id: number
+  status: AdminReservationStatus
+}
+
+export type UpdateAdminReservationStatusResult = {
+  id: string | number
+  status: AdminReservationStatus
+  created_at: string | null
+}
+
+export type UpdateAdminReservationPatientDetailsPayload = {
+  id: number
+  data: ReservationPatientDetailsPayload
+}
+
+function normalizeAdminReservationsResponse(
+  input: AdminReservationsResponse | ReservasiApiItem[] | null | undefined,
+): AdminReservationsResponse {
+  if (Array.isArray(input)) {
+    return {
+      reservations: input,
+      pagination: {
+        current_page: 1,
+        last_page: 1,
+        per_page: input.length,
+        total: input.length,
+      },
+    }
+  }
+
+  return {
+    reservations: Array.isArray(input?.reservations) ? input.reservations : [],
+    pagination: {
+      current_page: Number(input?.pagination.current_page || 1),
+      last_page: Number(input?.pagination.last_page || 1),
+      per_page: Number(input?.pagination.per_page || 10),
+      total: Number(input?.pagination.total || 0),
+    },
+  }
+}
+
+function toPatientDetailsRequestBody(
+  payload: ReservationPatientDetailsPayload,
+) {
+  const body: Record<string, string | number | null> = {
+    patient_id: payload.patient_id,
+    name: payload.name,
+    phone: payload.phone,
+  }
+
+  const setIfDefined = (
+    key: string,
+    value: string | number | null | undefined,
+  ) => {
+    if (value === undefined) return
+    body[key] = value
+  }
+
+  setIfDefined('nickname', payload.nickname)
+  setIfDefined('gender', payload.gender ?? null)
+  setIfDefined('age', payload.age)
+  setIfDefined('birth_place', payload.birth_place)
+  setIfDefined('birth_date', payload.birth_date)
+  setIfDefined('address', payload.address)
+  setIfDefined('village', payload.village)
+  setIfDefined('district', payload.district)
+  setIfDefined('city', payload.city)
+  setIfDefined('occupation', payload.occupation)
+  setIfDefined('parent_name', payload.parent_name)
+  setIfDefined('height', payload.height)
+  setIfDefined('weight', payload.weight)
+
+  setIfDefined(
+    'medical_history',
+    payload.medical_history ? JSON.stringify(payload.medical_history) : null,
+  )
+  setIfDefined(
+    'dental_history',
+    payload.dental_history ? JSON.stringify(payload.dental_history) : null,
+  )
+
+  return body
+}
+
+export async function getAdminReservations(): Promise<AdminReservationsResponse> {
+  const response = await apiRequest<
+    AdminReservationsResponse | ReservasiApiItem[]
+  >('admin/reservations', {
     method: 'GET',
     auth: true,
   })
 
-  return response?.reservations ?? []
+  return normalizeAdminReservationsResponse(response)
+}
+
+export async function getAdminReservationById(
+  id: number,
+): Promise<AdminReservationDetail> {
+  return apiRequest<AdminReservationDetail>(`admin/reservations/${id}`, {
+    method: 'GET',
+    auth: true,
+  })
+}
+
+export async function updateAdminReservationStatus(
+  payload: UpdateAdminReservationStatusPayload,
+): Promise<UpdateAdminReservationStatusResult> {
+  return apiRequest<UpdateAdminReservationStatusResult>(
+    `admin/reservations/${payload.id}`,
+    {
+      method: 'PUT',
+      auth: true,
+      body: {
+        status: payload.status,
+      },
+    },
+  )
+}
+
+export async function updateAdminReservationPatientDetails(
+  payload: UpdateAdminReservationPatientDetailsPayload,
+): Promise<null> {
+  return apiRequest<null>(`admin/reservations/${payload.id}/patient-details`, {
+    method: 'PUT',
+    auth: true,
+    body: toPatientDetailsRequestBody(payload.data),
+  })
+}
+
+export async function deleteAdminReservation(id: number): Promise<null> {
+  return apiRequest<null>(`admin/reservations/${id}`, {
+    method: 'DELETE',
+    auth: true,
+  })
+}
+
+export async function getReservasi(): Promise<ReservasiApiItem[]> {
+  const response = await getAdminReservations()
+  return response.reservations
 }
 
 export type PatientCategory = 'new' | 'existing'
