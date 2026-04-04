@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import Artikel from '../components/beranda/Artikel'
 import { useArticles, useArticleBySlug } from '#/hooks/useArtikel'
+import { appEnv } from '@/lib/env'
 
 export const Route = createFileRoute('/artikel')({
   validateSearch: (search) => {
@@ -30,9 +31,25 @@ function RouteComponent() {
   }
   const currentArticle = artikel?.find((item) => String(item.id) === String(id))
   const slug = currentArticle?.slug || ''
-  console.log(slug)
   const { data: currentArtikel } = useArticleBySlug(slug)
-  console.log(currentArtikel)
+
+  const resolveImage = (value: string | null | undefined) => {
+    if (!value) return 'placeholder.png'
+    if (value.startsWith('http')) return value
+
+    const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+    const cleanPath = value.replace(/^\/+/, '')
+    return cleanBase + '/' + cleanPath
+  }
+
+  const decodeHtmlEntities = (input: string) => {
+    return input
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&')
+  }
 
   return (
     <div className="mx-6 max-w-6xl flex flex-col justify-center items-center xl:mx-auto">
@@ -45,7 +62,7 @@ function RouteComponent() {
           className="w-full my-12 rounded-xl max-w-290.65 h-111.75 overflow-hidden"
         >
           <img
-            src={currentArtikel?.image_url || 'placeholder.png'}
+            src={resolveImage(currentArtikel?.image_url)}
             alt={currentArtikel?.title}
             className="object-cover w-full h-full"
           />
@@ -78,8 +95,10 @@ function RouteComponent() {
           custom={0.5}
           initial="hidden"
           animate="visible"
-          className="prose prose-sm md:prose-base max-w-none text-muted-foreground my-6"
-          dangerouslySetInnerHTML={{ __html: currentArtikel?.content || '' }}
+          className="max-w-none text-muted-foreground my-6 leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-xl [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+          dangerouslySetInnerHTML={{
+            __html: decodeHtmlEntities(currentArtikel?.content || ''),
+          }}
         />
       </div>
       <Artikel />

@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useArticles } from '#/hooks/useArtikel'
 import type { ArticleApiItem } from '#/services/artikelService'
+import { appEnv } from '@/lib/env'
 
 const containerVariants = {
   hidden: {},
@@ -98,6 +99,15 @@ export function ArtikelCard({
   artikel: ArticleApiItem
   onClick?: () => void
 }) {
+  const imageUrl = (() => {
+    if (!artikel.image_url) return '/default-article.jpg'
+    if (artikel.image_url.startsWith('http')) return artikel.image_url
+
+    const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+    const cleanPath = artikel.image_url.replace(/^\/+/, '')
+    return cleanBase + '/' + cleanPath
+  })()
+
   return (
     <motion.div
       className="flex flex-col shrink-0 w-64 snap-start cursor-pointer hover:shadow-md rounded-md border"
@@ -106,7 +116,7 @@ export function ArtikelCard({
     >
       <div className="hover:shadow-md cursor-pointer">
         <img
-          src={artikel.image_url || '/default-article.jpg'}
+          src={imageUrl}
           alt={artikel.title}
           className="rounded-t-xl w-64 h-44 object-cover"
         />
