@@ -15,7 +15,7 @@ const itemVariants = {
 }
 
 export default function FAQ() {
-  const { data: faqData = [], isLoading, isError } = useFaq()  
+  const { data: faqData = [], isLoading, isError } = useFaq()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
@@ -89,16 +89,22 @@ export function FAQItem({
 
       <AnimatePresence initial={false}>
         {isOpen && (
-          <motion.p
+          <motion.div
             key="jawaban"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="text-muted-foreground text-sm md:text-base overflow-hidden"
-          >
-            {item.answer}
-          </motion.p>
+            className="text-muted-foreground text-sm md:text-base overflow-hidden leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            dangerouslySetInnerHTML={{
+              __html: String(item.answer || '')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&amp;/g, '&'),
+            }}
+          ></motion.div>
         )}
       </AnimatePresence>
     </motion.div>
