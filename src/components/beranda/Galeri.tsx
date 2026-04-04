@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useGallery } from '@/hooks/useGallery'
+import { useGallery } from '#/hooks/useGaleri'
 
 const containerVariants = {
   hidden: {},
@@ -37,10 +37,8 @@ export default function GalleryCarousel() {
   // Hitung posisi relatif tiap card dari center
   const getPosition = (index: number) => {
     let offset = index - current
-    if (offset > (galleries?.length || 1) / 2)
-      offset -= galleries?.length || 1
-    if (offset < -(galleries?.length || 1) / 2)
-      offset += galleries?.length || 1
+    if (offset > (galleries?.length || 1) / 2) offset -= galleries?.length || 1
+    if (offset < -(galleries?.length || 1) / 2) offset += galleries?.length || 1
     return offset
   }
 
@@ -102,30 +100,28 @@ export default function GalleryCarousel() {
         viewport={{ once: true, amount: 0.2 }}
         className="relative w-full max-w-4xl h-50 md:h-80"
       >
-        {galleries?.map(
-          (img: { src: string; alt: string }, index: number) => {
-            const offset = getPosition(index)
-            const style = getStyle(offset)
+        {galleries?.map((img: { src: string; alt: string }, index: number) => {
+          const offset = getPosition(index)
+          const style = getStyle(offset)
 
-            return (
-              <div
-                key={index}
-                className="absolute transition-all duration-500 ease-in-out rounded-2xl overflow-hidden shadow-xl cursor-pointer"
-                style={style}
-                onClick={() => setCurrent(index)}
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  className="w-full h-full object-cover"
-                />
-                {offset !== 0 && (
-                  <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
-                )}
-              </div>
-            )
-          },
-        )}
+          return (
+            <div
+              key={index}
+              className="absolute transition-all duration-500 ease-in-out rounded-2xl overflow-hidden shadow-xl cursor-pointer"
+              style={style}
+              onClick={() => setCurrent(index)}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="w-full h-full object-cover"
+              />
+              {offset !== 0 && (
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+              )}
+            </div>
+          )
+        })}
       </motion.div>
 
       {/* Controls */}

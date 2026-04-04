@@ -4,8 +4,8 @@ import { motion } from 'framer-motion'
 import { useRef } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { useArticles } from '@/hooks/useArticles'
-import type { ArticleApiItem } from '#/services/articlesService'
+import { useArticles } from '#/hooks/useArtikel'
+import type { ArticleApiItem } from '#/services/artikelService'
 
 const containerVariants = {
   hidden: {},
@@ -21,7 +21,7 @@ export default function Berita() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const { data: articlesData, isLoading, isError } = useArticles()
-  
+
   const navigateBerita = (id: string) => {
     navigate({
       to: '/artikel',

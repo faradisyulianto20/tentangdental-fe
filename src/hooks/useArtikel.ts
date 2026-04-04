@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getArticleBySlug, getArticles } from '@/services/articlesService'
+import { getArticleBySlug, getArticles } from '#/services/artikelService'
 
 export function useArticles() {
   return useQuery({

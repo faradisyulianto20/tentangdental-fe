@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import Artikel from '../components/beranda/Artikel'
-import { useArticles, useArticleBySlug } from '@/hooks/useArticles'
+import { useArticles, useArticleBySlug } from '#/hooks/useArtikel'
 
 export const Route = createFileRoute('/artikel')({
   validateSearch: (search) => {
@@ -23,7 +23,7 @@ const fadeUp = {
 
 function RouteComponent() {
   let { id } = Route.useSearch()
-  const { data: artikel} = useArticles()
+  const { data: artikel } = useArticles()
   const lastArticleId = artikel?.length ? artikel[artikel.length - 1].id : null
   if (!id) {
     id = String(lastArticleId)
@@ -31,11 +31,11 @@ function RouteComponent() {
   const currentArticle = artikel?.find((item) => String(item.id) === String(id))
   const slug = currentArticle?.slug || ''
   console.log(slug)
-  const { data: currentArtikel} = useArticleBySlug(slug)
+  const { data: currentArtikel } = useArticleBySlug(slug)
   console.log(currentArtikel)
 
   return (
-    <div className='mx-6 max-w-6xl flex flex-col justify-center items-center xl:mx-auto'>
+    <div className="mx-6 max-w-6xl flex flex-col justify-center items-center xl:mx-auto">
       <div className="mx-6 max-w-6xl flex justify-center flex-col items-center xl:mx-auto">
         <motion.div
           variants={fadeUp}
