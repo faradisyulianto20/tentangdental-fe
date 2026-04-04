@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useGallery } from '#/hooks/useGaleri'
+import { appEnv } from '#/lib/env'
 
 const containerVariants = {
   hidden: {},
@@ -17,7 +18,24 @@ const containerVariants = {
 export default function GalleryCarousel() {
   const { data: galleryData, isLoading, isError } = useGallery()
 
-  const galleries = Array.isArray(galleryData) ? galleryData : []
+  const galleries =
+    galleryData?.galleries?.map((item) => {
+      const imageUrl = item.image_url || ''
+      if (imageUrl.startsWith('http')) {
+        return {
+          src: imageUrl,
+          alt: item.caption || `Galeri ${item.id}`,
+        }
+      }
+
+      const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+      const cleanPath = imageUrl.replace(/^\/+/, '')
+
+      return {
+        src: cleanPath ? cleanBase + '/' + cleanPath : '/hero1.png',
+        alt: item.caption || `Galeri ${item.id}`,
+      }
+    }) || []
 
   const [current, setCurrent] = useState(0)
 
@@ -46,7 +64,8 @@ export default function GalleryCarousel() {
     const absOffset = Math.abs(offset)
     if (absOffset > 2) return { display: 'none' }
 
-    const isMobile = window.innerWidth < 768
+    const isMobile =
+      typeof window !== 'undefined' ? window.innerWidth < 768 : false
 
     const configs: Record<number, React.CSSProperties> = {
       0: {
@@ -100,7 +119,7 @@ export default function GalleryCarousel() {
         viewport={{ once: true, amount: 0.2 }}
         className="relative w-full max-w-4xl h-50 md:h-80"
       >
-        {galleries?.map((img: { src: string; alt: string }, index: number) => {
+        {galleries?.map((img, index: number) => {
           const offset = getPosition(index)
           const style = getStyle(offset)
 
@@ -134,7 +153,7 @@ export default function GalleryCarousel() {
         </button>
 
         <div className="flex gap-1 md:gap-2">
-          {galleries?.map((_: { src: string; alt: string }, i: number) => (
+          {galleries?.map((_, i: number) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
