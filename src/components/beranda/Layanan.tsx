@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useLayanan } from '@/hooks/useLayanan'
 import type { LayananApiItem } from '@/services/layananService'
+import { appEnv } from '@/lib/env'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -23,17 +24,22 @@ export function LayananCard({
   variants?: typeof itemVariants
   onClick?: () => void
 }) {
+  const resolvedIcon = (() => {
+    if (!layanan.icon_url) return '/gigi.svg'
+    if (layanan.icon_url.startsWith('http')) return layanan.icon_url
+
+    const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+    const cleanPath = layanan.icon_url.replace(/^\/+/, '')
+    return cleanBase + '/' + cleanPath
+  })()
+
   return (
     <motion.button
       variants={variants}
       onClick={onClick}
       className="flex flex-col items-center gap-2 border p-6 border-primary rounded-lg cursor-pointer hover:shadow-md"
     >
-      <img
-        src={`/${layanan.icon_url}`}
-        alt={layanan.name}
-        className="w-12 h-12"
-      />
+      <img src={resolvedIcon} alt={layanan.name} className="w-12 h-12" />
       <h2 className="text-2xl font-bold">{layanan.name}</h2>
       <p className="text-muted-foreground text-center text-sm line-clamp-3">
         {layanan.detail}

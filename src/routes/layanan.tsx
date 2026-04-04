@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
 import { useState, useEffect } from 'react'
 import { useLayananById, useLayanan } from '@/hooks/useLayanan'
+import { appEnv } from '@/lib/env'
 
 export const Route = createFileRoute('/layanan')({
   validateSearch: (search: Record<string, unknown>) => {
@@ -41,8 +42,34 @@ function RouteComponent() {
     setTotalLayanan(4)
   }, [id])
 
-  const { data: artikel, isLoading: isArtikelLoading, isError: isArtikelError } = useLayananById(id)
-  const { data: layanan = [], isLoading: isLayananLoading, isError: isLayananError } = useLayanan()
+  const {
+    data: artikel,
+    isLoading: isArtikelLoading,
+    isError: isArtikelError,
+  } = useLayananById(id)
+  const {
+    data: layanan = [],
+    isLoading: isLayananLoading,
+    isError: isLayananError,
+  } = useLayanan()
+
+  const resolveStorageUrl = (value: string | null | undefined) => {
+    if (!value) return '/layanan-default.png'
+    if (value.startsWith('http')) return value
+
+    const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+    const cleanPath = value.replace(/^\/+/, '')
+    return cleanBase + '/' + cleanPath
+  }
+
+  const decodeHtmlEntities = (input: string) => {
+    return input
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, '&')
+  }
 
   const handleNavigate = (id: string) => {
     navigate({
@@ -50,20 +77,24 @@ function RouteComponent() {
       search: { id: id },
     })
   }
-  
 
   const layananFiltered = layanan
     .filter((item) => item.id !== parseInt(id))
     .slice(0, totalLayanan)
 
   if (isArtikelLoading || isLayananLoading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>
+    return (
+      <div className="flex justify-center items-center h-64">Loading...</div>
+    )
   }
 
   if (isArtikelError || isLayananError) {
-    return <div className="flex justify-center items-center h-64">Error loading data</div>
+    return (
+      <div className="flex justify-center items-center h-64">
+        Error loading data
+      </div>
+    )
   }
-
 
   return (
     <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto">
@@ -95,7 +126,9 @@ function RouteComponent() {
         className="w-full my-12 rounded-xl max-w-290.75 h-111.75 overflow-hidden"
       >
         <img
-          src={artikel?.support_img_url || '/layanan-default.png'}
+          src={resolveStorageUrl(
+            artikel?.support_image_url || artikel?.support_img_url,
+          )}
           alt={artikel?.name ?? ''}
           className="object-cover w-full h-full"
         />
@@ -107,9 +140,9 @@ function RouteComponent() {
           custom={0.4}
           initial="hidden"
           animate="visible"
-          className="prose prose-sm md:prose-base max-w-none text-muted-foreground flex-1"
+          className="max-w-none text-muted-foreground flex-1 leading-relaxed [&_p]:mb-2 [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1"
           dangerouslySetInnerHTML={{
-            __html: artikel?.article_content ?? '',
+            __html: decodeHtmlEntities(artikel?.article_content ?? ''),
           }}
         />
 
@@ -138,7 +171,7 @@ function RouteComponent() {
                 className="flex items-center text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
               >
                 <img
-                  src={`/${item.icon_url}`}
+                  src={resolveStorageUrl(item.icon_url)}
                   alt={item.name}
                   className="w-8 h-8"
                 />
