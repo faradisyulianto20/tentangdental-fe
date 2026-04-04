@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useDokter } from '@/hooks/useDokter'
 import type { DoctorApiItem } from '#/services/dokterService'
+import { appEnv } from '@/lib/env'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -20,6 +21,15 @@ export function ProfilDokterCard({
   dokter: DoctorApiItem
   index: number
 }) {
+  const photoUrl = (() => {
+    if (!dokter.photo_url) return '/dokter.png'
+    if (dokter.photo_url.startsWith('http')) return dokter.photo_url
+
+    const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+    const cleanPath = dokter.photo_url.replace(/^\/+/, '')
+    return cleanBase + '/' + cleanPath
+  })()
+
   return (
     <motion.div
       className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-0.5 bg-linear-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6`}
@@ -31,11 +41,13 @@ export function ProfilDokterCard({
         <div className="p-4">
           <p className="text-muted-foreground text-sm">{dokter?.statement}</p>
           <p className="font-bold text-lg mt-6">{dokter?.name}</p>
-          <p className="font-bold text-muted-foreground">{dokter.specialization}</p>
+          <p className="font-bold text-muted-foreground">
+            {dokter.specialization}
+          </p>
         </div>
         <div className="w-full md:relative h-fit md:h-auto flex justify-center">
           <img
-            src={dokter?.photo_url}
+            src={photoUrl}
             className="md:w-92 object-cover md:absolute md:right-0 z-10 -bottom-4 max-h-100"
           />
         </div>

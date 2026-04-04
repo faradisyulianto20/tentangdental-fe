@@ -3,60 +3,143 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FileUpload } from '@/components/ui/file-upload'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { MultiSelect } from '@/components/ui/multi-select'
 
-export default function ProfilDokterForm() {
-  const [selectedJadwal, setSelectedJadwal] = useState<string[]>([])
-  return (
-    <div>
-      <form className="space-y-4">
-        <FieldGroup>
-          <FieldSet>
-            <FieldGroup>
-              <Field>
-                <FieldLabel>Nama</FieldLabel>
-                <Input type="text" placeholder="Masukkan Nama Dokter" />
-              </Field>
-              <Field>
-                <FieldLabel>Spesalitas</FieldLabel>
-                <Input type="text" placeholder="Masukkan Spesialitas Dokter" />
-              </Field>
-              <Field>
-                <FieldLabel>Deskripsi</FieldLabel>
-                <Textarea
-                  placeholder="Masukkan Deskripsi Dokter"
-                  className="h-32 resize-none"
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Jadwal</FieldLabel>
-                <MultiSelect
-                  items={jadwal}
-                  value={selectedJadwal}
-                  onChange={setSelectedJadwal}
-                  placeholder="Pilih jadwal..."
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Gambar</FieldLabel>
-                <FileUpload label="Unggah Gambar" />
-              </Field>
-            </FieldGroup>
-          </FieldSet>
-          <Field orientation="horizontal">
-            <Button type="submit">Tambahkan Dokter</Button>
-          </Field>
-        </FieldGroup>
-      </form>
-    </div>
-  )
+export type ProfilDokterFormValues = {
+  name: string
+  specialization: string
+  statement: string
+  schedule: string[]
+  photoFile: File | null
 }
 
-const jadwal = [
-  'Senin 08.00 - 16.00',
-  'Selasa 08.00 - 16.00',
-  'Rabu 08.00 - 16.00',
-  'Kamis 08.00 - 16.00',
-  'Jumat 08.00 - 16.00',
-]
+type ProfilDokterFormProps = {
+  initialValues?: Partial<ProfilDokterFormValues>
+  submitLabel: string
+  scheduleOptions: string[]
+  isSubmitting?: boolean
+  submitError?: string
+  onSubmit: (values: ProfilDokterFormValues) => Promise<void> | void
+  onCancel?: () => void
+}
+
+export default function ProfilDokterForm({
+  initialValues,
+  submitLabel,
+  scheduleOptions,
+  isSubmitting,
+  submitError,
+  onSubmit,
+  onCancel,
+}: ProfilDokterFormProps) {
+  const [values, setValues] = useState<ProfilDokterFormValues>({
+    name: initialValues?.name || '',
+    specialization: initialValues?.specialization || '',
+    statement: initialValues?.statement || '',
+    schedule: initialValues?.schedule || [],
+    photoFile: initialValues?.photoFile || null,
+  })
+
+  useEffect(() => {
+    setValues({
+      name: initialValues?.name || '',
+      specialization: initialValues?.specialization || '',
+      statement: initialValues?.statement || '',
+      schedule: initialValues?.schedule || [],
+      photoFile: initialValues?.photoFile || null,
+    })
+  }, [initialValues])
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    await onSubmit(values)
+  }
+
+  return (
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      <FieldGroup>
+        <FieldSet>
+          <FieldGroup>
+            <Field>
+              <FieldLabel>Nama</FieldLabel>
+              <Input
+                type="text"
+                placeholder="Masukkan Nama Dokter"
+                value={values.name}
+                onChange={(event) =>
+                  setValues((prev) => ({ ...prev, name: event.target.value }))
+                }
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Spesialis</FieldLabel>
+              <Input
+                type="text"
+                placeholder="Masukkan Spesialis Dokter"
+                value={values.specialization}
+                onChange={(event) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    specialization: event.target.value,
+                  }))
+                }
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Pernyataan</FieldLabel>
+              <Textarea
+                placeholder="Masukkan Pernyataan Dokter"
+                className="h-32 resize-none"
+                value={values.statement}
+                onChange={(event) =>
+                  setValues((prev) => ({
+                    ...prev,
+                    statement: event.target.value,
+                  }))
+                }
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Jadwal</FieldLabel>
+              <MultiSelect
+                items={scheduleOptions}
+                value={values.schedule}
+                onChange={(next) =>
+                  setValues((prev) => ({ ...prev, schedule: next }))
+                }
+                placeholder="Pilih jadwal..."
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Foto</FieldLabel>
+              <FileUpload
+                label="Unggah Foto"
+                acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] || null
+                  setValues((prev) => ({ ...prev, photoFile: file }))
+                }}
+              />
+            </Field>
+          </FieldGroup>
+        </FieldSet>
+
+        {submitError ? (
+          <p className="text-sm text-destructive">{submitError}</p>
+        ) : null}
+
+        <Field orientation="horizontal" className="gap-2">
+          {onCancel ? (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Batal
+            </Button>
+          ) : null}
+          <Button type="submit" disabled={Boolean(isSubmitting)}>
+            {isSubmitting ? 'Memproses...' : submitLabel}
+          </Button>
+        </Field>
+      </FieldGroup>
+    </form>
+  )
+}
