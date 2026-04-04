@@ -168,16 +168,16 @@ function normalizeAdminReservationsResponse(
 function toPatientDetailsRequestBody(
   payload: ReservationPatientDetailsPayload,
 ) {
-  const body: Record<string, string | number | null> = {
+  type JsonSection = Record<string, string | number | boolean | null>
+  type JsonLike = string | number | boolean | null | JsonSection
+
+  const body: Record<string, JsonLike> = {
     patient_id: payload.patient_id,
     name: payload.name,
     phone: payload.phone,
   }
 
-  const setIfDefined = (
-    key: string,
-    value: string | number | null | undefined,
-  ) => {
+  const setIfDefined = (key: string, value: JsonLike | undefined) => {
     if (value === undefined) return
     body[key] = value
   }
@@ -196,14 +196,27 @@ function toPatientDetailsRequestBody(
   setIfDefined('height', payload.height)
   setIfDefined('weight', payload.weight)
 
-  setIfDefined(
-    'medical_history',
-    payload.medical_history ? JSON.stringify(payload.medical_history) : null,
-  )
-  setIfDefined(
-    'dental_history',
-    payload.dental_history ? JSON.stringify(payload.dental_history) : null,
-  )
+  const normalizeSection = (section?: Record<string, unknown>) => {
+    if (!section) return null
+
+    const next: JsonSection = {}
+    Object.entries(section).forEach(([key, value]) => {
+      if (value === undefined) return
+      if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        value === null
+      ) {
+        next[key] = value
+      }
+    })
+
+    return next
+  }
+
+  setIfDefined('medical_history', normalizeSection(payload.medical_history))
+  setIfDefined('dental_history', normalizeSection(payload.dental_history))
 
   return body
 }

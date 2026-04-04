@@ -1,19 +1,58 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
-import { Button } from '#/components/ui/button'
+import {
+  Calendar,
+  Clock,
+  Phone,
+  User,
+  Heart,
+  Smile,
+  FileText,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogFooter,
-} from '#/components/ui/dialog'
-import { Input } from '#/components/ui/input'
-import { Field, FieldGroup, FieldLabel } from '#/components/ui/field'
-import { Textarea } from '#/components/ui/textarea'
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldTitle,
+} from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
+import { DatePicker } from '@/components/ui/date-picker'
+import { MultiSelect } from '@/components/ui/multi-select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import type { CheckedState } from '@radix-ui/react-checkbox'
+import { ApiError } from '@/lib/api-client'
+import { useDokter } from '@/hooks/useDokter'
+import { useLayanan } from '@/hooks/useLayanan'
 import {
   useAdminReservationById,
   useAdminReservations,
-  useDeleteAdminReservation,
   useUpdateAdminReservationPatientDetails,
   useUpdateAdminReservationStatus,
 } from '@/hooks/useReservasi'
@@ -23,95 +62,82 @@ import type {
   ReservationDentalHistoryForm,
   ReservationMedicalHistoryForm,
   ReservasiApiItem,
-} from '#/services/reservasiService'
-import { ApiError } from '#/lib/api-client'
+} from '@/services/reservasiService'
 
 export const Route = createFileRoute('/admin/reservasi')({
   component: RouteComponent,
 })
 
-type DetailForm = {
-  patientId: string
+type ReservationForm = {
   name: string
   nickname: string
-  gender: string
-  age: string
-  birthPlace: string
-  birthDate: string
-  address: string
-  village: string
-  district: string
-  city: string
+  gender: 'Laki-laki' | 'Perempuan' | ''
   phone: string
+  age: string
   occupation: string
+  birthDate: Date | null
   parentName: string
+  city: string
+  district: string
+  village: string
+  address: string
   height: string
   weight: string
   complain: string
   reservationDate: string
   appointmentTime: string
+  doctor: string
+  layanan: string[]
   doctorNotes: string
-  medicalHistory: ReservationMedicalHistoryForm
-  dentalHistory: ReservationDentalHistoryForm
 }
 
-const emptyMedicalHistory: ReservationMedicalHistoryForm = {
-  has_allergy: '',
+type ToggleState = {
+  hasAlergi: boolean
+  hasPenyakitSistemik: boolean
+  isKonsumsiObat: boolean
+  isRawatRumahSakit: boolean
+  isKebiasaanRokok: boolean
+  isSakitGigi: boolean
+  isBerdarahSikatGigi: boolean
+  isPerawatanGigiSebelumnya: boolean
+  isKebisaanKesehatanMulut: boolean
+  isKebiasaanBuruk: boolean
+  isKawatGigi: boolean
+  isPSA: boolean
+  isMemilikiGigiPalsu: boolean
+  isRutinKontrol: boolean
+}
+
+const emptyMedical: ReservationMedicalHistoryForm = {
+  has_allergy: 'no',
   allergy_detail: '',
-  has_systemic_disease: '',
+  has_systemic_disease: 'no',
   systemic_disease_detail: '',
-  undergoing_treatment: '',
+  undergoing_treatment: 'no',
   treatment_detail: '',
-  ever_hospitalized: '',
+  ever_hospitalized: 'no',
   hospitalized_reason: '',
-  smoking_or_alcohol: '',
+  smoking_or_alcohol: 'no',
 }
 
-const emptyDentalHistory: ReservationDentalHistoryForm = {
-  frequent_tooth_pain: '',
+const emptyDental: ReservationDentalHistoryForm = {
+  frequent_tooth_pain: 'no',
   tooth_pain_detail: '',
-  bleeding_gums: '',
-  ever_dental_treatment: '',
+  bleeding_gums: 'no',
+  ever_dental_treatment: 'no',
   dental_treatment_detail: '',
   brushing_frequency: '',
-  use_floss_or_mouthwash: '',
-  bad_habits: '',
+  use_floss_or_mouthwash: 'no',
+  bad_habits: 'no',
   bad_habits_detail: '',
-  ever_braces: '',
+  ever_braces: 'no',
   braces_years: '',
-  root_canal_treatment: '',
+  root_canal_treatment: 'no',
   root_canal_detail: '',
-  dentures: '',
-  routine_checkup: '',
+  dentures: 'no',
+  routine_checkup: 'no',
   dental_checkup_frequency: '',
   doctor_notes: '',
-}
-
-function normalizeDate(value: string | null | undefined) {
-  if (!value) return ''
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value.slice(0, 10)
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
-
-function dateTimeFromDate(value: string) {
-  return value ? `${value}T00:00:00` : null
-}
-
-function formatDateTime(value: string | null | undefined) {
-  if (!value) return '-'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleString('id-ID', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }
 
 function statusLabel(status: string) {
@@ -123,15 +149,56 @@ function statusLabel(status: string) {
 }
 
 function statusColor(status: string) {
-  if (status === 'pending') return 'bg-amber-100 text-amber-700'
-  if (status === 'validated') return 'bg-blue-100 text-blue-700'
-  if (status === 'completed') return 'bg-emerald-100 text-emerald-700'
-  if (status === 'cancelled') return 'bg-rose-100 text-rose-700'
-  return 'bg-slate-100 text-slate-700'
+  if (status === 'pending') return 'bg-[#B7CC9B] text-white'
+  if (status === 'validated') return 'bg-[#58C4EC] text-white'
+  if (status === 'completed') return 'bg-emerald-500 text-white'
+  if (status === 'cancelled') return 'bg-rose-500 text-white'
+  return 'bg-slate-500 text-white'
 }
 
-function toId(value: string | number) {
-  return typeof value === 'number' ? value : Number(value)
+function formatDateOnly(value: string | null | undefined) {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+function formatTime(value: string | null | undefined) {
+  if (!value) return '-'
+  if (!/^\d{2}:\d{2}(:\d{2})?$/.test(value)) return '-'
+  const withDate = `1970-01-01T${value}`
+  const date = new Date(withDate)
+  if (Number.isNaN(date.getTime())) return '-'
+  return date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
+
+function yesNoToBool(input?: string | null) {
+  if (!input) return false
+  return ['yes', 'true', '1'].includes(input.toLowerCase())
+}
+
+function toIsoDate(date: Date | null) {
+  if (!date) return null
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}T00:00:00`
+}
+
+function parseDate(input?: string | null) {
+  if (!input) return null
+  const date = new Date(input)
+  if (Number.isNaN(date.getTime())) return null
+  return date
 }
 
 function readApiErrorMessage(error: unknown, fallback: string) {
@@ -146,118 +213,210 @@ function readApiErrorMessage(error: unknown, fallback: string) {
   return error.message || fallback
 }
 
-function mapDetail(detail: AdminReservationDetail): DetailForm {
-  const patient = detail.patient_form
-  const medical = detail.medical_history_form || emptyMedicalHistory
-  const dental = detail.dental_history_form || emptyDentalHistory
+function toId(value: string | number) {
+  return typeof value === 'number' ? value : Number(value)
+}
 
-  return {
-    patientId: patient?.patient_id || String(detail.patient?.id || ''),
+function parseServices(input: unknown): string[] {
+  if (Array.isArray(input)) {
+    return input
+      .map((item) => {
+        if (typeof item === 'string') return item
+        if (typeof item === 'object' && item !== null && 'name' in item) {
+          const rec = item as Record<string, unknown>
+          return typeof rec.name === 'string' ? rec.name : ''
+        }
+        return ''
+      })
+      .filter(Boolean)
+  }
+
+  if (typeof input === 'string') {
+    return input
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean)
+  }
+
+  return []
+}
+
+function mapDetailToForm(detail: AdminReservationDetail): {
+  form: ReservationForm
+  medical: ReservationMedicalHistoryForm
+  dental: ReservationDentalHistoryForm
+  toggles: ToggleState
+  patientId: string
+} {
+  const patient = detail.patient_form
+  const medical = { ...emptyMedical, ...(detail.medical_history_form || {}) }
+  const dental = { ...emptyDental, ...(detail.dental_history_form || {}) }
+
+  const form: ReservationForm = {
     name: patient?.name || detail.patient?.name || '',
     nickname: patient?.nickname || '',
-    gender: patient?.gender || '',
-    age: patient?.age || detail.age || '',
-    birthPlace: patient?.birth_place || '',
-    birthDate: normalizeDate(patient?.birth_date || detail.birth_date),
-    address: patient?.address || '',
-    village: patient?.village || '',
-    district: patient?.district || '',
-    city: patient?.city || '',
+    gender:
+      patient?.gender === 'female'
+        ? 'Perempuan'
+        : patient?.gender === 'male'
+          ? 'Laki-laki'
+          : '',
     phone: patient?.phone || detail.patient?.phone || '',
+    age: patient?.age || detail.age || '',
     occupation: patient?.occupation || '',
+    birthDate: parseDate(patient?.birth_date || detail.birth_date),
     parentName: patient?.parent_name || '',
+    city: patient?.city || '',
+    district: patient?.district || '',
+    village: patient?.village || '',
+    address: patient?.address || '',
     height: patient?.height || '',
     weight: patient?.weight || '',
     complain: detail.complain || '',
-    reservationDate: normalizeDate(detail.reservation_date),
-    appointmentTime: detail.appointment_time || '',
+    reservationDate: formatDateOnly(detail.reservation_date),
+    appointmentTime: formatTime(detail.appointment_time),
+    doctor: detail.doctor?.name || '',
+    layanan: parseServices(detail.services),
     doctorNotes: dental.doctor_notes || '',
-    medicalHistory: { ...emptyMedicalHistory, ...medical },
-    dentalHistory: { ...emptyDentalHistory, ...dental },
+  }
+
+  const toggles: ToggleState = {
+    hasAlergi: yesNoToBool(medical.has_allergy),
+    hasPenyakitSistemik: yesNoToBool(medical.has_systemic_disease),
+    isKonsumsiObat: yesNoToBool(medical.undergoing_treatment),
+    isRawatRumahSakit: yesNoToBool(medical.ever_hospitalized),
+    isKebiasaanRokok: yesNoToBool(medical.smoking_or_alcohol),
+    isSakitGigi: yesNoToBool(dental.frequent_tooth_pain),
+    isBerdarahSikatGigi: yesNoToBool(dental.bleeding_gums),
+    isPerawatanGigiSebelumnya: yesNoToBool(dental.ever_dental_treatment),
+    isKebisaanKesehatanMulut: yesNoToBool(dental.use_floss_or_mouthwash),
+    isKebiasaanBuruk: yesNoToBool(dental.bad_habits),
+    isKawatGigi: yesNoToBool(dental.ever_braces),
+    isPSA: yesNoToBool(dental.root_canal_treatment),
+    isMemilikiGigiPalsu: yesNoToBool(dental.dentures),
+    isRutinKontrol: yesNoToBool(dental.routine_checkup),
+  }
+
+  return {
+    form,
+    medical,
+    dental,
+    toggles,
+    patientId: patient?.patient_id || String(detail.patient?.id || ''),
   }
 }
 
-function RouteComponent() {
-  const [selectedReservationId, setSelectedReservationId] = useState<
-    number | null
-  >(null)
-  const [form, setForm] = useState<DetailForm | null>(null)
-  const [selectedStatus, setSelectedStatus] =
-    useState<AdminReservationStatus>('pending')
-  const [submitError, setSubmitError] = useState('')
-
-  const reservationsQuery = useAdminReservations()
-  const detailQuery = useAdminReservationById(
-    selectedReservationId ?? undefined,
-  )
+function ReservationCard({
+  item,
+  onSaved,
+}: {
+  item: ReservasiApiItem
+  onSaved?: () => void
+}) {
+  const detailQuery = useAdminReservationById(toId(item.id))
   const updatePatientDetails = useUpdateAdminReservationPatientDetails()
   const updateStatus = useUpdateAdminReservationStatus()
-  const deleteReservation = useDeleteAdminReservation()
+  const { data: doctorsData } = useDokter()
+  const { data: servicesData } = useLayanan()
 
-  const reservations = useMemo(
-    () =>
-      (reservationsQuery.data?.reservations || []).filter(
-        (r: ReservasiApiItem) => r.status !== 'cancelled',
-      ),
-    [reservationsQuery.data],
-  )
+  const [submitError, setSubmitError] = useState('')
+  const [selectedStatus, setSelectedStatus] =
+    useState<AdminReservationStatus>('pending')
+  const [patientId, setPatientId] = useState('')
+  const [form, setForm] = useState<ReservationForm | null>(null)
+  const [medical, setMedical] =
+    useState<ReservationMedicalHistoryForm>(emptyMedical)
+  const [dental, setDental] =
+    useState<ReservationDentalHistoryForm>(emptyDental)
+  const [toggles, setToggles] = useState<ToggleState>({
+    hasAlergi: false,
+    hasPenyakitSistemik: false,
+    isKonsumsiObat: false,
+    isRawatRumahSakit: false,
+    isKebiasaanRokok: false,
+    isSakitGigi: false,
+    isBerdarahSikatGigi: false,
+    isPerawatanGigiSebelumnya: false,
+    isKebisaanKesehatanMulut: false,
+    isKebiasaanBuruk: false,
+    isKawatGigi: false,
+    isPSA: false,
+    isMemilikiGigiPalsu: false,
+    isRutinKontrol: false,
+  })
+  const [dropdownJenisKelaminOpen, setDropdownJenisKelaminOpen] =
+    useState(false)
+  const [dropdownDokterOpen, setDropdownDokterOpen] = useState(false)
 
   useEffect(() => {
-    if (!detailQuery.data) return
-    setForm(mapDetail(detailQuery.data))
+    const detail = detailQuery.data
+    if (!detail) return
+    const mapped = mapDetailToForm(detail)
+    setForm(mapped.form)
+    setMedical(mapped.medical)
+    setDental(mapped.dental)
+    setToggles(mapped.toggles)
+    setPatientId(mapped.patientId)
 
-    const status = detailQuery.data.status
+    const currentStatus = detail.status
     if (
-      status === 'pending' ||
-      status === 'validated' ||
-      status === 'completed' ||
-      status === 'cancelled'
+      currentStatus === 'pending' ||
+      currentStatus === 'validated' ||
+      currentStatus === 'completed' ||
+      currentStatus === 'cancelled'
     ) {
-      setSelectedStatus(status)
+      setSelectedStatus(currentStatus)
     }
   }, [detailQuery.data])
 
-  const updateForm = (key: keyof DetailForm, value: unknown) => {
-    setForm((prev) => (prev ? { ...prev, [key]: value } : prev))
+  const doctorList = Array.isArray(doctorsData)
+    ? doctorsData.map((d) => d.name)
+    : []
+  const layananList = Array.isArray(servicesData)
+    ? servicesData.map((s) => s.name)
+    : []
+
+  const setFormField = (
+    key: keyof ReservationForm,
+    value: string | Date | null | string[],
+  ) => {
+    setForm((prev) => {
+      if (!prev) return prev
+      return { ...prev, [key]: value }
+    })
   }
 
-  const openDetail = (item: ReservasiApiItem) => {
-    setSubmitError('')
-    setForm(null)
-    setSelectedReservationId(toId(item.id))
+  const setToggle = (key: keyof ToggleState, checked: CheckedState) => {
+    if (typeof checked !== 'boolean') return
+    setToggles((prev) => ({ ...prev, [key]: checked }))
   }
 
-  const closeDetail = () => {
-    setSubmitError('')
-    setForm(null)
-    setSelectedReservationId(null)
-  }
-
-  const saveDetail = async () => {
-    if (!selectedReservationId || !form) return
+  const save = async () => {
+    if (!form) return
     setSubmitError('')
 
-    const patientId = Number(form.patientId)
-    if (!patientId || Number.isNaN(patientId)) {
-      setSubmitError('Patient ID wajib diisi dengan benar.')
+    const idNumber = Number(patientId)
+    if (!idNumber || Number.isNaN(idNumber)) {
+      setSubmitError('Patient ID tidak valid.')
       return
     }
 
     try {
       await updatePatientDetails.mutateAsync({
-        id: selectedReservationId,
+        id: toId(item.id),
         data: {
-          patient_id: patientId,
-          name: form.name.trim(),
-          phone: form.phone.trim(),
+          patient_id: idNumber,
+          name: form.name,
+          phone: form.phone,
           nickname: form.nickname || null,
           gender:
-            form.gender === 'male' || form.gender === 'female'
-              ? form.gender
-              : null,
+            form.gender === 'Laki-laki'
+              ? 'male'
+              : form.gender === 'Perempuan'
+                ? 'female'
+                : null,
           age: form.age ? Number(form.age) : null,
-          birth_place: form.birthPlace || null,
-          birth_date: dateTimeFromDate(form.birthDate),
+          birth_date: toIsoDate(form.birthDate),
           address: form.address || null,
           village: form.village || null,
           district: form.district || null,
@@ -266,261 +425,646 @@ function RouteComponent() {
           parent_name: form.parentName || null,
           height: form.height ? Number(form.height) : null,
           weight: form.weight ? Number(form.weight) : null,
-          medical_history: form.medicalHistory,
+          medical_history: {
+            ...medical,
+            has_allergy: toggles.hasAlergi ? 'yes' : 'no',
+            has_systemic_disease: toggles.hasPenyakitSistemik ? 'yes' : 'no',
+            undergoing_treatment: toggles.isKonsumsiObat ? 'yes' : 'no',
+            ever_hospitalized: toggles.isRawatRumahSakit ? 'yes' : 'no',
+            smoking_or_alcohol: toggles.isKebiasaanRokok ? 'yes' : 'no',
+          },
           dental_history: {
-            ...form.dentalHistory,
+            ...dental,
+            frequent_tooth_pain: toggles.isSakitGigi ? 'yes' : 'no',
+            bleeding_gums: toggles.isBerdarahSikatGigi ? 'yes' : 'no',
+            ever_dental_treatment: toggles.isPerawatanGigiSebelumnya
+              ? 'yes'
+              : 'no',
+            use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut
+              ? 'yes'
+              : 'no',
+            bad_habits: toggles.isKebiasaanBuruk ? 'yes' : 'no',
+            ever_braces: toggles.isKawatGigi ? 'yes' : 'no',
+            root_canal_treatment: toggles.isPSA ? 'yes' : 'no',
+            dentures: toggles.isMemilikiGigiPalsu ? 'yes' : 'no',
+            routine_checkup: toggles.isRutinKontrol ? 'yes' : 'no',
             doctor_notes: form.doctorNotes,
           },
         },
       })
 
-      if (selectedStatus !== detailQuery.data?.status) {
+      if (selectedStatus !== item.status) {
         await updateStatus.mutateAsync({
-          id: selectedReservationId,
+          id: toId(item.id),
           status: selectedStatus,
         })
       }
 
-      if (selectedStatus === 'cancelled') {
-        closeDetail()
-      }
+      onSaved?.()
     } catch (error) {
       setSubmitError(readApiErrorMessage(error, 'Gagal menyimpan reservasi.'))
     }
   }
 
   return (
-    <div className="flex flex-col">
-      <h1 className="text-2xl font-bold">Antrian Pasien</h1>
-      <div className="mt-4 flex flex-col gap-3">
-        {reservations.map((item) => (
-          <div
-            key={item.id}
-            className="rounded-lg border border-border bg-card p-4 flex flex-col gap-3 md:flex-row md:justify-between"
+    <div className="rounded-lg p-4 mb-4 bg-[#E0F4FB]">
+      <div className="flex flex-col-reverse lg:flex-row justify-between">
+        <div>
+          <h2 className="text-lg font-bold">{item.patient?.name || '-'}</h2>
+          <p className="text-sm text-muted-foreground">
+            {parseServices(item.services).join(', ') || '-'}
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2 mb-3">
+          <Button
+            variant="default"
+            className={`mt-2 rounded-2xl text-sm ${statusColor(item.status)}`}
+            disabled
           >
-            <div className="space-y-1">
-              <p className="font-semibold">{item.patient?.name || '-'}</p>
-              <p className="text-sm text-muted-foreground">
-                {Array.isArray(item.services)
-                  ? item.services.map((s) => s.name).join(', ')
-                  : '-'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {formatDateTime(item.reservation_date)} •{' '}
-                {item.appointment_time || '-'}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span
-                className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusColor(item.status)}`}
+            {statusLabel(item.status)}
+          </Button>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="default"
+                className="bg-[#B9D654] text-white hover:bg-[#A8C24A] mt-2 text-sm rounded-2xl"
               >
-                {statusLabel(item.status)}
-              </span>
-              <Button type="button" onClick={() => openDetail(item)}>
                 Lihat Detail
               </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-sm p-8">
+              {!form ? (
+                <p className="text-sm text-muted-foreground">
+                  Memuat detail...
+                </p>
+              ) : (
+                <>
+                  <FieldGroup className="flex">
+                    <FieldLegend className="flex gap-2">
+                      <User className="w-12 h-12 text-primary" />
+                      <div>
+                        <FieldTitle className="font-bold text-lg">
+                          Data Pasien
+                        </FieldTitle>
+                        <FieldDescription>
+                          Nomor Pasien:
+                          <span className="font-medium"> {patientId}</span>
+                        </FieldDescription>
+                      </div>
+                    </FieldLegend>
+                  </FieldGroup>
 
-      <Dialog
-        open={selectedReservationId !== null}
-        onOpenChange={(open) => !open && closeDetail()}
-      >
-        <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
-          {!form ? (
-            <p className="text-sm text-muted-foreground">
-              Memuat detail reservasi...
-            </p>
-          ) : (
-            <div className="space-y-6">
-              <FieldGroup className="grid md:grid-cols-2 gap-3">
-                <Field>
-                  <FieldLabel>Patient ID</FieldLabel>
-                  <Input
-                    value={form.patientId}
-                    onChange={(e) => updateForm('patientId', e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>Nama</FieldLabel>
-                  <Input
-                    value={form.name}
-                    onChange={(e) => updateForm('name', e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>No HP</FieldLabel>
-                  <Input
-                    value={form.phone}
-                    onChange={(e) => updateForm('phone', e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>Jenis Kelamin</FieldLabel>
-                  <Input
-                    value={form.gender}
-                    onChange={(e) => updateForm('gender', e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>Tanggal Lahir</FieldLabel>
-                  <Input
-                    type="date"
-                    value={form.birthDate}
-                    onChange={(e) => updateForm('birthDate', e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>Kota</FieldLabel>
-                  <Input
-                    value={form.city}
-                    onChange={(e) => updateForm('city', e.target.value)}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel>Status</FieldLabel>
-                  <select
-                    value={selectedStatus}
-                    onChange={(e) =>
-                      setSelectedStatus(
-                        e.target.value as AdminReservationStatus,
-                      )
-                    }
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="pending">Menunggu</option>
-                    <option value="validated">Tervalidasi</option>
-                    <option value="completed">Selesai</option>
-                    <option value="cancelled">Dibatalkan</option>
-                  </select>
-                </Field>
-                <Field>
-                  <FieldLabel>Tanggal Reservasi</FieldLabel>
-                  <Input
-                    type="date"
-                    value={form.reservationDate}
-                    onChange={(e) =>
-                      updateForm('reservationDate', e.target.value)
-                    }
-                  />
-                </Field>
-                <Field className="md:col-span-2">
-                  <FieldLabel>Keluhan</FieldLabel>
-                  <Textarea
-                    value={form.complain}
-                    onChange={(e) => updateForm('complain', e.target.value)}
-                  />
-                </Field>
-                <Field className="md:col-span-2">
-                  <FieldLabel>Catatan Dokter</FieldLabel>
-                  <Textarea
-                    value={form.doctorNotes}
-                    onChange={(e) => updateForm('doctorNotes', e.target.value)}
-                  />
-                </Field>
-              </FieldGroup>
-
-              <FieldGroup className="grid md:grid-cols-2 gap-3">
-                {Object.keys(emptyMedicalHistory).map((key) => (
-                  <Field key={key}>
-                    <FieldLabel>{key}</FieldLabel>
-                    <Input
-                      value={String(
-                        form.medicalHistory[
-                          key as keyof ReservationMedicalHistoryForm
-                        ] || '',
-                      )}
-                      onChange={(e) =>
-                        updateForm('medicalHistory', {
-                          ...form.medicalHistory,
-                          [key]: e.target.value,
-                        })
-                      }
-                    />
-                  </Field>
-                ))}
-              </FieldGroup>
-
-              <FieldGroup className="grid md:grid-cols-2 gap-3">
-                {Object.keys(emptyDentalHistory)
-                  .filter((k) => k !== 'doctor_notes')
-                  .map((key) => (
-                    <Field key={key}>
-                      <FieldLabel>{key}</FieldLabel>
+                  <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
+                    <Field>
+                      <FieldLabel>Nama Pasien</FieldLabel>
                       <Input
-                        value={String(
-                          form.dentalHistory[
-                            key as keyof ReservationDentalHistoryForm
-                          ] || '',
-                        )}
+                        value={form.name}
+                        onChange={(e) => setFormField('name', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Nama Panggilan</FieldLabel>
+                      <Input
+                        value={form.nickname}
                         onChange={(e) =>
-                          updateForm('dentalHistory', {
-                            ...form.dentalHistory,
-                            [key]: e.target.value,
-                          })
+                          setFormField('nickname', e.target.value)
                         }
                       />
                     </Field>
-                  ))}
-              </FieldGroup>
+                    <Field>
+                      <FieldLabel>Jenis Kelamin</FieldLabel>
+                      <DropdownMenu
+                        open={dropdownJenisKelaminOpen}
+                        onOpenChange={setDropdownJenisKelaminOpen}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between border-primary"
+                          >
+                            <span
+                              className={
+                                form.gender ? '' : 'text-muted-foreground'
+                              }
+                            >
+                              {form.gender || 'Pilih jenis kelamin'}
+                            </span>
+                            {dropdownJenisKelaminOpen ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                          {['Laki-laki', 'Perempuan'].map((jk) => (
+                            <DropdownMenuItem
+                              key={jk}
+                              onSelect={() => setFormField('gender', jk)}
+                            >
+                              {jk}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </Field>
+                    <Field>
+                      <FieldLabel>Nomor Handphone</FieldLabel>
+                      <Input
+                        value={form.phone}
+                        onChange={(e) => setFormField('phone', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Umur</FieldLabel>
+                      <Input
+                        value={form.age}
+                        onChange={(e) => setFormField('age', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Pekerjaan</FieldLabel>
+                      <Input
+                        value={form.occupation}
+                        onChange={(e) =>
+                          setFormField('occupation', e.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Tanggal Lahir</FieldLabel>
+                      <DatePicker
+                        value={form.birthDate}
+                        onChange={(date) => setFormField('birthDate', date)}
+                        placeholder="Pilih tanggal lahir"
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Nama Orang Tua</FieldLabel>
+                      <Input
+                        value={form.parentName}
+                        onChange={(e) =>
+                          setFormField('parentName', e.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Kota/Kabupaten</FieldLabel>
+                      <Input
+                        value={form.city}
+                        onChange={(e) => setFormField('city', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Kecamatan</FieldLabel>
+                      <Input
+                        value={form.district}
+                        onChange={(e) =>
+                          setFormField('district', e.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Kelurahan</FieldLabel>
+                      <Input
+                        value={form.village}
+                        onChange={(e) =>
+                          setFormField('village', e.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Alamat Lengkap</FieldLabel>
+                      <Input
+                        value={form.address}
+                        onChange={(e) =>
+                          setFormField('address', e.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Tinggi Badan (cm)</FieldLabel>
+                      <Input
+                        value={form.height}
+                        onChange={(e) => setFormField('height', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Berat Badan (kg)</FieldLabel>
+                      <Input
+                        value={form.weight}
+                        onChange={(e) => setFormField('weight', e.target.value)}
+                      />
+                    </Field>
+                  </FieldGroup>
 
-              {submitError ? (
-                <p className="text-sm text-destructive">{submitError}</p>
-              ) : null}
-            </div>
-          )}
+                  <FieldSeparator />
+                  <FieldGroup className="flex">
+                    <FieldLegend className="flex gap-2">
+                      <Heart className="w-12 h-12 text-primary" />
+                      <FieldTitle className="font-bold text-lg">
+                        Riwayat Kesehatan Umum
+                      </FieldTitle>
+                    </FieldLegend>
+                  </FieldGroup>
 
-          <DialogFooter className="gap-2">
-            <DialogClose asChild>
-              <Button variant="outline">Batal</Button>
-            </DialogClose>
-            <Button
-              type="button"
-              variant="outline"
-              className="border-destructive text-destructive hover:bg-destructive/10"
-              onClick={async () => {
-                if (!selectedReservationId) return
-                try {
-                  await updateStatus.mutateAsync({
-                    id: selectedReservationId,
-                    status: 'cancelled',
-                  })
-                  closeDetail()
-                } catch (error) {
-                  setSubmitError(
-                    readApiErrorMessage(error, 'Gagal membatalkan reservasi.'),
-                  )
-                }
-              }}
-            >
-              Batalkan Reservasi
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="border-destructive text-destructive hover:bg-destructive/10"
-              onClick={async () => {
-                if (!selectedReservationId) return
-                try {
-                  await deleteReservation.mutateAsync(selectedReservationId)
-                  closeDetail()
-                } catch (error) {
-                  setSubmitError(
-                    readApiErrorMessage(error, 'Gagal menghapus reservasi.'),
-                  )
-                }
-              }}
-            >
-              Hapus Reservasi
-            </Button>
-            <Button type="button" onClick={saveDetail}>
-              Simpan
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                  <FieldGroup>
+                    <YesNoField
+                      label="Apakah ada alergi obat atau makanan?"
+                      checked={toggles.hasAlergi}
+                      onCheckedChange={(c) => setToggle('hasAlergi', c)}
+                    />
+                    <YesNoField
+                      label="Apakah ada riwayat penyakit sistemik? (Misalnya hipertensi, Jantung, Kanker, dll)"
+                      checked={toggles.hasPenyakitSistemik}
+                      onCheckedChange={(c) =>
+                        setToggle('hasPenyakitSistemik', c)
+                      }
+                    />
+                    <YesNoField
+                      label="Apakah Anda sedang konsumsi obat, kemoterapi, atau radiasi?"
+                      checked={toggles.isKonsumsiObat}
+                      onCheckedChange={(c) => setToggle('isKonsumsiObat', c)}
+                    />
+                    <YesNoField
+                      label="Apakah Anda pernah dirawat di rumah sakit?"
+                      checked={toggles.isRawatRumahSakit}
+                      onCheckedChange={(c) => setToggle('isRawatRumahSakit', c)}
+                    />
+                    <YesNoField
+                      label="Memiliki kebiasaan merokok atau alkohol?"
+                      checked={toggles.isKebiasaanRokok}
+                      onCheckedChange={(c) => setToggle('isKebiasaanRokok', c)}
+                    />
+                  </FieldGroup>
+
+                  <FieldSeparator />
+                  <FieldGroup className="flex">
+                    <FieldLegend className="flex gap-2">
+                      <Smile className="w-12 h-12 text-primary" />
+                      <FieldTitle className="font-bold text-lg">
+                        Riwayat Kesehatan Gigi dan Mulut
+                      </FieldTitle>
+                    </FieldLegend>
+                  </FieldGroup>
+
+                  <FieldGroup>
+                    <YesNoField
+                      label="Apakah Anda sering mengalami sakit gigi?"
+                      checked={toggles.isSakitGigi}
+                      onCheckedChange={(c) => setToggle('isSakitGigi', c)}
+                    />
+                    <YesNoField
+                      label="Apakah Anda pernah mengalami berdarah saat menyikat gigi?"
+                      checked={toggles.isBerdarahSikatGigi}
+                      onCheckedChange={(c) =>
+                        setToggle('isBerdarahSikatGigi', c)
+                      }
+                    />
+                    <YesNoField
+                      label="Apakah Anda pernah melakukan perawatan gigi sebelumnya?"
+                      checked={toggles.isPerawatanGigiSebelumnya}
+                      onCheckedChange={(c) =>
+                        setToggle('isPerawatanGigiSebelumnya', c)
+                      }
+                    />
+                    <Field className="flex flex-row items-center justify-between w-full">
+                      <FieldLabel>
+                        Seberapa sering Anda menyikat gigi dalam sehari?
+                      </FieldLabel>
+                      <Select
+                        value={dental.brushing_frequency}
+                        onValueChange={(v) =>
+                          setDental((prev) => ({
+                            ...prev,
+                            brushing_frequency: v,
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="max-w-130">
+                          <SelectValue placeholder="Pilih frekuensi" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1-kali">1 kali sehari</SelectItem>
+                          <SelectItem value="2-kali">2 kali sehari</SelectItem>
+                          <SelectItem value="3-kali">3 kali sehari</SelectItem>
+                          <SelectItem value="lebih-3">
+                            Lebih dari 3 kali
+                          </SelectItem>
+                          <SelectItem value="jarang">Jarang</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <YesNoField
+                      label="Apakah Anda menggunakan benang gigi atau moouthwash secara rutin?"
+                      checked={toggles.isKebisaanKesehatanMulut}
+                      onCheckedChange={(c) =>
+                        setToggle('isKebisaanKesehatanMulut', c)
+                      }
+                    />
+                    <YesNoField
+                      label="Apakah Anda memiliki kebiasaan buruk (Misal menggertakan gigi)"
+                      checked={toggles.isKebiasaanBuruk}
+                      onCheckedChange={(c) => setToggle('isKebiasaanBuruk', c)}
+                    />
+                    <YesNoField
+                      label="Apakah Anda pernah menggunakan kawat gigi atau behel?"
+                      checked={toggles.isKawatGigi}
+                      onCheckedChange={(c) => setToggle('isKawatGigi', c)}
+                    />
+                    <YesNoField
+                      label="Apakah Anda pernah menjalani perawatan saluran akar (PSA)?"
+                      checked={toggles.isPSA}
+                      onCheckedChange={(c) => setToggle('isPSA', c)}
+                    />
+                    <YesNoField
+                      label="Apakah Anda memiliki gigi palsu (lepas atau permanen)?"
+                      checked={toggles.isMemilikiGigiPalsu}
+                      onCheckedChange={(c) =>
+                        setToggle('isMemilikiGigiPalsu', c)
+                      }
+                    />
+                    <YesNoField
+                      label="Apakah Anda rutin kontrol ke dokter gigi setiap 6 bulan?"
+                      checked={toggles.isRutinKontrol}
+                      onCheckedChange={(c) => setToggle('isRutinKontrol', c)}
+                    />
+                    <Field className="flex flex-row items-center justify-between w-full">
+                      <FieldLabel>
+                        Berapa kali Anda checkup ke dokter gigi?
+                      </FieldLabel>
+                      <Select
+                        value={dental.dental_checkup_frequency}
+                        onValueChange={(v) =>
+                          setDental((prev) => ({
+                            ...prev,
+                            dental_checkup_frequency: v,
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="max-w-130">
+                          <SelectValue placeholder="Pilih frekuensi checkup" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1-tahun">
+                            1 kali setahun
+                          </SelectItem>
+                          <SelectItem value="2-tahun">
+                            2 kali setahun
+                          </SelectItem>
+                          <SelectItem value="3-tahun">
+                            3 kali setahun
+                          </SelectItem>
+                          <SelectItem value="6-bulan">
+                            Setiap 6 bulan
+                          </SelectItem>
+                          <SelectItem value="3-bulan">
+                            Setiap 3 bulan
+                          </SelectItem>
+                          <SelectItem value="jarang">Jarang</SelectItem>
+                          <SelectItem value="belum">Belum pernah</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </FieldGroup>
+
+                  <FieldSeparator />
+                  <FieldGroup className="flex">
+                    <FieldLegend className="flex gap-2">
+                      <Clock className="w-12 h-12 text-primary" />
+                      <FieldTitle className="font-bold text-lg">
+                        Reservasi
+                      </FieldTitle>
+                    </FieldLegend>
+                  </FieldGroup>
+
+                  <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
+                    <Field>
+                      <FieldLabel>Nama Lengkap</FieldLabel>
+                      <Input
+                        value={form.name}
+                        onChange={(e) => setFormField('name', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Tanggal Lahir</FieldLabel>
+                      <DatePicker
+                        value={form.birthDate}
+                        onChange={(date) => setFormField('birthDate', date)}
+                        placeholder="Pilih tanggal lahir"
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Umur</FieldLabel>
+                      <Input
+                        value={form.age}
+                        onChange={(e) => setFormField('age', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Nomor Handphone</FieldLabel>
+                      <Input
+                        value={form.phone}
+                        onChange={(e) => setFormField('phone', e.target.value)}
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Jadwal Periksa</FieldLabel>
+                      <Input value={form.reservationDate} disabled />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Jam Reservasi</FieldLabel>
+                      <Input value={form.appointmentTime} disabled />
+                    </Field>
+                    <Field>
+                      <FieldLabel>Pilihan Dokter</FieldLabel>
+                      <DropdownMenu
+                        open={dropdownDokterOpen}
+                        onOpenChange={setDropdownDokterOpen}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-between border-primary"
+                          >
+                            <span
+                              className={
+                                form.doctor ? '' : 'text-muted-foreground'
+                              }
+                            >
+                              {form.doctor || 'Pilih dokter'}
+                            </span>
+                            {dropdownDokterOpen ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                          {doctorList.map((d) => (
+                            <DropdownMenuItem
+                              key={d}
+                              onSelect={() => setFormField('doctor', d)}
+                            >
+                              {d}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </Field>
+                    <Field>
+                      <FieldLabel>Layanan</FieldLabel>
+                      <MultiSelect
+                        items={layananList}
+                        value={form.layanan}
+                        onChange={(next) => setFormField('layanan', next)}
+                        placeholder="Pilih layanan..."
+                      />
+                    </Field>
+                    <Field className="md:col-span-2">
+                      <FieldLabel>Status Reservasi</FieldLabel>
+                      <Select
+                        value={selectedStatus}
+                        onValueChange={(v) =>
+                          setSelectedStatus(v as AdminReservationStatus)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Menunggu</SelectItem>
+                          <SelectItem value="validated">Tervalidasi</SelectItem>
+                          <SelectItem value="completed">Selesai</SelectItem>
+                          <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </FieldGroup>
+
+                  <Field>
+                    <FieldLabel>Keluhan</FieldLabel>
+                    <Textarea
+                      value={form.complain}
+                      onChange={(e) => setFormField('complain', e.target.value)}
+                    />
+                  </Field>
+
+                  <FieldSeparator />
+                  <FieldGroup className="flex">
+                    <FieldLegend className="flex gap-2">
+                      <FileText className="w-12 h-12 text-primary" />
+                      <FieldTitle className="font-bold text-lg">
+                        Catatan Dokter
+                      </FieldTitle>
+                    </FieldLegend>
+                  </FieldGroup>
+                  <Field>
+                    <FieldLabel>Catatan/Rekomendasi Dokter</FieldLabel>
+                    <Textarea
+                      value={form.doctorNotes}
+                      onChange={(e) =>
+                        setFormField('doctorNotes', e.target.value)
+                      }
+                    />
+                  </Field>
+
+                  {submitError ? (
+                    <p className="text-sm text-destructive">{submitError}</p>
+                  ) : null}
+
+                  <DialogFooter className="mt-6">
+                    <DialogClose asChild>
+                      <Button variant="outline">Batal</Button>
+                    </DialogClose>
+                    <Button
+                      type="button"
+                      className="bg-[#B9D654] text-white hover:bg-[#A8C24A]"
+                      onClick={save}
+                    >
+                      {updatePatientDetails.isPending || updateStatus.isPending
+                        ? 'Menyimpan...'
+                        : 'Simpan'}
+                    </Button>
+                  </DialogFooter>
+                </>
+              )}
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 text-sm gap-2 font-bold mt-1">
+        <p className="flex gap-2 items-center">
+          <Calendar className="w-4 h-4" />
+          {formatDateOnly(item.reservation_date)}
+        </p>
+        <p className="flex gap-2 items-center">
+          <Phone className="w-4 h-4" />
+          {item.patient?.phone || '-'}
+        </p>
+        <p className="flex gap-2 items-center">
+          <Clock className="w-4 h-4" />
+          {formatTime(item.appointment_time)}
+        </p>
+        <p className="flex gap-2 items-center">
+          <User className="w-4 h-4" />
+          {item.doctor?.name || '-'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function YesNoField({
+  label,
+  checked,
+  onCheckedChange,
+}: {
+  label: string
+  checked: boolean
+  onCheckedChange: (value: CheckedState) => void
+}) {
+  return (
+    <Field className="flex flex-row items-center justify-between w-full">
+      <FieldLabel>{label}</FieldLabel>
+      <div className="flex justify-end">
+        <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
+      </div>
+    </Field>
+  )
+}
+
+function RouteComponent() {
+  const { data: reservasiData } = useAdminReservations()
+
+  const reservations = useMemo(
+    () =>
+      (reservasiData?.reservations || []).filter(
+        (r) => r.status !== 'cancelled',
+      ),
+    [reservasiData],
+  )
+
+  return (
+    <div className="flex flex-col">
+      <h1 className="text-2xl font-bold">Antrian Pasien</h1>
+      <p className="text-sm text-muted-foreground">
+        {new Date().toLocaleDateString('id-ID', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      </p>
+
+      <div className="mt-4">
+        {reservations.map((item) => (
+          <ReservationCard key={item.id} item={item} />
+        ))}
+      </div>
     </div>
   )
 }
