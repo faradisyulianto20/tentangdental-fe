@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createAdminPromo,
   deleteAdminPromo,
@@ -6,10 +6,16 @@ import {
   getAdminPromos,
   getPromos,
   updateAdminPromo,
+  type AdminPromoItem,
+  type AdminPromoPagination,
   type CreateAdminPromoPayload,
   type UpdateAdminPromoPayload,
 } from '#/services/promoService'
-import { queryClient } from '@/lib/queryClient'
+
+type AdminPromosQueryData = {
+  promos: AdminPromoItem[]
+  pagination: AdminPromoPagination
+}
 
 export function usePromos() {
   return useQuery({
@@ -37,27 +43,86 @@ export function useAdminPromoById(id?: number) {
 }
 
 export function useCreateAdminPromo() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (payload: CreateAdminPromoPayload) => createAdminPromo(payload),
-    onSuccess: async () => {
+    onSuccess: async (createdPromo) => {
+      queryClient.setQueryData<AdminPromosQueryData>(
+        ['admin-promos'],
+        (prev) => {
+          if (!prev) return prev
+
+          return {
+            ...prev,
+            promos: [createdPromo, ...prev.promos],
+            pagination: {
+              ...prev.pagination,
+              total: prev.pagination.total + 1,
+            },
+          }
+        },
+      )
+
       await queryClient.invalidateQueries({ queryKey: ['admin-promos'] })
     },
   })
 }
 
 export function useUpdateAdminPromo() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (payload: UpdateAdminPromoPayload) => updateAdminPromo(payload),
-    onSuccess: async () => {
+    onSuccess: async (updatedPromo) => {
+      queryClient.setQueryData<AdminPromosQueryData>(
+        ['admin-promos'],
+        (prev) => {
+          if (!prev) return prev
+
+          return {
+            ...prev,
+            promos: prev.promos.map((promo) =>
+              promo.id === updatedPromo.id ? updatedPromo : promo,
+            ),
+          }
+        },
+      )
+
+      queryClient.setQueryData(['admin-promos', updatedPromo.id], updatedPromo)
       await queryClient.invalidateQueries({ queryKey: ['admin-promos'] })
     },
   })
 }
 
 export function useDeleteAdminPromo() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (id: number) => deleteAdminPromo(id),
-    onSuccess: async () => {
+    onSuccess: async (_, deletedId) => {
+      queryClient.setQueryData<AdminPromosQueryData>(
+        ['admin-promos'],
+        (prev) => {
+          if (!prev) return prev
+
+          const nextPromos = prev.promos.filter(
+            (promo) => promo.id !== deletedId,
+          )
+          const nextTotal = Math.max(0, prev.pagination.total - 1)
+
+          return {
+            ...prev,
+            promos: nextPromos,
+            pagination: {
+              ...prev.pagination,
+              total: nextTotal,
+            },
+          }
+        },
+      )
+
+      queryClient.removeQueries({ queryKey: ['admin-promos', deletedId] })
       await queryClient.invalidateQueries({ queryKey: ['admin-promos'] })
     },
   })
