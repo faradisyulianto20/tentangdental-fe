@@ -9,12 +9,14 @@ import {
   useAdminReservationStats,
   useAdminServiceAnalytics,
 } from '@/hooks/useDashboard'
+import { useAuth } from '@/hooks/useAuth'
 
 export const Route = createFileRoute('/admin/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const auth = useAuth()
   const dashboard = useAdminDashboard()
   const reservationStats = useAdminReservationStats()
   const serviceAnalytics = useAdminServiceAnalytics()
@@ -64,13 +66,15 @@ function RouteComponent() {
     dashboard.data?.daily_statistics?.pending ??
     0
 
+  const adminName = auth.user?.name || 'Admin Klinik'
+
   return (
     <div>
       <div>
         <h1 className="font-bold text-xl">
           Selamat Datang,{' '}
           <span className="text-transparent bg-clip-text bg-linear-to-r from-[#01C7FE] to-[#89FBA4] font-bold text-2xl leading-10 ">
-            Admin Klinik
+            {adminName}
           </span>
         </h1>
         <p className="text-muted-foreground mb-6">{formatDate(now)}</p>

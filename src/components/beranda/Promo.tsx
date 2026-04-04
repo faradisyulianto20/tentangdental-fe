@@ -25,6 +25,19 @@ type Promo = {
   detail: string
 }
 
+function decodeHtmlEntities(input: string) {
+  return input
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+}
+
+function normalizePromoDetail(detail: string) {
+  return decodeHtmlEntities(String(detail || ''))
+}
+
 export function PromoCard({
   promo,
   variants,
@@ -49,8 +62,8 @@ export function PromoCard({
         </div>
       </div>
       <div
-        dangerouslySetInnerHTML={{ __html: promo.detail }}
-        className="font-bold text-primary text-xs text-left overflow-auto h-32"
+        dangerouslySetInnerHTML={{ __html: normalizePromoDetail(promo.detail) }}
+        className="text-primary text-xs text-left overflow-auto h-32 leading-relaxed [&_p]:mb-1.5 [&_strong]:font-bold [&_em]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-1"
       />
       <Link to="/reservasi" className="mx-auto items-justify-end mt-auto">
         <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
@@ -90,8 +103,7 @@ export default function Promo() {
     }))
   }, [promosData])
 
-  const promosSource =
-    fetchedPromos.length > 0 ? fetchedPromos : promos
+  const promosSource = fetchedPromos.length > 0 ? fetchedPromos : promos
 
   return (
     <div className="text-center max-w-6xl mx-6">
