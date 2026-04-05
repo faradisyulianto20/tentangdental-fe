@@ -29,7 +29,7 @@ export type ReservationDentalHistoryForm = {
   bad_habits?: boolean | string | null
   bad_habits_detail?: string | null
   ever_braces?: boolean | string | null
-  braces_years?: number | null
+  braces_years?: string | null
   root_canal_treatment?: boolean | string | null
   root_canal_detail?: string | null
   dentures?: boolean | string | null

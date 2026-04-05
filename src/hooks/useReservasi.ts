@@ -139,6 +139,10 @@ export function useUpdateAdminReservationPatientDetails() {
         queryKey: ['admin-reservations', variables.id],
       })
       await queryClient.invalidateQueries({ queryKey: ['admin-reservations'] })
+      await queryClient.invalidateQueries({ queryKey: ['admin-patients'] })
+      await queryClient.invalidateQueries({
+        queryKey: ['admin-patients', variables.data.patient_id],
+      })
       await queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] })
       await queryClient.invalidateQueries({
         queryKey: ['admin-dashboard', 'reservation-stats'],
