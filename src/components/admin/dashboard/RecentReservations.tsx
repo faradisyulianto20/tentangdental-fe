@@ -12,6 +12,43 @@ type RecentReservationsProps = {
   items: RecentReservationItem[]
 }
 
+function formatDateOnly(value: string | null | undefined) {
+  if (!value) return '-'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+function formatTime(value: string | null | undefined) {
+  if (!value) return '-'
+
+  const trimmed = value.trim()
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(trimmed)) {
+    const withDate = `1970-01-01T${trimmed}`
+    const date = new Date(withDate)
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+      })
+    }
+  }
+
+  const parsed = new Date(trimmed)
+  if (Number.isNaN(parsed.getTime())) return '-'
+  return parsed.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
+
 function formatStatus(status: string) {
   if (status === 'pending') return 'Menunggu'
   if (status === 'validated') return 'Tervalidasi'
@@ -61,7 +98,8 @@ export default function RecentReservations({ items }: RecentReservationsProps) {
                 </span>
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                {item.reservation_date} • {item.appointment_time}
+                {formatDateOnly(item.reservation_date)} •{' '}
+                {formatTime(item.appointment_time)}
               </p>
             </div>
           ))
