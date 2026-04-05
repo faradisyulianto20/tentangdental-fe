@@ -109,33 +109,33 @@ type ToggleState = {
 }
 
 const emptyMedical: ReservationMedicalHistoryForm = {
-  has_allergy: 'no',
+  has_allergy: false,
   allergy_detail: '',
-  has_systemic_disease: 'no',
+  has_systemic_disease: false,
   systemic_disease_detail: '',
-  undergoing_treatment: 'no',
+  undergoing_treatment: false,
   treatment_detail: '',
-  ever_hospitalized: 'no',
+  ever_hospitalized: false,
   hospitalized_reason: '',
-  smoking_or_alcohol: 'no',
+  smoking_or_alcohol: false,
 }
 
 const emptyDental: ReservationDentalHistoryForm = {
-  frequent_tooth_pain: 'no',
+  frequent_tooth_pain: false,
   tooth_pain_detail: '',
-  bleeding_gums: 'no',
-  ever_dental_treatment: 'no',
+  bleeding_gums: false,
+  ever_dental_treatment: false,
   dental_treatment_detail: '',
   brushing_frequency: '',
-  use_floss_or_mouthwash: 'no',
-  bad_habits: 'no',
+  use_floss_or_mouthwash: false,
+  bad_habits: false,
   bad_habits_detail: '',
-  ever_braces: 'no',
+  ever_braces: false,
   braces_years: '',
-  root_canal_treatment: 'no',
+  root_canal_treatment: false,
   root_canal_detail: '',
-  dentures: 'no',
-  routine_checkup: 'no',
+  dentures: false,
+  routine_checkup: false,
   dental_checkup_frequency: '',
   doctor_notes: '',
 }
@@ -181,9 +181,35 @@ function formatTime(value: string | null | undefined) {
   })
 }
 
-function yesNoToBool(input?: string | null) {
+function yesNoToBool(input?: string | boolean | null) {
+  if (typeof input === 'boolean') return input
   if (!input) return false
   return ['yes', 'true', '1'].includes(input.toLowerCase())
+}
+
+function normalizeOptionalText(value?: string | null) {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed ? trimmed : null
+}
+
+function normalizeSelectableValue(value?: string | null) {
+  if (!value) return null
+  const invalidLegacyValues = new Set([
+    '1-kali',
+    '2-kali',
+    '3-kali',
+    'lebih-3',
+    'jarang',
+    '1-tahun',
+    '2-tahun',
+    '3-tahun',
+    '6-bulan',
+    '3-bulan',
+    'belum',
+  ])
+
+  return invalidLegacyValues.has(value) ? null : value
 }
 
 function toIsoDate(date: Date | null) {
@@ -427,27 +453,56 @@ function ReservationCard({
           weight: form.weight ? Number(form.weight) : null,
           medical_history: {
             ...medical,
-            has_allergy: toggles.hasAlergi ? 'yes' : 'no',
-            has_systemic_disease: toggles.hasPenyakitSistemik ? 'yes' : 'no',
-            undergoing_treatment: toggles.isKonsumsiObat ? 'yes' : 'no',
-            ever_hospitalized: toggles.isRawatRumahSakit ? 'yes' : 'no',
-            smoking_or_alcohol: toggles.isKebiasaanRokok ? 'yes' : 'no',
+            has_allergy: toggles.hasAlergi,
+            allergy_detail: toggles.hasAlergi
+              ? normalizeOptionalText(medical.allergy_detail)
+              : null,
+            has_systemic_disease: toggles.hasPenyakitSistemik,
+            systemic_disease_detail: toggles.hasPenyakitSistemik
+              ? normalizeOptionalText(medical.systemic_disease_detail)
+              : null,
+            undergoing_treatment: toggles.isKonsumsiObat,
+            treatment_detail: toggles.isKonsumsiObat
+              ? normalizeOptionalText(medical.treatment_detail)
+              : null,
+            ever_hospitalized: toggles.isRawatRumahSakit,
+            hospitalized_reason: toggles.isRawatRumahSakit
+              ? normalizeOptionalText(medical.hospitalized_reason)
+              : null,
+            smoking_or_alcohol: toggles.isKebiasaanRokok,
           },
           dental_history: {
             ...dental,
-            frequent_tooth_pain: toggles.isSakitGigi ? 'yes' : 'no',
-            bleeding_gums: toggles.isBerdarahSikatGigi ? 'yes' : 'no',
-            ever_dental_treatment: toggles.isPerawatanGigiSebelumnya
-              ? 'yes'
-              : 'no',
-            use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut
-              ? 'yes'
-              : 'no',
-            bad_habits: toggles.isKebiasaanBuruk ? 'yes' : 'no',
-            ever_braces: toggles.isKawatGigi ? 'yes' : 'no',
-            root_canal_treatment: toggles.isPSA ? 'yes' : 'no',
-            dentures: toggles.isMemilikiGigiPalsu ? 'yes' : 'no',
-            routine_checkup: toggles.isRutinKontrol ? 'yes' : 'no',
+            frequent_tooth_pain: toggles.isSakitGigi,
+            tooth_pain_detail: toggles.isSakitGigi
+              ? normalizeOptionalText(dental.tooth_pain_detail)
+              : null,
+            bleeding_gums: toggles.isBerdarahSikatGigi,
+            ever_dental_treatment: toggles.isPerawatanGigiSebelumnya,
+            dental_treatment_detail: toggles.isPerawatanGigiSebelumnya
+              ? normalizeOptionalText(dental.dental_treatment_detail)
+              : null,
+            brushing_frequency: normalizeSelectableValue(
+              dental.brushing_frequency,
+            ),
+            use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut,
+            bad_habits: toggles.isKebiasaanBuruk,
+            bad_habits_detail: toggles.isKebiasaanBuruk
+              ? normalizeOptionalText(dental.bad_habits_detail)
+              : null,
+            ever_braces: toggles.isKawatGigi,
+            braces_years: toggles.isKawatGigi
+              ? normalizeOptionalText(dental.braces_years)
+              : null,
+            root_canal_treatment: toggles.isPSA,
+            root_canal_detail: toggles.isPSA
+              ? normalizeOptionalText(dental.root_canal_detail)
+              : null,
+            dentures: toggles.isMemilikiGigiPalsu,
+            routine_checkup: toggles.isRutinKontrol,
+            dental_checkup_frequency: normalizeSelectableValue(
+              dental.dental_checkup_frequency,
+            ),
             doctor_notes: form.doctorNotes,
           },
         },
@@ -670,27 +725,59 @@ function ReservationCard({
                   </FieldGroup>
 
                   <FieldGroup>
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah ada alergi obat atau makanan?"
                       checked={toggles.hasAlergi}
                       onCheckedChange={(c) => setToggle('hasAlergi', c)}
+                      detailValue={medical.allergy_detail || ''}
+                      onDetailChange={(value) =>
+                        setMedical((prev) => ({
+                          ...prev,
+                          allergy_detail: value,
+                        }))
+                      }
+                      placeholder="Contoh: alergi penisilin, seafood, dll"
                     />
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah ada riwayat penyakit sistemik? (Misalnya hipertensi, Jantung, Kanker, dll)"
                       checked={toggles.hasPenyakitSistemik}
                       onCheckedChange={(c) =>
                         setToggle('hasPenyakitSistemik', c)
                       }
+                      detailValue={medical.systemic_disease_detail || ''}
+                      onDetailChange={(value) =>
+                        setMedical((prev) => ({
+                          ...prev,
+                          systemic_disease_detail: value,
+                        }))
+                      }
+                      placeholder="Contoh: hipertensi sejak 2020"
                     />
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah Anda sedang konsumsi obat, kemoterapi, atau radiasi?"
                       checked={toggles.isKonsumsiObat}
                       onCheckedChange={(c) => setToggle('isKonsumsiObat', c)}
+                      detailValue={medical.treatment_detail || ''}
+                      onDetailChange={(value) =>
+                        setMedical((prev) => ({
+                          ...prev,
+                          treatment_detail: value,
+                        }))
+                      }
+                      placeholder="Tuliskan obat/terapi yang sedang dijalani"
                     />
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah Anda pernah dirawat di rumah sakit?"
                       checked={toggles.isRawatRumahSakit}
                       onCheckedChange={(c) => setToggle('isRawatRumahSakit', c)}
+                      detailValue={medical.hospitalized_reason || ''}
+                      onDetailChange={(value) =>
+                        setMedical((prev) => ({
+                          ...prev,
+                          hospitalized_reason: value,
+                        }))
+                      }
+                      placeholder="Tuliskan alasan/perawatan saat dirawat"
                     />
                     <YesNoField
                       label="Memiliki kebiasaan merokok atau alkohol?"
@@ -710,10 +797,18 @@ function ReservationCard({
                   </FieldGroup>
 
                   <FieldGroup>
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah Anda sering mengalami sakit gigi?"
                       checked={toggles.isSakitGigi}
                       onCheckedChange={(c) => setToggle('isSakitGigi', c)}
+                      detailValue={dental.tooth_pain_detail || ''}
+                      onDetailChange={(value) =>
+                        setDental((prev) => ({
+                          ...prev,
+                          tooth_pain_detail: value,
+                        }))
+                      }
+                      placeholder="Contoh: sakit saat minum dingin, 2x seminggu"
                     />
                     <YesNoField
                       label="Apakah Anda pernah mengalami berdarah saat menyikat gigi?"
@@ -722,19 +817,27 @@ function ReservationCard({
                         setToggle('isBerdarahSikatGigi', c)
                       }
                     />
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah Anda pernah melakukan perawatan gigi sebelumnya?"
                       checked={toggles.isPerawatanGigiSebelumnya}
                       onCheckedChange={(c) =>
                         setToggle('isPerawatanGigiSebelumnya', c)
                       }
+                      detailValue={dental.dental_treatment_detail || ''}
+                      onDetailChange={(value) =>
+                        setDental((prev) => ({
+                          ...prev,
+                          dental_treatment_detail: value,
+                        }))
+                      }
+                      placeholder="Contoh: scaling, tambal, cabut gigi"
                     />
                     <Field className="flex flex-row items-center justify-between w-full">
                       <FieldLabel>
                         Seberapa sering Anda menyikat gigi dalam sehari?
                       </FieldLabel>
                       <Select
-                        value={dental.brushing_frequency}
+                        value={dental.brushing_frequency ?? undefined}
                         onValueChange={(v) =>
                           setDental((prev) => ({
                             ...prev,
@@ -746,13 +849,11 @@ function ReservationCard({
                           <SelectValue placeholder="Pilih frekuensi" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1-kali">1 kali sehari</SelectItem>
-                          <SelectItem value="2-kali">2 kali sehari</SelectItem>
-                          <SelectItem value="3-kali">3 kali sehari</SelectItem>
-                          <SelectItem value="lebih-3">
-                            Lebih dari 3 kali
+                          <SelectItem value="1">1 kali sehari</SelectItem>
+                          <SelectItem value="2">2 kali sehari</SelectItem>
+                          <SelectItem value="more_than_2">
+                            Lebih dari 2 kali sehari
                           </SelectItem>
-                          <SelectItem value="jarang">Jarang</SelectItem>
                         </SelectContent>
                       </Select>
                     </Field>
@@ -763,20 +864,41 @@ function ReservationCard({
                         setToggle('isKebisaanKesehatanMulut', c)
                       }
                     />
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah Anda memiliki kebiasaan buruk (Misal menggertakan gigi)"
                       checked={toggles.isKebiasaanBuruk}
                       onCheckedChange={(c) => setToggle('isKebiasaanBuruk', c)}
+                      detailValue={dental.bad_habits_detail || ''}
+                      onDetailChange={(value) =>
+                        setDental((prev) => ({
+                          ...prev,
+                          bad_habits_detail: value,
+                        }))
+                      }
+                      placeholder="Contoh: menggertakan gigi saat tidur"
                     />
-                    <YesNoField
-                      label="Apakah Anda pernah menggunakan kawat gigi atau behel?"
+                    <YesNoFieldWithDetail
+                      label="Apakah Anda pernah menggunakan kawat gigi atau behel? (dalam tahun)"
                       checked={toggles.isKawatGigi}
                       onCheckedChange={(c) => setToggle('isKawatGigi', c)}
+                      detailValue={dental.braces_years || ''}
+                      onDetailChange={(value) =>
+                        setDental((prev) => ({ ...prev, braces_years: value }))
+                      }
+                      placeholder="Contoh: 2 (2 tahun penggunaan kawat gigi)"
                     />
-                    <YesNoField
+                    <YesNoFieldWithDetail
                       label="Apakah Anda pernah menjalani perawatan saluran akar (PSA)?"
                       checked={toggles.isPSA}
                       onCheckedChange={(c) => setToggle('isPSA', c)}
+                      detailValue={dental.root_canal_detail || ''}
+                      onDetailChange={(value) =>
+                        setDental((prev) => ({
+                          ...prev,
+                          root_canal_detail: value,
+                        }))
+                      }
+                      placeholder="Contoh: gigi geraham kanan bawah tahun 2023"
                     />
                     <YesNoField
                       label="Apakah Anda memiliki gigi palsu (lepas atau permanen)?"
@@ -795,7 +917,7 @@ function ReservationCard({
                         Berapa kali Anda checkup ke dokter gigi?
                       </FieldLabel>
                       <Select
-                        value={dental.dental_checkup_frequency}
+                        value={dental.dental_checkup_frequency ?? undefined}
                         onValueChange={(v) =>
                           setDental((prev) => ({
                             ...prev,
@@ -807,23 +929,14 @@ function ReservationCard({
                           <SelectValue placeholder="Pilih frekuensi checkup" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1-tahun">
-                            1 kali setahun
+                          <SelectItem value="6_months">
+                            6 bulan sekali
                           </SelectItem>
-                          <SelectItem value="2-tahun">
-                            2 kali setahun
+                          <SelectItem value="1_year">1 kali setahun</SelectItem>
+                          <SelectItem value="more_than_1_year">
+                            1 kali tiap lebih dari 1 tahun
                           </SelectItem>
-                          <SelectItem value="3-tahun">
-                            3 kali setahun
-                          </SelectItem>
-                          <SelectItem value="6-bulan">
-                            Setiap 6 bulan
-                          </SelectItem>
-                          <SelectItem value="3-bulan">
-                            Setiap 3 bulan
-                          </SelectItem>
-                          <SelectItem value="jarang">Jarang</SelectItem>
-                          <SelectItem value="belum">Belum pernah</SelectItem>
+                          <SelectItem value="never">Belum pernah</SelectItem>
                         </SelectContent>
                       </Select>
                     </Field>
@@ -1033,6 +1146,39 @@ function YesNoField({
       <div className="flex justify-end">
         <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
       </div>
+    </Field>
+  )
+}
+
+function YesNoFieldWithDetail({
+  label,
+  checked,
+  onCheckedChange,
+  detailValue,
+  onDetailChange,
+  placeholder,
+}: {
+  label: string
+  checked: boolean
+  onCheckedChange: (value: CheckedState) => void
+  detailValue: string
+  onDetailChange: (value: string) => void
+  placeholder: string
+}) {
+  return (
+    <Field className="flex flex-col w-full">
+      <div className="flex flex-row items-center justify-between w-full">
+        <FieldLabel>{label}</FieldLabel>
+        <Checkbox checked={checked} onCheckedChange={onCheckedChange} />
+      </div>
+      {checked ? (
+        <Input
+          value={detailValue}
+          onChange={(e) => onDetailChange(e.target.value)}
+          placeholder={placeholder}
+          className="mt-2"
+        />
+      ) : null}
     </Field>
   )
 }

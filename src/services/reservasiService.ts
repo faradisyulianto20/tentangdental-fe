@@ -7,35 +7,35 @@ export type AdminReservationStatus =
   | 'cancelled'
 
 export type ReservationMedicalHistoryForm = {
-  has_allergy?: string
-  allergy_detail?: string
-  has_systemic_disease?: string
-  systemic_disease_detail?: string
-  undergoing_treatment?: string
-  treatment_detail?: string
-  ever_hospitalized?: string
-  hospitalized_reason?: string
-  smoking_or_alcohol?: string
+  has_allergy?: boolean | string | null
+  allergy_detail?: string | null
+  has_systemic_disease?: boolean | string | null
+  systemic_disease_detail?: string | null
+  undergoing_treatment?: boolean | string | null
+  treatment_detail?: string | null
+  ever_hospitalized?: boolean | string | null
+  hospitalized_reason?: string | null
+  smoking_or_alcohol?: boolean | string | null
 }
 
 export type ReservationDentalHistoryForm = {
-  frequent_tooth_pain?: string
-  tooth_pain_detail?: string
-  bleeding_gums?: string
-  ever_dental_treatment?: string
-  dental_treatment_detail?: string
-  brushing_frequency?: string
-  use_floss_or_mouthwash?: string
-  bad_habits?: string
-  bad_habits_detail?: string
-  ever_braces?: string
-  braces_years?: string
-  root_canal_treatment?: string
-  root_canal_detail?: string
-  dentures?: string
-  routine_checkup?: string
-  dental_checkup_frequency?: string
-  doctor_notes?: string
+  frequent_tooth_pain?: boolean | string | null
+  tooth_pain_detail?: string | null
+  bleeding_gums?: boolean | string | null
+  ever_dental_treatment?: boolean | string | null
+  dental_treatment_detail?: string | null
+  brushing_frequency?: string | null
+  use_floss_or_mouthwash?: boolean | string | null
+  bad_habits?: boolean | string | null
+  bad_habits_detail?: string | null
+  ever_braces?: boolean | string | null
+  braces_years?: number | null
+  root_canal_treatment?: boolean | string | null
+  root_canal_detail?: string | null
+  dentures?: boolean | string | null
+  routine_checkup?: boolean | string | null
+  dental_checkup_frequency?: string | null
+  doctor_notes?: string | null
 }
 
 export type ReservationPatientForm = {
