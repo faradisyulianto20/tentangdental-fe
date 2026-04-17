@@ -251,6 +251,12 @@ function toId(value: string | number) {
   return typeof value === 'number' ? value : Number(value)
 }
 
+function mapGenderPayload(genderLabel: '' | 'Laki-laki' | 'Perempuan') {
+  if (genderLabel === 'Laki-laki') return 'male'
+  if (genderLabel === 'Perempuan') return 'female'
+  return null
+}
+
 function parseServices(input: unknown): string[] {
   if (Array.isArray(input)) {
     return input
@@ -290,9 +296,9 @@ function mapDetailToForm(detail: AdminReservationDetail): {
     name: patient?.name || detail.patient?.name || '',
     nickname: patient?.nickname || '',
     gender:
-      patient?.gender === 'female'
+      patient?.gender === 'female' || patient?.gender === 'perempuan'
         ? 'Perempuan'
-        : patient?.gender === 'male'
+        : patient?.gender === 'male' || patient?.gender === 'laki-laki'
           ? 'Laki-laki'
           : '',
     phone: patient?.phone || detail.patient?.phone || '',
@@ -445,6 +451,7 @@ function ReservationCard({
           patient_id: idNumber,
           name: form.name,
           phone: form.phone,
+          gender: mapGenderPayload(form.gender),
           nickname: form.nickname || null,
           age: form.age ? Number(form.age) : null,
           birth_date: toIsoDate(form.birthDate),
@@ -544,6 +551,7 @@ function ReservationCard({
           patient_id: idNumber,
           name: form.name,
           phone: form.phone,
+          gender: mapGenderPayload(form.gender),
           nickname: form.nickname || null,
           age: form.age ? Number(form.age) : null,
           birth_date: toIsoDate(form.birthDate),
@@ -655,6 +663,7 @@ function ReservationCard({
           patient_id: idNumber,
           name: form.name,
           phone: form.phone,
+          gender: mapGenderPayload(form.gender),
           nickname: form.nickname || null,
           age: form.age ? Number(form.age) : null,
           birth_date: toIsoDate(form.birthDate),
@@ -1484,13 +1493,14 @@ function YesNoFieldWithDetail({
 function RouteComponent() {
   const { data: reservasiData } = useAdminReservations()
 
-  const { pending, validated, completed } = useMemo(
+  const { pending, validated, completed, cancelled } = useMemo(
     () => {
       const all = reservasiData?.reservations || []
       return {
         pending: all.filter((r) => r.status === 'pending'),
         validated: all.filter((r) => r.status === 'validated'),
         completed: all.filter((r) => r.status === 'completed'),
+        cancelled: all.filter((r) => r.status === 'cancelled'),
       }
     },
     [reservasiData],
@@ -1560,7 +1570,24 @@ function RouteComponent() {
           </div>
         )}
 
-        {pending.length === 0 && validated.length === 0 && completed.length === 0 && (
+        {/* Cancelled Section */}
+        {cancelled.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-semibold text-red-700">
+                Dibatalkan ({cancelled.length})
+              </h2>
+              <div className="flex-1 h-0.5 bg-red-200"></div>
+            </div>
+            <div className="space-y-4">
+              {cancelled.map((item) => (
+                <ReservationCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {pending.length === 0 && validated.length === 0 && completed.length === 0 && cancelled.length === 0 && (
           <p className="text-center text-muted-foreground py-8">
             Tidak ada reservasi
           </p>

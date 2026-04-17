@@ -214,6 +214,7 @@ export async function updateAdminPatient(payload: UpdateAdminPatientPayload) {
     method: 'PUT',
     auth: true,
     body: payload.data,
+    timeoutMs: 30000, // 30 seconds for complex patient updates with medical/dental history
   })
 }
 

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
 import type { CheckedState } from '@radix-ui/react-checkbox'
 import {
   ChevronDown,
@@ -18,10 +19,12 @@ import { ApiError } from '@/lib/api-client'
 import {
   useAdminPatientById,
   useAdminPatients,
-  useUpdateAdminPatient,
   useDeleteAdminPatient,
 } from '@/hooks/usePatient'
-import { useAdminReservationById } from '@/hooks/useReservasi'
+import {
+  useAdminReservationById,
+  useUpdateAdminReservationPatientDetails,
+} from '@/hooks/useReservasi'
 import type {
   AdminPatientDetail,
   AdminPatientListItem,
@@ -216,6 +219,10 @@ function normalizeSelectableValue(value?: string | null) {
   return value
 }
 
+function toId(value: string | number) {
+  return typeof value === 'number' ? value : Number(value)
+}
+
 function getReadableError(error: unknown, fallback: string) {
   if (!(error instanceof ApiError)) return fallback
 
@@ -274,14 +281,14 @@ function mapGenderLabel(gender?: PatientGender | null) {
 }
 
 function mapGenderPayload(genderLabel: FormState['gender']) {
-  if (genderLabel === 'Laki-laki') return 'laki-laki'
-  if (genderLabel === 'Perempuan') return 'perempuan'
+  if (genderLabel === 'Laki-laki') return 'male'
+  if (genderLabel === 'Perempuan') return 'female'
   return null
 }
 
 function mapGenderFromReservation(gender?: string | null) {
-  if (gender === 'female') return 'Perempuan'
-  if (gender === 'male') return 'Laki-laki'
+  if (gender === 'perempuan' || gender === 'female') return 'Perempuan'
+  if (gender === 'laki-laki' || gender === 'male') return 'Laki-laki'
   return ''
 }
 
@@ -357,23 +364,20 @@ function mapPatientToForm(
 
 function FormulirDialog({ pasien }: { pasien: PatientRow }) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const [submitError, setSubmitError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [dropdownJenisKelaminOpen, setDropdownJenisKelaminOpen] =
     useState(false)
-
-  console.log('FormulirDialog - Patient ID:', pasien.id)
+  const isInitializedRef = useRef(false)
 
   const detailQuery = useAdminPatientById(pasien.id, open)
-  const updatePatient = useUpdateAdminPatient()
+  const updatePatientDetails = useUpdateAdminReservationPatientDetails()
 
   // Get first/last reservation ID from patient detail
   const firstReservationId = useMemo(() => {
-    console.log('useMemo triggered - detailQuery.data:', !!detailQuery.data)
-    
     if (!detailQuery.data?.reservations || detailQuery.data.reservations.length === 0) {
-      console.log('No reservations found for patient ID:', pasien.id)
       return undefined
     }
     
@@ -381,10 +385,6 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
     // Ambil reservation pertama (index 0)
     const firstReservation = detailQuery.data.reservations[0]
     const id = Number(firstReservation.id)
-    
-    console.log('Available reservations count:', detailQuery.data.reservations.length)
-    console.log('First Reservation ID for patient:', pasien.id, 'is:', id)
-    console.log('First Reservation data:', firstReservation)
     
     return id
   }, [detailQuery.data?.reservations, pasien.id])
@@ -417,30 +417,29 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
     isRutinKontrol: false,
   })
 
+  // Reset initialized flag when dialog opens with different patient or closes
+  useEffect(() => {
+    isInitializedRef.current = false
+  }, [open, pasien.id])
+
   useEffect(() => {
     if (!detailQuery.data) {
-      console.log('detailQuery.data is null/undefined for patient:', pasien.id)
       return
     }
-
-    console.log('=== Data Loading ===')
-    console.log('Patient ID:', pasien.id)
-    console.log('Patient Detail Data:', detailQuery.data)
-    console.log('Patient Detail Reservations:', detailQuery.data.reservations)
-    console.log('First Reservation ID from useMemo:', firstReservationId)
-    console.log('Reservation Query Data:', reservationQuery.data)
     
-    const mapped = mapPatientToForm(detailQuery.data, reservationQuery.data)
-    console.log('Mapped Form:', mapped.form)
-    console.log('=== End Data Loading ===')
-    
-    setForm(mapped.form)
-    setMedical(mapped.medical)
-    setDental(mapped.dental)
-    setToggles(mapped.toggles)
-    setSubmitError('')
-    setFieldErrors({})
-  }, [detailQuery.data, reservationQuery.data, firstReservationId, pasien.id])
+    // Only initialize on first load, not on subsequent data changes
+    if (!isInitializedRef.current) {
+      const mapped = mapPatientToForm(detailQuery.data, reservationQuery.data)
+      
+      setForm(mapped.form)
+      setMedical(mapped.medical)
+      setDental(mapped.dental)
+      setToggles(mapped.toggles)
+      setSubmitError('')
+      setFieldErrors({})
+      isInitializedRef.current = true
+    }
+  }, [detailQuery.data])
 
   const setFormField = (key: keyof FormState, value: string | Date | null) => {
     setForm((prev) => {
@@ -463,10 +462,16 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
     setSubmitError('')
     setFieldErrors({})
 
+    if (!firstReservationId) {
+      setSubmitError('Tidak ada reservasi yang ditemukan untuk pasien ini.')
+      return
+    }
+
     try {
-      await updatePatient.mutateAsync({
-        id: pasien.id,
+      await updatePatientDetails.mutateAsync({
+        id: toId(firstReservationId),
         data: {
+          patient_id: pasien.id,
           name: form.name.trim(),
           phone: form.phone.trim(),
           birth_date: toIsoDate(form.birthDate),
@@ -538,6 +543,14 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
         },
       })
 
+      // Invalidate queries untuk force refetch data
+      await queryClient.invalidateQueries({
+        queryKey: ['adminPatientById', pasien.id],
+      })
+      await queryClient.invalidateQueries({
+        queryKey: ['adminReservationById', firstReservationId],
+      })
+
       setOpen(false)
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
@@ -559,7 +572,6 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-sm p-8">
         {(() => {
-          console.log('Render check - detailQuery.isLoading:', detailQuery.isLoading, 'reservationQuery.isLoading:', reservationQuery.isLoading, 'form:', !!form)
           return detailQuery.isLoading || reservationQuery.isLoading || !form ? (
             <p className="text-sm text-muted-foreground">
               Memuat detail pasien...
@@ -1012,9 +1024,9 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
                 type="button"
                 className="bg-[#B9D654] text-white hover:bg-[#A8C24A]"
                 onClick={save}
-                disabled={updatePatient.isPending}
+                disabled={updatePatientDetails.isPending}
               >
-                {updatePatient.isPending ? 'Menyimpan...' : 'Simpan'}
+                {updatePatientDetails.isPending ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </DialogFooter>
             </>
@@ -1155,7 +1167,7 @@ export default function DataPasienTable() {
         setDeleteConfirmOpen(false)
         setDeletePatientId(null)
       } catch (error) {
-        console.error('Error deleting patient:', error)
+        // Error is handled by mutation error state
       }
     }
   }

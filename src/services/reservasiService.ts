@@ -106,7 +106,7 @@ export type ReservationPatientDetailsPayload = {
   patient_id: number
   name: string
   nickname?: string | null
-  gender?: 'laki-laki' | 'perempuan' | null
+  gender?: 'male' | 'female' | null
   age?: number | null
   birth_place?: string | null
   birth_date?: string | null
@@ -252,6 +252,7 @@ export async function updateAdminReservationStatus(
       body: {
         status: payload.status,
       },
+      timeoutMs: 30000, // 30 seconds for reservation status updates
     },
   )
 }
@@ -263,6 +264,7 @@ export async function updateAdminReservationPatientDetails(
     method: 'PUT',
     auth: true,
     body: toPatientDetailsRequestBody(payload.data),
+    timeoutMs: 30000, // 30 seconds for patient details updates
   })
 }
 
