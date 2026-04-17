@@ -51,15 +51,7 @@ const badgeColors = [
 
 // Helper function to get day name in Indonesian
 const getDayNameIndonesian = (date: Date): string => {
-  const days = [
-    'minggu',
-    'senin',
-    'selasa',
-    'rabu',
-    'kamis',
-    'jumat',
-    'sabtu',
-  ]
+  const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu']
   return days[date.getDay()]
 }
 
@@ -69,67 +61,89 @@ const isDoctorAvailableOnDate = (
   date: Date,
 ): string[] => {
   if (!doctorSchedule) return []
-  
+
   // If schedule is already an object with day keys
   if (typeof doctorSchedule === 'object' && !Array.isArray(doctorSchedule)) {
     const dayName = getDayNameIndonesian(date)
     const daySchedule = (doctorSchedule as Record<string, string[]>)[dayName]
-    return daySchedule || []
+    if (!Array.isArray(daySchedule)) return []
+
+    return daySchedule
+      .filter((slot) => typeof slot === 'string')
+      .map((slot) => slot.replace(/\./g, ':').replace(/\s*-\s*/g, ' - '))
   }
-  
+
   // Fallback to array format
-  return Array.isArray(doctorSchedule) ? doctorSchedule : []
+  if (!Array.isArray(doctorSchedule)) return []
+
+  const dayName = getDayNameIndonesian(date)
+  return doctorSchedule
+    .filter(
+      (item) =>
+        typeof item === 'string' && item.toLowerCase().includes(dayName),
+    )
+    .map((item) => {
+      const match = item.match(/(\d{1,2}[\.:]\d{2})\s*-\s*(\d{1,2}[\.:]\d{2})/)
+
+      if (!match) return item
+
+      const start = match[1].replace(/\./g, ':')
+      const end = match[2].replace(/\./g, ':')
+      return `${start} - ${end}`
+    })
 }
 
 // Zod Validation
-const formSchema = z.object({
-  namaLengkap: z.string().min(1, 'Nama lengkap harus diisi'),
-  nomorHandphone: z.string().min(1, 'Nomor handphone harus diisi'),
-  tanggalLahir: z.date().nullable(),
-  umur: z.string().optional(),
-  jenisKelamin: z
-    .enum(['laki-laki', 'perempuan'])
-    .optional()
-    .refine(
-      (val) => val === undefined || ['laki-laki', 'perempuan'].includes(val),
-      { message: 'The selected gender is invalid.' },
-    ),
-  jadwalPeriksa: z
-    .date({ required_error: 'Jadwal periksa harus diisi' })
-    .nullable()
-    .refine((val) => val !== null, { message: 'Jadwal periksa harus diisi' })
-    .refine(
-      (val) => {
-        if (val === null) return true
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        return val >= today
-      },
-      { message: 'Jadwal periksa tidak boleh hari kemarin' },
-    ),
-  jamReservasi: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format jam harus HH:MM'),
-  pilihanDokter: z.string().min(1, 'Pilihan dokter harus diisi'),
-  layanan: z
-    .array(z.string())
-    .min(1, 'Layanan harus dipilih')
-    .max(3, 'Maksimal 3 layanan'),
-  nomorPasien: z.string().optional(),
-  isPasienLama: z.boolean().default(false),
-  keluhan: z.string().min(1, 'Keluhan harus diisi'),
-}).refine(
-  (data) => {
-    if (data.isPasienLama && !data.nomorPasien) {
-      return false
-    }
-    return true
-  },
-  {
-    message: 'Nomor pasien harus diisi untuk pasien lama',
-    path: ['nomorPasien'],
-  },
-)
+const formSchema = z
+  .object({
+    namaLengkap: z.string().min(1, 'Nama lengkap harus diisi'),
+    nomorHandphone: z.string().min(1, 'Nomor handphone harus diisi'),
+    tanggalLahir: z.date().nullable(),
+    umur: z.string().optional(),
+    jenisKelamin: z
+      .enum(['laki-laki', 'perempuan'])
+      .optional()
+      .refine(
+        (val) => val === undefined || ['laki-laki', 'perempuan'].includes(val),
+        { message: 'The selected gender is invalid.' },
+      ),
+    jadwalPeriksa: z
+      .date({ required_error: 'Jadwal periksa harus diisi' })
+      .nullable()
+      .refine((val) => val !== null, { message: 'Jadwal periksa harus diisi' })
+      .refine(
+        (val) => {
+          if (val === null) return true
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          return val >= today
+        },
+        { message: 'Jadwal periksa tidak boleh hari kemarin' },
+      ),
+    jamReservasi: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format jam harus HH:MM'),
+    pilihanDokter: z.string().min(1, 'Pilihan dokter harus diisi'),
+    layanan: z
+      .array(z.string())
+      .min(1, 'Layanan harus dipilih')
+      .max(3, 'Maksimal 3 layanan'),
+    nomorPasien: z.string().optional(),
+    isPasienLama: z.boolean().default(false),
+    keluhan: z.string().min(1, 'Keluhan harus diisi'),
+  })
+  .refine(
+    (data) => {
+      if (data.isPasienLama && !data.nomorPasien) {
+        return false
+      }
+      return true
+    },
+    {
+      message: 'Nomor pasien harus diisi untuk pasien lama',
+      path: ['nomorPasien'],
+    },
+  )
 
 export default function FormReservasi() {
   const navigate = useNavigate()
@@ -142,9 +156,8 @@ export default function FormReservasi() {
   const [serverErrors, setServerErrors] = useState<ServerFieldErrors>({})
   const [successOpen, setSuccessOpen] = useState(false)
   const [createdPatientId, setCreatedPatientId] = useState<string>('')
-  const [selectedJadwalPeriksa, setSelectedJadwalPeriksa] = useState<Date | null>(
-    null,
-  )
+  const [selectedJadwalPeriksa, setSelectedJadwalPeriksa] =
+    useState<Date | null>(null)
 
   const doctors = Array.isArray(doctorsData)
     ? doctorsData.map((doctor) => ({
@@ -175,7 +188,7 @@ export default function FormReservasi() {
       reservation_date: 'jadwalPeriksa',
       appointment_time: 'jamReservasi',
       service_ids: 'layanan',
-      patient_category: 'nomorPasien',
+      patient_id: 'nomorPasien',
       gender: 'jenisKelamin',
     }
 
@@ -200,6 +213,14 @@ export default function FormReservasi() {
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
     return `${year}-${month}-${day}`
+  }
+
+  const mapGenderToApi = (
+    value: 'laki-laki' | 'perempuan' | undefined,
+  ): 'male' | 'female' | undefined => {
+    if (value === 'laki-laki') return 'male'
+    if (value === 'perempuan') return 'female'
+    return undefined
   }
 
   const { Field, handleSubmit, reset, setFieldValue } = useForm({
@@ -251,10 +272,12 @@ export default function FormReservasi() {
 
       try {
         const payload = {
-          patient_category: (checked ? 'existing' : 'new') as 'existing' | 'new',
+          patient_category: (checked ? 'existing' : 'new') as
+            | 'existing'
+            | 'new',
           name: value.namaLengkap,
           phone: value.nomorHandphone,
-          gender: value.jenisKelamin,
+          gender: mapGenderToApi(value.jenisKelamin),
           address: '-',
           birth_date: value.tanggalLahir
             ? formatDate(value.tanggalLahir)
@@ -268,17 +291,19 @@ export default function FormReservasi() {
               : formatDate(new Date()),
           appointment_time: value.jamReservasi,
           service_ids: value.layanan.map((item) => Number(item)),
-          ...(checked && value.nomorPasien ? { patient_id: Number(value.nomorPasien) } : {}),
+          ...(checked && value.nomorPasien
+            ? { patient_id: Number(value.nomorPasien) }
+            : {}),
         }
-        
+
         const result = await createReservation.mutateAsync(payload)
         console.log('✅ Reservasi berhasil:', result)
-        
+
         // Store the created patient ID
         if (result.patient?.id) {
           setCreatedPatientId(String(result.patient.id))
         }
-        
+
         setSuccessOpen(true)
         reset()
         setChecked(false)
@@ -465,11 +490,12 @@ export default function FormReservasi() {
                   return (
                     <div className="space-y-4">
                       <FieldLabel>Pilihan Dokter</FieldLabel>
-                      {selectedJadwalPeriksa && availableDoctors.length === 0 && (
-                        <FieldDescription className="text-destructive">
-                          Tidak ada dokter yang tersedia pada hari tersebut
-                        </FieldDescription>
-                      )}
+                      {selectedJadwalPeriksa &&
+                        availableDoctors.length === 0 && (
+                          <FieldDescription className="text-destructive">
+                            Tidak ada dokter yang tersedia pada hari tersebut
+                          </FieldDescription>
+                        )}
                       <DropdownMenu
                         open={dropdownOpen}
                         onOpenChange={setDropdownOpen}
@@ -661,7 +687,9 @@ export default function FormReservasi() {
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
             <div>
               <p className="text-sm text-muted-foreground">No. Pasien</p>
-              <p className="text-lg font-bold text-primary">{createdPatientId}</p>
+              <p className="text-lg font-bold text-primary">
+                {createdPatientId}
+              </p>
             </div>
           </div>
 

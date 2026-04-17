@@ -284,9 +284,10 @@ export type PatientCategory = 'new' | 'existing'
 
 export type CreatePublicReservationPayload = {
   patient_category: PatientCategory
+  patient_id?: number
   name: string
   phone: string
-  gender?: 'laki-laki' | 'perempuan'
+  gender?: 'male' | 'female'
   address?: string
   birth_date?: string
   age?: number
