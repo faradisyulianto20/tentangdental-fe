@@ -14,6 +14,7 @@ import {
   useCreateAdminDoctor,
   useDeleteAdminDoctor,
   useUpdateAdminDoctor,
+  useAdminDoctorScheduleOptions,
 } from '@/hooks/useDokter'
 import type { DoctorApiItem } from '@/services/dokterService'
 import { ApiError } from '@/lib/api-client'
@@ -21,14 +22,6 @@ import { ApiError } from '@/lib/api-client'
 export const Route = createFileRoute('/admin/profil-dokter')({
   component: RouteComponent,
 })
-
-const jadwalOptions = [
-  'Senin 08.00 - 16.00',
-  'Selasa 08.00 - 16.00',
-  'Rabu 08.00 - 16.00',
-  'Kamis 08.00 - 16.00',
-  'Jumat 08.00 - 16.00',
-]
 
 function readApiErrorMessage(error: unknown, fallback: string) {
   if (!(error instanceof ApiError)) return fallback
@@ -49,6 +42,47 @@ function readApiErrorMessage(error: unknown, fallback: string) {
   return error.message || fallback
 }
 
+const dayLookup: Record<string, string> = {
+  senin: 'senin',
+  selasa: 'selasa',
+  rabu: 'rabu',
+  kamis: 'kamis',
+  jumat: 'jumat',
+  sabtu: 'sabtu',
+  minggu: 'minggu',
+}
+
+function toScheduleMap(labels: string[]): Record<string, string[]> {
+  const result: Record<string, string[]> = {
+    senin: [],
+    selasa: [],
+    rabu: [],
+    kamis: [],
+    jumat: [],
+    sabtu: [],
+    minggu: [],
+  }
+
+  labels.forEach((label) => {
+    const parts = label.trim().split(' ')
+    if (parts.length < 2) return
+
+    const dayRaw = parts[0].toLowerCase()
+    const day = dayLookup[dayRaw]
+    if (!day) return
+
+    const slot = parts
+      .slice(1)
+      .join(' ')
+      .replace(/\s*-\s*/g, '-')
+    if (slot.length > 0) {
+      result[day].push(slot)
+    }
+  })
+
+  return result
+}
+
 function RouteComponent() {
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorApiItem | null>(
     null,
@@ -58,9 +92,14 @@ function RouteComponent() {
   const [createFormKey, setCreateFormKey] = useState(0)
 
   const doctorsQuery = useAdminDoctors()
+  const scheduleOptionsQuery = useAdminDoctorScheduleOptions()
   const createDoctor = useCreateAdminDoctor()
   const updateDoctor = useUpdateAdminDoctor()
   const deleteDoctor = useDeleteAdminDoctor()
+
+  const jadwalOptions = useMemo(() => {
+    return scheduleOptionsQuery.data?.dropdown_options || []
+  }, [scheduleOptionsQuery.data])
 
   const doctorList = useMemo(
     () => doctorsQuery.data?.doctors || [],
@@ -90,7 +129,7 @@ function RouteComponent() {
       name: values.name,
       specialization: values.specialization || null,
       statement: values.statement || null,
-      schedule: values.schedule,
+      schedule: toScheduleMap(values.schedule),
       photo: values.photoFile,
     })
 
@@ -113,7 +152,7 @@ function RouteComponent() {
       name: values.name,
       specialization: values.specialization || null,
       statement: values.statement || null,
-      schedule: JSON.stringify(values.schedule), // ✅ serialize ke JSON string
+      schedule: toScheduleMap(values.schedule),
       photo: values.photoFile,
     })
 
@@ -220,4 +259,4 @@ function RouteComponent() {
       </Dialog>
     </div>
   )
-} 
+}
