@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogTrigger,
@@ -434,104 +433,104 @@ function ReservationCard({
     setToggles((prev) => ({ ...prev, [key]: checked }))
   }
 
-  const save = async () => {
-    if (!form) return
-    setSubmitError('')
+  // const save = async () => {
+  //   if (!form) return
+  //   setSubmitError('')
 
-    const idNumber = Number(patientId)
-    if (!idNumber || Number.isNaN(idNumber)) {
-      setSubmitError('Patient ID tidak valid.')
-      return
-    }
+  //   const idNumber = Number(patientId)
+  //   if (!idNumber || Number.isNaN(idNumber)) {
+  //     setSubmitError('Patient ID tidak valid.')
+  //     return
+  //   }
 
-    try {
-      await updatePatientDetails.mutateAsync({
-        id: toId(item.id),
-        data: {
-          patient_id: idNumber,
-          name: form.name,
-          phone: form.phone,
-          gender: mapGenderPayload(form.gender),
-          nickname: form.nickname || null,
-          age: form.age ? Number(form.age) : null,
-          birth_date: toIsoDate(form.birthDate),
-          address: form.address || null,
-          village: form.village || null,
-          district: form.district || null,
-          city: form.city || null,
-          occupation: form.occupation || null,
-          parent_name: form.parentName || null,
-          height: form.height ? Number(form.height) : null,
-          weight: form.weight ? Number(form.weight) : null,
-          medical_history: {
-            ...medical,
-            has_allergy: toggles.hasAlergi,
-            allergy_detail: toggles.hasAlergi
-              ? normalizeOptionalText(medical.allergy_detail)
-              : null,
-            has_systemic_disease: toggles.hasPenyakitSistemik,
-            systemic_disease_detail: toggles.hasPenyakitSistemik
-              ? normalizeOptionalText(medical.systemic_disease_detail)
-              : null,
-            undergoing_treatment: toggles.isKonsumsiObat,
-            treatment_detail: toggles.isKonsumsiObat
-              ? normalizeOptionalText(medical.treatment_detail)
-              : null,
-            ever_hospitalized: toggles.isRawatRumahSakit,
-            hospitalized_reason: toggles.isRawatRumahSakit
-              ? normalizeOptionalText(medical.hospitalized_reason)
-              : null,
-            smoking_or_alcohol: toggles.isKebiasaanRokok,
-          },
-          dental_history: {
-            ...dental,
-            frequent_tooth_pain: toggles.isSakitGigi,
-            tooth_pain_detail: toggles.isSakitGigi
-              ? normalizeOptionalText(dental.tooth_pain_detail)
-              : null,
-            bleeding_gums: toggles.isBerdarahSikatGigi,
-            ever_dental_treatment: toggles.isPerawatanGigiSebelumnya,
-            dental_treatment_detail: toggles.isPerawatanGigiSebelumnya
-              ? normalizeOptionalText(dental.dental_treatment_detail)
-              : null,
-            brushing_frequency: normalizeSelectableValue(
-              dental.brushing_frequency,
-            ),
-            use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut,
-            bad_habits: toggles.isKebiasaanBuruk,
-            bad_habits_detail: toggles.isKebiasaanBuruk
-              ? normalizeOptionalText(dental.bad_habits_detail)
-              : null,
-            ever_braces: toggles.isKawatGigi,
-            braces_years: toggles.isKawatGigi
-              ? normalizeOptionalText(dental.braces_years)
-              : null,
-            root_canal_treatment: toggles.isPSA,
-            root_canal_detail: toggles.isPSA
-              ? normalizeOptionalText(dental.root_canal_detail)
-              : null,
-            dentures: toggles.isMemilikiGigiPalsu,
-            routine_checkup: toggles.isRutinKontrol,
-            dental_checkup_frequency: normalizeSelectableValue(
-              dental.dental_checkup_frequency,
-            ),
-            doctor_notes: form.doctorNotes,
-          },
-        },
-      })
+  //   try {
+  //     await updatePatientDetails.mutateAsync({
+  //       id: toId(item.id),
+  //       data: {
+  //         patient_id: idNumber,
+  //         name: form.name,
+  //         phone: form.phone,
+  //         gender: mapGenderPayload(form.gender),
+  //         nickname: form.nickname || null,
+  //         age: form.age ? Number(form.age) : null,
+  //         birth_date: toIsoDate(form.birthDate),
+  //         address: form.address || null,
+  //         village: form.village || null,
+  //         district: form.district || null,
+  //         city: form.city || null,
+  //         occupation: form.occupation || null,
+  //         parent_name: form.parentName || null,
+  //         height: form.height ? Number(form.height) : null,
+  //         weight: form.weight ? Number(form.weight) : null,
+  //         medical_history: {
+  //           ...medical,
+  //           has_allergy: toggles.hasAlergi,
+  //           allergy_detail: toggles.hasAlergi
+  //             ? normalizeOptionalText(medical.allergy_detail)
+  //             : null,
+  //           has_systemic_disease: toggles.hasPenyakitSistemik,
+  //           systemic_disease_detail: toggles.hasPenyakitSistemik
+  //             ? normalizeOptionalText(medical.systemic_disease_detail)
+  //             : null,
+  //           undergoing_treatment: toggles.isKonsumsiObat,
+  //           treatment_detail: toggles.isKonsumsiObat
+  //             ? normalizeOptionalText(medical.treatment_detail)
+  //             : null,
+  //           ever_hospitalized: toggles.isRawatRumahSakit,
+  //           hospitalized_reason: toggles.isRawatRumahSakit
+  //             ? normalizeOptionalText(medical.hospitalized_reason)
+  //             : null,
+  //           smoking_or_alcohol: toggles.isKebiasaanRokok,
+  //         },
+  //         dental_history: {
+  //           ...dental,
+  //           frequent_tooth_pain: toggles.isSakitGigi,
+  //           tooth_pain_detail: toggles.isSakitGigi
+  //             ? normalizeOptionalText(dental.tooth_pain_detail)
+  //             : null,
+  //           bleeding_gums: toggles.isBerdarahSikatGigi,
+  //           ever_dental_treatment: toggles.isPerawatanGigiSebelumnya,
+  //           dental_treatment_detail: toggles.isPerawatanGigiSebelumnya
+  //             ? normalizeOptionalText(dental.dental_treatment_detail)
+  //             : null,
+  //           brushing_frequency: normalizeSelectableValue(
+  //             dental.brushing_frequency,
+  //           ),
+  //           use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut,
+  //           bad_habits: toggles.isKebiasaanBuruk,
+  //           bad_habits_detail: toggles.isKebiasaanBuruk
+  //             ? normalizeOptionalText(dental.bad_habits_detail)
+  //             : null,
+  //           ever_braces: toggles.isKawatGigi,
+  //           braces_years: toggles.isKawatGigi
+  //             ? normalizeOptionalText(dental.braces_years)
+  //             : null,
+  //           root_canal_treatment: toggles.isPSA,
+  //           root_canal_detail: toggles.isPSA
+  //             ? normalizeOptionalText(dental.root_canal_detail)
+  //             : null,
+  //           dentures: toggles.isMemilikiGigiPalsu,
+  //           routine_checkup: toggles.isRutinKontrol,
+  //           dental_checkup_frequency: normalizeSelectableValue(
+  //             dental.dental_checkup_frequency,
+  //           ),
+  //           doctor_notes: form.doctorNotes,
+  //         },
+  //       },
+  //     })
 
-      if (selectedStatus !== item.status) {
-        await updateStatus.mutateAsync({
-          id: toId(item.id),
-          status: selectedStatus,
-        })
-      }
+  //     if (selectedStatus !== item.status) {
+  //       await updateStatus.mutateAsync({
+  //         id: toId(item.id),
+  //         status: selectedStatus,
+  //       })
+  //     }
 
-      onSaved?.()
-    } catch (error) {
-      setSubmitError(readApiErrorMessage(error, 'Gagal menyimpan reservasi.'))
-    }
-  }
+  //     onSaved?.()
+  //   } catch (error) {
+  //     setSubmitError(readApiErrorMessage(error, 'Gagal menyimpan reservasi.'))
+  //   }
+  // }
 
   const handleValidate = async () => {
     try {

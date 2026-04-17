@@ -7,7 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Clock,
   FileText,
   Heart,
   Search,
@@ -33,7 +32,6 @@ import type {
 import type {
   ReservationDentalHistoryForm,
   ReservationMedicalHistoryForm,
-  ReservationPatientForm,
   AdminReservationDetail,
 } from '@/services/reservasiService'
 import { Button } from '@/components/ui/button'
