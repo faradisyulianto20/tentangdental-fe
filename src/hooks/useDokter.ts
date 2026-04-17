@@ -5,12 +5,21 @@ import {
   getAdminDoctorById,
   getAdminDoctors,
   getDoctors,
+  getAdminDoctorScheduleOptions,
   updateAdminDoctor,
   type AdminDoctorPagination,
   type CreateAdminDoctorPayload,
   type DoctorApiItem,
   type UpdateAdminDoctorPayload,
 } from '@/services/dokterService'
+
+export function useAdminDoctorScheduleOptions() {
+  return useQuery({
+    queryKey: ['admin-doctor-schedule-options'],
+    queryFn: getAdminDoctorScheduleOptions,
+    staleTime: 1000 * 60 * 10,
+  })
+}
 
 type AdminDoctorsQueryData = {
   doctors: DoctorApiItem[]
