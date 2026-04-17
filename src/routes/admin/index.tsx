@@ -10,6 +10,7 @@ import {
   useAdminServiceAnalytics,
 } from '@/hooks/useDashboard'
 import { useAuth } from '@/hooks/useAuth'
+import { useAdminReservations } from '@/hooks/useReservasi'
 
 export const Route = createFileRoute('/admin/')({
   component: RouteComponent,
@@ -20,6 +21,7 @@ function RouteComponent() {
   const dashboard = useAdminDashboard()
   const reservationStats = useAdminReservationStats()
   const serviceAnalytics = useAdminServiceAnalytics()
+  const adminReservations = useAdminReservations()
 
   const now = new Date()
 
@@ -68,7 +70,30 @@ function RouteComponent() {
 
   const adminName = auth.user?.name || 'Admin Klinik'
 
+  // Transform recent reservations from admin reservations data (only pending, validated, rejected)
+  const recentReservationItems =
+    adminReservations.data?.reservations
+      ?.filter(
+        (item) =>
+          item.status === 'pending' ||
+          item.status === 'validated' ||
+          item.status === 'rejected' ||
+          item.status === 'cancelled',
+      )
+      .slice(0, 5)
+      .map((item) => ({
+        id: item.id,
+        patient_name: item.patient?.name || '-',
+        service_name: item.services?.[0]?.name || '-',
+        doctor_name: item.doctor?.name || '-',
+        reservation_date: item.reservation_date || '',
+        appointment_time: item.appointment_time || '',
+        status: item.status || 'pending',
+      })) || []
+
   console.log(totalReservations)
+
+  console.log(recentReservationItems)
 
   return (
     <div>
@@ -98,9 +123,7 @@ function RouteComponent() {
         <StatisticsDashboard monthLabel={monthLabel} services={serviceItems} />
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <RecentReservations
-            items={dashboard.data?.recent_reservations || []}
-          />
+          <RecentReservations items={recentReservationItems} />
           <DoctorSchedule />
         </div>
       </div>
