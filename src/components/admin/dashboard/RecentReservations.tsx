@@ -1,3 +1,5 @@
+import { useNavigate } from '@tanstack/react-router'
+
 type RecentReservationItem = {
   id: string | number
   patient_name: string
@@ -66,6 +68,20 @@ function statusColor(status: string) {
 }
 
 export default function RecentReservations({ items }: RecentReservationsProps) {
+  const navigate = useNavigate()
+  
+  // Filter out completed status and sort by pending, validated, then cancelled
+  const sortedItems = items
+    .filter((item) => item.status !== 'completed')
+    .sort((a, b) => {
+      const statusOrder: Record<string, number> = {
+        pending: 1,
+        validated: 2,
+        cancelled: 3,
+      }
+      return (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999)
+    })
+
   return (
     <div className="p-4 shadow-md rounded-lg">
       <h2 className="text-2xl font-bold">Reservasi Terbaru</h2>
@@ -74,13 +90,17 @@ export default function RecentReservations({ items }: RecentReservationsProps) {
       </p>
 
       <div className="space-y-3">
-        {items.length === 0 ? (
+        {sortedItems.length === 0 ? (
           <div className="rounded-lg border p-4 text-sm text-muted-foreground">
             Belum ada reservasi terbaru.
           </div>
         ) : (
-          items.map((item) => (
-            <div key={item.id} className="rounded-lg border bg-[#E0F4FB] p-4">
+          sortedItems.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-lg border bg-[#E0F4FB] p-4 cursor-pointer hover:bg-[#D0E8F5] transition-colors"
+              onClick={() => navigate({ to: '/admin/reservasi' })}
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-semibold">{item.patient_name}</p>

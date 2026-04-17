@@ -1,38 +1,40 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '#/components/ui/button'
 import { ChevronLeft, User, MapPin, Activity, Stethoscope } from 'lucide-react'
+import { useAdminPatientById } from '@/hooks/usePatient'
+import { Skeleton } from '#/components/ui/skeleton'
 
 interface DetailPasienProps {
   id: string
 }
 
-// Simulasi pencarian data (Nanti ganti dengan dataPasien.find)
-const pasien = {
-  namaPasien: 'Alice Johnson',
-  namaPanggilan: 'Alice',
-  layanan: 'Tambal Gigi',
-  tanggalReservasi: 'Senin, 17 Maret 2024',
-  nomorHandphone: '081234567892',
-  jamReservasi: '09:00 AM',
-  dokter: 'Dr. Lee',
-  status: 'selesai',
-  nomorPasien: 'P003',
-  jenisKelamin: 'Perempuan',
-  umur: '25',
-  pekerjaan: 'Mahasiswa',
-  tanggalLahir: '1999-11-03',
-  namaOrangTua: 'David Johnson',
-  kotaKabupaten: 'Bantul',
-  kecamatan: 'Kasihan',
-  kelurahan: 'Tirtonirmolo',
-  alamatLengkap: 'Jl. Bantul No. 22',
-  tinggiBadan: '158',
-  beratBadan: '50',
-  keluhan: 'Gigi berlubang di bagian belakang dan terasa ngilu.',
-}
-
 export default function DetailPasien({ id }: DetailPasienProps) {
   const navigate = useNavigate()
+  const patientId = id ? Number(id) : undefined
+  const { data: pasien, isLoading } = useAdminPatientById(patientId)
+  if (isLoading) {
+    return (
+      <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
+        <Skeleton className="h-9 w-48 rounded-md" />
+        <Skeleton className="h-14 w-72 rounded-md mt-2" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <Skeleton className="h-48 w-full rounded-lg" />
+        </div>
+      </div>
+    )
+  }
+
+  if (!pasien) {
+    return (
+      <div className="p-4 md:p-6">
+        <p className="text-destructive">Data pasien tidak ditemukan</p>
+      </div>
+    )
+  }
+
+  console.log('DetailPasien ID:', id)
 
   //  Nanti id buat filter ke data asli
   return (
@@ -51,16 +53,16 @@ export default function DetailPasien({ id }: DetailPasienProps) {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
-              {pasien.namaPasien} ({pasien.namaPanggilan})
+              {pasien.name} {pasien.nickname ? `(${pasien.nickname})` : ''}
             </h1>
             <p className="text-sm text-gray-500">
-              ID Pasien: {pasien.nomorPasien}
+              ID Pasien: {pasien.id}
             </p>
           </div>
         </div>
         <div className="flex gap-2">
           <span className="bg-success/20 text-success-foreground px-4 py-1.5 rounded-full text-sm font-semibold capitalize">
-            Status: {pasien.status}
+            Status: {pasien.last_reservation?.status || 'no-reservation'}
           </span>
         </div>
       </div>
@@ -75,12 +77,12 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <h2>Informasi Pribadi</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 text-sm">
-              <InfoItem label="Jenis Kelamin" value={pasien.jenisKelamin} />
-              <InfoItem label="Umur" value={`${pasien.umur} Tahun`} />
-              <InfoItem label="Pekerjaan" value={pasien.pekerjaan} />
-              <InfoItem label="Tanggal Lahir" value={pasien.tanggalLahir} />
-              <InfoItem label="Orang Tua/Wali" value={pasien.namaOrangTua} />
-              <InfoItem label="No. Handphone" value={pasien.nomorHandphone} />
+              <InfoItem label="Jenis Kelamin" value={pasien.gender === 'laki-laki' ? 'Laki-laki' : pasien.gender === 'perempuan' ? 'Perempuan' : '-'} />
+              <InfoItem label="Umur" value={pasien.age ? `${pasien.age} Tahun` : '-'} />
+              <InfoItem label="Pekerjaan" value={pasien.occupation || '-'} />
+              <InfoItem label="Tanggal Lahir" value={pasien.birth_date ? new Date(pasien.birth_date).toLocaleDateString('id-ID') : '-'} />
+              <InfoItem label="Orang Tua/Wali" value={pasien.parent_name || '-'} />
+              <InfoItem label="No. Handphone" value={pasien.phone || '-'} />
             </div>
           </div>
 
@@ -91,11 +93,11 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <h2>Alamat & Lokasi</h2>
             </div>
             <div className="grid grid-cols-2 gap-y-4 text-sm">
-              <InfoItem label="Kota/Kabupaten" value={pasien.kotaKabupaten} />
-              <InfoItem label="Kecamatan" value={pasien.kecamatan} />
-              <InfoItem label="Kelurahan" value={pasien.kelurahan} />
+              <InfoItem label="Kota/Kabupaten" value={pasien.city || '-'} />
+              <InfoItem label="Kecamatan" value={pasien.district || '-'} />
+              <InfoItem label="Kelurahan" value={pasien.village || '-'} />
               <div className="col-span-2">
-                <InfoItem label="Alamat Lengkap" value={pasien.alamatLengkap} />
+                <InfoItem label="Alamat Lengkap" value={pasien.address || '-'} />
               </div>
             </div>
           </div>
@@ -106,7 +108,7 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <Stethoscope size={18} />
               <h2>Keluhan Utama</h2>
             </div>
-            <p className="text-gray-700 italic">"{pasien.keluhan}"</p>
+            <p className="text-gray-700 italic">"{ pasien.reservations?.[0]?.complain || '-'}"</p>
           </div>
         </div>
 
@@ -122,14 +124,14 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <div className="text-center">
                 <p className="text-xs text-gray-500 uppercase">Tinggi</p>
                 <p className="text-xl font-bold text-slate-800">
-                  {pasien.tinggiBadan} cm
+                  {pasien.height || '-'} cm
                 </p>
               </div>
               <div className="w-px h-10 bg-info/30"></div>
               <div className="text-center">
                 <p className="text-xs text-gray-500 uppercase">Berat</p>
                 <p className="text-xl font-bold text-slate-800">
-                  {pasien.beratBadan} kg
+                  {pasien.weight || '-'} kg
                 </p>
               </div>
             </div>
@@ -142,20 +144,24 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <div className="flex justify-between">
                 <span className="text-gray-500">Layanan:</span>
                 <span className="font-medium text-primary">
-                  {pasien.layanan}
+                  {pasien.last_reservation?.services?.map((s) => s.name).join(', ') || '-'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Tanggal:</span>
-                <span className="font-medium">{pasien.tanggalReservasi}</span>
+                <span className="font-medium">
+                  {pasien.last_reservation?.reservation_date
+                    ? new Date(pasien.last_reservation.reservation_date).toLocaleDateString('id-ID')
+                    : '-'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Jam:</span>
-                <span className="font-medium">{pasien.jamReservasi}</span>
+                <span className="font-medium">{pasien.last_reservation?.appointment_time || '-'}</span>
               </div>
               <div className="flex justify-between border-t pt-2 mt-2">
                 <span className="text-gray-500">Dokter:</span>
-                <span className="font-bold">{pasien.dokter}</span>
+                <span className="font-bold">{pasien.last_reservation?.doctor_name || '-'}</span>
               </div>
             </div>
           </div>

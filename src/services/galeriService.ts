@@ -16,8 +16,8 @@ export type GalleryPagination = {
 }
 
 export type GalleryApiResponse = {
-  galleries: GalleryApiItem[]
-  pagination: GalleryPagination
+  galleries?: GalleryApiItem[]
+  pagination?: GalleryPagination
 }
 
 export type AdminGalleryPagination = {
@@ -35,21 +35,21 @@ export type CreateAdminGalleryPayload = {
 export async function getGallery(
   page = 1,
 ): Promise<{ galleries: GalleryApiItem[]; pagination: GalleryPagination }> {
-  const result = await apiRequest<GalleryApiResponse>(
-    `galleries?page=${page}`,
-    {
-      method: 'GET',
-      auth: false,
-    },
-  )
+  const result = await apiRequest<GalleryApiItem[]>(`galleries?page=${page}`, {
+    method: 'GET',
+    auth: false,
+  })
+
+  // API mengembalikan array langsung dari data galeri
+  const galleries = Array.isArray(result) ? result : []
 
   return {
-    galleries: Array.isArray(result?.galleries) ? result.galleries : [],
+    galleries,
     pagination: {
-      current_page: Number(result?.pagination?.current_page || 1),
-      last_page: Number(result?.pagination?.last_page || 1),
-      per_page: Number(result?.pagination?.per_page || 10),
-      total: Number(result?.pagination?.total || 0),
+      current_page: 1,
+      last_page: 1,
+      per_page: galleries.length,
+      total: galleries.length,
     },
   }
 }

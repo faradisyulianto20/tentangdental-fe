@@ -43,7 +43,7 @@ export const Route = createRootRoute({
     links: [
       {
         rel: 'icon',
-        href: '/logo.svg',
+        href: '/logo.png',
         type: 'image/svg+xml',
       },
       {

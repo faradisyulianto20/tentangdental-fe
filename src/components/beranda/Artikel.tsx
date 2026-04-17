@@ -7,6 +7,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useArticles } from '#/hooks/useArtikel'
 import type { ArticleApiItem } from '#/services/artikelService'
 import { appEnv } from '@/lib/env'
+import { Skeleton } from '../ui/skeleton'
 
 const containerVariants = {
   hidden: {},
@@ -21,26 +22,21 @@ const itemVariants = {
 export default function Berita() {
   const scrollRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
-  const { data: articlesData, isLoading, isError } = useArticles()
+  const { data: articlesData, isLoading } = useArticles()
 
   const navigateBerita = (id: string) => {
-    navigate({
-      to: '/artikel',
-      search: { id },
-    })
+    navigate({ to: '/artikel', search: { id } })
   }
 
   const scroll = (dir: 'left' | 'right') => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({
-        left: dir === 'right' ? 300 : -300,
-        behavior: 'smooth',
-      })
-    }
+    scrollRef.current?.scrollBy({
+      left: dir === 'right' ? 300 : -300,
+      behavior: 'smooth',
+    })
   }
 
   return (
-    <div className="text-center max-w-7xl px-16 mt-12">
+    <div className="w-full max-w-6xl mx-auto px-6 mt-12 text-center">
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -69,13 +65,24 @@ export default function Berita() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {articlesData?.map((item, index) => (
-            <ArtikelCard
-              key={index}
-              artikel={item}
-              onClick={() => navigateBerita(item.id)}
-            />
-          ))}
+          {isLoading
+            ? [...Array(5)].map((_, index) => (
+                <div key={index} className="flex flex-col shrink-0 w-64 snap-start">
+                  <Skeleton className="rounded-t-xl w-64 h-44" />
+                  <div className="flex flex-col p-4 gap-2">
+                    <Skeleton className="h-5 w-full rounded-md" />
+                    <Skeleton className="h-5 w-5/6 rounded-md" />
+                    <Skeleton className="h-4 w-full rounded-md mt-2" />
+                  </div>
+                </div>
+              ))
+            : articlesData?.map((item) => (
+                <ArtikelCard
+                  key={item.id}
+                  artikel={item}
+                  onClick={() => navigateBerita(String(item.id))}
+                />
+              ))}
         </motion.div>
 
         {/* Right Arrow */}
@@ -102,7 +109,6 @@ export function ArtikelCard({
   const imageUrl = (() => {
     if (!artikel.image_url) return '/default-article.jpg'
     if (artikel.image_url.startsWith('http')) return artikel.image_url
-
     const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
     const cleanPath = artikel.image_url.replace(/^\/+/, '')
     return cleanBase + '/' + cleanPath
@@ -114,13 +120,11 @@ export function ArtikelCard({
       onClick={onClick}
       variants={itemVariants}
     >
-      <div className="hover:shadow-md cursor-pointer">
-        <img
-          src={imageUrl}
-          alt={artikel.title}
-          className="rounded-t-xl w-64 h-44 object-cover"
-        />
-      </div>
+      <img
+        src={imageUrl}
+        alt={artikel.title}
+        className="rounded-t-xl w-64 h-44 object-cover"
+      />
       <div className="flex flex-col text-left p-4">
         <h2 className="text-lg font-semibold leading-5 line-clamp-2">
           {artikel.title}

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useGallery } from '#/hooks/useGaleri'
 import { appEnv } from '#/lib/env'
+import { Skeleton } from '../ui/skeleton'
 
 const containerVariants = {
   hidden: {},
@@ -102,6 +103,35 @@ export default function GalleryCarousel() {
     return configs[absOffset] ?? { display: 'none' }
   }
 
+  if(isLoading) {
+    return (
+      <div className="w-full flex flex-col items-center gap-8 py-12 overflow-hidden max-w-6xl mx-6">
+        <div className="text-center">
+          <Skeleton className="h-6 w-40 rounded-md mx-auto" />
+          <Skeleton className="h-4 w-full rounded-md mt-2" />
+        </div>
+        <div className="relative w-full max-w-4xl h-50 md:h-80">
+          {[...Array(5)].map((_, index) => (
+            <div
+              key={index}
+              className="absolute rounded-2xl overflow-hidden shadow-xl cursor-pointer"
+              style={{
+                width: '220px',
+                height: '150px',
+                left: `${20 + index * 15}%`,
+                top: '20px',
+                transform: 'translateX(-50%) scale(0.8)',
+                opacity: 0.5,
+              }}
+
+            >
+              <Skeleton className="w-full h-full rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="w-full flex flex-col items-center gap-8 py-12 overflow-hidden max-w-6xl mx-6">
       <div className="text-center">

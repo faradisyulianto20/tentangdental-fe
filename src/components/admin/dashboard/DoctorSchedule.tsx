@@ -1,4 +1,8 @@
+import { useDokter } from '@/hooks/useDokter'
+
 export default function DoctorSchedule() {
+  const { data: doctors, isLoading, isError } = useDokter()
+
   const now = new Date()
   const formattedDate = now.toLocaleDateString('id-ID', {
     weekday: 'long',
@@ -6,6 +10,7 @@ export default function DoctorSchedule() {
     month: 'long',
     day: 'numeric',
   })
+
   return (
     <div className="p-4 shadow-md rounded-lg">
       <div>
@@ -13,16 +18,25 @@ export default function DoctorSchedule() {
         <p className="text-sm text-muted-foreground">{formattedDate}</p>
       </div>
       <div className="mt-4">
-        {doctorSchedules.map((schedule, index) => (
-          <div key={index} className="border rounded-lg p-4 mb-4 bg-[#E0F4FB] flex gap-2">
+        {isLoading && <p className="text-muted-foreground">Memuat jadwal dokter...</p>}
+        {isError && (
+          <p className="text-red-500">Gagal memuat jadwal dokter</p>
+        )}
+        {doctors?.map((doctor) => (
+          <div
+            key={doctor.id}
+            className="border rounded-lg p-4 mb-4 bg-[#E0F4FB] flex gap-2"
+          >
             <img
-              src={schedule.imgUrl}
-              alt={schedule.namaDokter}
+              src={doctor.photo_url}
+              alt={doctor.name}
               className="w-12 h-12 rounded-full object-cover"
             />
             <div>
-              <h2 className="text-lg font-bold">{schedule.namaDokter}</h2>
-              <p className="text-sm text-muted-foreground">{schedule.jamKerja}</p>
+              <h2 className="text-lg font-bold">{doctor.name}</h2>
+              <p className="text-sm text-muted-foreground">
+                {doctor.schedule?.join(', ') || 'Jadwal tidak tersedia'}
+              </p>
             </div>
           </div>
         ))}
@@ -30,21 +44,3 @@ export default function DoctorSchedule() {
     </div>
   )
 }
-
-const doctorSchedules = [
-  {
-    imgUrl: 'dokter.png',
-    namaDokter: 'Dr. Smith',
-    jamKerja: '08:00 - 16:00',
-  },
-  {
-    imgUrl: 'dokter.png',
-    namaDokter: 'Dr. Johnson',
-    jamKerja: '10:00 - 18:00',
-  },
-  {
-    imgUrl: 'dokter.png',
-    namaDokter: 'Dr. Lee',
-    jamKerja: '09:00 - 17:00',
-  },
-]

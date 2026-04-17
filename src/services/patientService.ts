@@ -6,7 +6,7 @@ import type {
   ReservationMedicalHistoryForm,
 } from '@/services/reservasiService'
 
-export type PatientGender = 'male' | 'female'
+export type PatientGender = 'laki-laki' | 'perempuan'
 
 export type AdminPatientListItem = {
   id: number
@@ -112,17 +112,33 @@ export type PatientRontgenItem = {
   created_at: string | null
 }
 
-export type AdminPatientRontgensData = {
-  patient: {
+export type AdminPatientReservation = {
+  id: number
+  complain: string | null
+  services: Array<{
     id: number
-    patient_number: string
     name: string
-    phone: string
-    birth_date: string | null
-    gender: PatientGender | null
-    age: number | null
-  }
+  }>
+  doctor_name: string | null
+  reservation_date: string | null
+  appointment_time: string | null
+  status: string | null
+}
+
+export type AdminPatientRontgensData = {
+  id: number
+  name: string
+  phone: string
+  birth_date: string | null
+  gender: PatientGender | null
+  age: number | null
+  address: string | null
+  medical_history: Record<string, unknown> | null
+  dental_history: Record<string, unknown> | null
+  reservations: AdminPatientReservation[]
   rontgens: PatientRontgenItem[]
+  created_at: string | null
+  updated_at: string | null
 }
 
 export type UpdateAdminPatientPayload = {
@@ -187,7 +203,7 @@ export async function getAdminPatientById(id: number) {
 }
 
 export async function getAdminPatientRontgens(id: number) {
-  return apiRequest<AdminPatientRontgensData>(`admin/patients/${id}/rontgens`, {
+  return apiRequest<AdminPatientRontgensData>(`admin/patients/${id}`, {
     method: 'GET',
     auth: true,
   })

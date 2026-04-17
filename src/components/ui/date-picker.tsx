@@ -30,6 +30,7 @@ interface DatePickerProps {
   onChange: (date: Date) => void
   placeholder?: string
   disabled?: boolean
+  minDate?: Date
   onBlur?: () => void
 }
 
@@ -39,6 +40,7 @@ export function DatePicker({
   onBlur,
   placeholder = 'Pilih tanggal',
   disabled = false,
+  minDate,
 }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const [viewYear, setViewYear] = useState(new Date().getFullYear())
@@ -166,6 +168,7 @@ export function DatePicker({
             {/* Current month days */}
             {Array.from({ length: daysInMonth }, (_, i) => {
               const day = i + 1
+              const currentDate = new Date(viewYear, viewMonth, day)
               const isToday =
                 day === today.getDate() &&
                 viewMonth === today.getMonth() &&
@@ -175,16 +178,26 @@ export function DatePicker({
                 day === value.getDate() &&
                 viewMonth === value.getMonth() &&
                 viewYear === value.getFullYear()
+              const isDisabled =
+                minDate &&
+                new Date(viewYear, viewMonth, day) <
+                  new Date(
+                    minDate.getFullYear(),
+                    minDate.getMonth(),
+                    minDate.getDate(),
+                  )
 
               return (
                 <button
                   key={day}
-                  onClick={() => selectDay(day)}
+                  onClick={() => !isDisabled && selectDay(day)}
+                  disabled={isDisabled}
                   type="button"
                   className={`text-center text-xs py-1.5 rounded-md transition-colors
+                    ${isDisabled ? 'text-muted-foreground/30 cursor-not-allowed' : ''}
                     ${isSel ? 'bg-primary text-white font-bold' : ''}
                     ${isToday && !isSel ? 'font-bold text-primary' : ''}
-                    ${!isSel ? 'hover:bg-primary/10' : ''}`}
+                    ${!isSel && !isDisabled ? 'hover:bg-primary/10' : ''}`}
                 >
                   {day}
                 </button>

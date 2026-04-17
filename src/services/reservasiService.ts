@@ -106,7 +106,7 @@ export type ReservationPatientDetailsPayload = {
   patient_id: number
   name: string
   nickname?: string | null
-  gender?: 'male' | 'female' | null
+  gender?: 'laki-laki' | 'perempuan' | null
   age?: number | null
   birth_place?: string | null
   birth_date?: string | null
@@ -284,7 +284,7 @@ export type CreatePublicReservationPayload = {
   patient_category: PatientCategory
   name: string
   phone: string
-  gender?: 'male' | 'female'
+  gender?: 'laki-laki' | 'perempuan'
   address?: string
   birth_date?: string
   age?: number

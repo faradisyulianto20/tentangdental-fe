@@ -68,6 +68,8 @@ function RouteComponent() {
 
   const adminName = auth.user?.name || 'Admin Klinik'
 
+  console.log(totalReservations)
+
   return (
     <div>
       <div>

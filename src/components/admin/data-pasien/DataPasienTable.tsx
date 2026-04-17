@@ -11,6 +11,7 @@ import {
   Heart,
   Search,
   Smile,
+  Trash2,
   User,
 } from 'lucide-react'
 import { ApiError } from '@/lib/api-client'
@@ -18,7 +19,9 @@ import {
   useAdminPatientById,
   useAdminPatients,
   useUpdateAdminPatient,
+  useDeleteAdminPatient,
 } from '@/hooks/usePatient'
+import { useAdminReservationById } from '@/hooks/useReservasi'
 import type {
   AdminPatientDetail,
   AdminPatientListItem,
@@ -27,6 +30,8 @@ import type {
 import type {
   ReservationDentalHistoryForm,
   ReservationMedicalHistoryForm,
+  ReservationPatientForm,
+  AdminReservationDetail,
 } from '@/services/reservasiService'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -84,8 +89,7 @@ type PatientRow = {
   no: number
   nomorPasien: string
   namaPasien: string
-  layanan: string
-  tanggal: string
+  umur: string
   noTelp: string
 }
 
@@ -264,18 +268,27 @@ function extractFieldErrors(error: unknown): FieldErrors {
 }
 
 function mapGenderLabel(gender?: PatientGender | null) {
-  if (gender === 'male') return 'Laki-laki'
-  if (gender === 'female') return 'Perempuan'
+  if (gender === 'laki-laki') return 'Laki-laki'
+  if (gender === 'perempuan') return 'Perempuan'
   return ''
 }
 
 function mapGenderPayload(genderLabel: FormState['gender']) {
-  if (genderLabel === 'Laki-laki') return 'male'
-  if (genderLabel === 'Perempuan') return 'female'
+  if (genderLabel === 'Laki-laki') return 'laki-laki'
+  if (genderLabel === 'Perempuan') return 'perempuan'
   return null
 }
 
-function mapPatientToForm(detail: AdminPatientDetail) {
+function mapGenderFromReservation(gender?: string | null) {
+  if (gender === 'female') return 'Perempuan'
+  if (gender === 'male') return 'Laki-laki'
+  return ''
+}
+
+function mapPatientToForm(
+  detail: AdminPatientDetail,
+  reservationData?: AdminReservationDetail,
+) {
   const lastReservation = detail.last_reservation
   const firstReservation =
     Array.isArray(detail.reservations) && detail.reservations.length > 0
@@ -293,21 +306,25 @@ function mapPatientToForm(detail: AdminPatientDetail) {
     ),
   }
 
+  // Priority: ambil dari reservation patient_form, fallback ke detail patient data
+  const patientForm = reservationData?.patient_form
   const form: FormState = {
-    name: detail.name || '',
-    nickname: detail.nickname || '',
-    gender: mapGenderLabel(detail.gender),
-    phone: detail.phone || '',
-    age: detail.age ? String(detail.age) : '',
-    occupation: detail.occupation || '',
-    birthDate: parseDate(detail.birth_date),
-    parentName: detail.parent_name || '',
-    city: detail.city || '',
-    district: detail.district || '',
-    village: detail.village || '',
-    address: detail.address || '',
-    height: detail.height ? String(detail.height) : '',
-    weight: detail.weight ? String(detail.weight) : '',
+    name: patientForm?.name || detail.name || '',
+    nickname: patientForm?.nickname || detail.nickname || '',
+    gender: patientForm
+      ? mapGenderFromReservation(patientForm.gender)
+      : mapGenderLabel(detail.gender),
+    phone: patientForm?.phone || detail.phone || '',
+    age: patientForm?.age || (detail.age ? String(detail.age) : ''),
+    occupation: patientForm?.occupation || detail.occupation || '',
+    birthDate: parseDate(patientForm?.birth_date || detail.birth_date),
+    parentName: patientForm?.parent_name || detail.parent_name || '',
+    city: patientForm?.city || detail.city || '',
+    district: patientForm?.district || detail.district || '',
+    village: patientForm?.village || detail.village || '',
+    address: patientForm?.address || detail.address || '',
+    height: patientForm?.height || (detail.height ? String(detail.height) : ''),
+    weight: patientForm?.weight || (detail.weight ? String(detail.weight) : ''),
     complain: firstReservation?.complain || '',
     reservationDate: lastReservation?.reservation_date || '-',
     appointmentTime: lastReservation?.appointment_time || '-',
@@ -346,8 +363,37 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
   const [dropdownJenisKelaminOpen, setDropdownJenisKelaminOpen] =
     useState(false)
 
+  console.log('FormulirDialog - Patient ID:', pasien.id)
+
   const detailQuery = useAdminPatientById(pasien.id, open)
   const updatePatient = useUpdateAdminPatient()
+
+  // Get first/last reservation ID from patient detail
+  const firstReservationId = useMemo(() => {
+    console.log('useMemo triggered - detailQuery.data:', !!detailQuery.data)
+    
+    if (!detailQuery.data?.reservations || detailQuery.data.reservations.length === 0) {
+      console.log('No reservations found for patient ID:', pasien.id)
+      return undefined
+    }
+    
+    // Karena sudah fetch patient spesifik, semua reservasi di array ini adalah milik patient itu
+    // Ambil reservation pertama (index 0)
+    const firstReservation = detailQuery.data.reservations[0]
+    const id = Number(firstReservation.id)
+    
+    console.log('Available reservations count:', detailQuery.data.reservations.length)
+    console.log('First Reservation ID for patient:', pasien.id, 'is:', id)
+    console.log('First Reservation data:', firstReservation)
+    
+    return id
+  }, [detailQuery.data?.reservations, pasien.id])
+
+  // Fetch full reservation data (includes patient_form)
+  const reservationQuery = useAdminReservationById(
+    firstReservationId,
+    open && !!firstReservationId,
+  )
 
   const [form, setForm] = useState<FormState | null>(null)
   const [medical, setMedical] =
@@ -372,16 +418,29 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
   })
 
   useEffect(() => {
-    if (!detailQuery.data) return
+    if (!detailQuery.data) {
+      console.log('detailQuery.data is null/undefined for patient:', pasien.id)
+      return
+    }
 
-    const mapped = mapPatientToForm(detailQuery.data)
+    console.log('=== Data Loading ===')
+    console.log('Patient ID:', pasien.id)
+    console.log('Patient Detail Data:', detailQuery.data)
+    console.log('Patient Detail Reservations:', detailQuery.data.reservations)
+    console.log('First Reservation ID from useMemo:', firstReservationId)
+    console.log('Reservation Query Data:', reservationQuery.data)
+    
+    const mapped = mapPatientToForm(detailQuery.data, reservationQuery.data)
+    console.log('Mapped Form:', mapped.form)
+    console.log('=== End Data Loading ===')
+    
     setForm(mapped.form)
     setMedical(mapped.medical)
     setDental(mapped.dental)
     setToggles(mapped.toggles)
     setSubmitError('')
     setFieldErrors({})
-  }, [detailQuery.data])
+  }, [detailQuery.data, reservationQuery.data, firstReservationId, pasien.id])
 
   const setFormField = (key: keyof FormState, value: string | Date | null) => {
     setForm((prev) => {
@@ -499,12 +558,15 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-sm p-8">
-        {detailQuery.isLoading || !form ? (
-          <p className="text-sm text-muted-foreground">
-            Memuat detail pasien...
-          </p>
-        ) : (
-          <>
+        {(() => {
+          console.log('Render check - detailQuery.isLoading:', detailQuery.isLoading, 'reservationQuery.isLoading:', reservationQuery.isLoading, 'form:', !!form)
+          return detailQuery.isLoading || reservationQuery.isLoading || !form ? (
+            <p className="text-sm text-muted-foreground">
+              Memuat detail pasien...
+            </p>
+          ) : (
+            <>
+
             <FieldGroup className="flex">
               <FieldLegend className="flex gap-2">
                 <User className="w-12 h-12 text-primary" />
@@ -915,66 +977,7 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
                   {fieldErrors['dental_history.dental_checkup_frequency']}
                 </FieldDescription>
               ) : null}
-            </FieldGroup>
-
-            <FieldSeparator />
-
-            <FieldGroup className="flex">
-              <FieldLegend className="flex gap-2">
-                <Clock className="w-12 h-12 text-primary" />
-                <FieldTitle className="font-bold text-lg">Reservasi</FieldTitle>
-              </FieldLegend>
-            </FieldGroup>
-            <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
-              <Field>
-                <FieldLabel>Nama Lengkap</FieldLabel>
-                <Input
-                  placeholder="Masukkan nama pasien"
-                  value={form.name}
-                  onChange={(e) => setFormField('name', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Tanggal Lahir</FieldLabel>
-                <DatePicker
-                  value={form.birthDate}
-                  onChange={(date) => setFormField('birthDate', date)}
-                  placeholder="Pilih tanggal lahir"
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Umur</FieldLabel>
-                <Input
-                  placeholder="Masukkan umur pasien"
-                  value={form.age}
-                  onChange={(e) => setFormField('age', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Nomor Handphone</FieldLabel>
-                <Input
-                  placeholder="Masukkan nomor HP pasien"
-                  value={form.phone}
-                  onChange={(e) => setFormField('phone', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Tanggal Kunjungan</FieldLabel>
-                <Input value={form.reservationDate} readOnly />
-              </Field>
-              <Field>
-                <FieldLabel>Pilihan Dokter</FieldLabel>
-                <Input value={form.doctor} readOnly />
-              </Field>
-              <Field>
-                <FieldLabel>Layanan</FieldLabel>
-                <Input value={form.layanan} readOnly />
-              </Field>
-              <Field>
-                <FieldLabel>Jam Reservasi</FieldLabel>
-                <Input value={form.appointmentTime} readOnly />
-              </Field>
-            </FieldGroup>
+            </FieldGroup> 
 
             <FieldSeparator />
 
@@ -1014,8 +1017,9 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
                 {updatePatient.isPending ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </DialogFooter>
-          </>
-        )}
+            </>
+          )
+        })()}
       </DialogContent>
     </Dialog>
   )
@@ -1083,14 +1087,9 @@ function mapPatientsToRows(
   return patients.map((patient, index) => ({
     id: patient.id,
     no: offset + index + 1,
-    nomorPasien: patient.patient_number,
+    nomorPasien: String(patient.id),
     namaPasien: patient.name,
-    layanan:
-      Array.isArray(patient.latest_services) &&
-      patient.latest_services.length > 0
-        ? patient.latest_services.join(', ')
-        : '-',
-    tanggal: patient.latest_reservation_date || '-',
+    umur: patient.age ? String(patient.age) : '-',
     noTelp: patient.phone,
   }))
 }
@@ -1099,8 +1098,12 @@ export default function DataPasienTable() {
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deletePatientId, setDeletePatientId] = useState<number | null>(null)
 
   const patientsQuery = useAdminPatients(currentPage, itemsPerPage)
+  const deletePatientMutation = useDeleteAdminPatient()
+
 
   useEffect(() => {
     if (
@@ -1129,7 +1132,6 @@ export default function DataPasienTable() {
       (pasien) =>
         pasien.nomorPasien.toLowerCase().includes(query) ||
         pasien.namaPasien.toLowerCase().includes(query) ||
-        pasien.layanan.toLowerCase().includes(query) ||
         pasien.noTelp.toLowerCase().includes(query),
     )
   }, [rows, searchQuery])
@@ -1143,6 +1145,18 @@ export default function DataPasienTable() {
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page)
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (deletePatientId) {
+      try {
+        await deletePatientMutation.mutateAsync(deletePatientId)
+        setDeleteConfirmOpen(false)
+        setDeletePatientId(null)
+      } catch (error) {
+        console.error('Error deleting patient:', error)
+      }
     }
   }
 
@@ -1162,7 +1176,7 @@ export default function DataPasienTable() {
     <div className="space-y-4 w-full">
       <InputGroup className="w-full md:w-1/2">
         <InputGroupInput
-          placeholder="Cari berdasarkan nomor pasien, nama, layanan, atau nomor telp..."
+          placeholder="Cari berdasarkan nomor pasien, nama, atau nomor telp..."
           value={searchQuery}
           onChange={handleSearchChange}
         />
@@ -1206,10 +1220,7 @@ export default function DataPasienTable() {
                     Nama Pasien
                   </TableHead>
                   <TableHead className="text-xs md:text-sm whitespace-nowrap">
-                    Layanan
-                  </TableHead>
-                  <TableHead className="text-xs md:text-sm whitespace-nowrap">
-                    Tanggal Kunjungan
+                    Umur
                   </TableHead>
                   <TableHead className="text-xs md:text-sm whitespace-nowrap">
                     No Telp
@@ -1219,6 +1230,9 @@ export default function DataPasienTable() {
                   </TableHead>
                   <TableHead className="text-center text-xs md:text-sm">
                     Rontgen
+                  </TableHead>
+                  <TableHead className="text-center text-xs md:text-sm">
+                    Hapus
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -1235,10 +1249,7 @@ export default function DataPasienTable() {
                       {pasien.namaPasien}
                     </TableCell>
                     <TableCell className="text-xs md:text-sm whitespace-nowrap">
-                      {pasien.layanan}
-                    </TableCell>
-                    <TableCell className="text-xs md:text-sm whitespace-nowrap">
-                      {pasien.tanggal}
+                      {pasien.umur}
                     </TableCell>
                     <TableCell className="text-xs md:text-sm whitespace-nowrap">
                       {pasien.noTelp}
@@ -1247,15 +1258,32 @@ export default function DataPasienTable() {
                       <FormulirDialog pasien={pasien} />
                     </TableCell>
                     <TableCell className="text-center">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        className="text-xs md:text-sm"
-                        onClick={() => handleNavigate(pasien.id)}
-                      >
-                        Lihat
-                      </Button>
+                      <div className="flex gap-2 justify-center">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="text-xs md:text-sm"
+                          onClick={() => handleNavigate(pasien.id)}
+                        >
+                          Lihat
+                        </Button>
+                       
+                      </div>
                     </TableCell>
+                    <TableCell className="text-center">
+                       <Button
+                          variant="destructive"
+                          size="sm"
+                          className="text-xs md:text-sm"
+                          onClick={() => {
+                            setDeletePatientId(pasien.id)
+                            setDeleteConfirmOpen(true)
+                          }}
+                          disabled={deletePatientMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -1307,6 +1335,28 @@ export default function DataPasienTable() {
           </div>
         </>
       )}
+
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent>
+          <h2 className="text-lg font-semibold">Hapus Pasien</h2>
+          <p className="text-sm text-gray-600 mt-2">
+            Apakah Anda yakin ingin menghapus data pasien ini? Tindakan ini tidak
+            dapat diundo.
+          </p>
+          <DialogFooter className="mt-6">
+            <DialogClose asChild>
+              <Button variant="outline">Batal</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deletePatientMutation.isPending}
+            >
+              {deletePatientMutation.isPending ? 'Menghapus...' : 'Hapus'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

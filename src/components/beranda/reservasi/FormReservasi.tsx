@@ -49,16 +49,64 @@ const badgeColors = [
   'bg-teal-100 text-teal-700 border-teal-200',
 ]
 
+// Helper function to get day name in Indonesian
+const getDayNameIndonesian = (date: Date): string => {
+  const days = [
+    'minggu',
+    'senin',
+    'selasa',
+    'rabu',
+    'kamis',
+    'jumat',
+    'sabtu',
+  ]
+  return days[date.getDay()]
+}
+
+// Helper to check if doctor is available on a specific date
+const isDoctorAvailableOnDate = (
+  doctorSchedule: Record<string, string[]> | string[] | undefined,
+  date: Date,
+): string[] => {
+  if (!doctorSchedule) return []
+  
+  // If schedule is already an object with day keys
+  if (typeof doctorSchedule === 'object' && !Array.isArray(doctorSchedule)) {
+    const dayName = getDayNameIndonesian(date)
+    const daySchedule = (doctorSchedule as Record<string, string[]>)[dayName]
+    return daySchedule || []
+  }
+  
+  // Fallback to array format
+  return Array.isArray(doctorSchedule) ? doctorSchedule : []
+}
+
 // Zod Validation
 const formSchema = z.object({
   namaLengkap: z.string().min(1, 'Nama lengkap harus diisi'),
   nomorHandphone: z.string().min(1, 'Nomor handphone harus diisi'),
   tanggalLahir: z.date().nullable(),
   umur: z.string().optional(),
+  jenisKelamin: z
+    .enum(['laki-laki', 'perempuan'])
+    .optional()
+    .refine(
+      (val) => val === undefined || ['laki-laki', 'perempuan'].includes(val),
+      { message: 'The selected gender is invalid.' },
+    ),
   jadwalPeriksa: z
     .date({ required_error: 'Jadwal periksa harus diisi' })
     .nullable()
-    .refine((val) => val !== null, { message: 'Jadwal periksa harus diisi' }),
+    .refine((val) => val !== null, { message: 'Jadwal periksa harus diisi' })
+    .refine(
+      (val) => {
+        if (val === null) return true
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        return val >= today
+      },
+      { message: 'Jadwal periksa tidak boleh hari kemarin' },
+    ),
   jamReservasi: z
     .string()
     .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format jam harus HH:MM'),
@@ -68,8 +116,20 @@ const formSchema = z.object({
     .min(1, 'Layanan harus dipilih')
     .max(3, 'Maksimal 3 layanan'),
   nomorPasien: z.string().optional(),
+  isPasienLama: z.boolean().default(false),
   keluhan: z.string().min(1, 'Keluhan harus diisi'),
-})
+}).refine(
+  (data) => {
+    if (data.isPasienLama && !data.nomorPasien) {
+      return false
+    }
+    return true
+  },
+  {
+    message: 'Nomor pasien harus diisi untuk pasien lama',
+    path: ['nomorPasien'],
+  },
+)
 
 export default function FormReservasi() {
   const navigate = useNavigate()
@@ -82,11 +142,15 @@ export default function FormReservasi() {
   const [serverErrors, setServerErrors] = useState<ServerFieldErrors>({})
   const [successOpen, setSuccessOpen] = useState(false)
   const [createdPatientId, setCreatedPatientId] = useState<string>('')
+  const [selectedJadwalPeriksa, setSelectedJadwalPeriksa] = useState<Date | null>(
+    null,
+  )
 
   const doctors = Array.isArray(doctorsData)
     ? doctorsData.map((doctor) => ({
         id: String(doctor.id),
         name: doctor.name,
+        schedule: doctor.schedule,
       }))
     : []
 
@@ -112,6 +176,7 @@ export default function FormReservasi() {
       appointment_time: 'jamReservasi',
       service_ids: 'layanan',
       patient_category: 'nomorPasien',
+      gender: 'jenisKelamin',
     }
 
     Object.entries(input).forEach(([key, value]) => {
@@ -143,11 +208,13 @@ export default function FormReservasi() {
       nomorHandphone: '' as string,
       tanggalLahir: null as Date | null,
       umur: '' as string,
+      jenisKelamin: undefined as 'laki-laki' | 'perempuan' | undefined,
       jadwalPeriksa: null as Date | null,
       jamReservasi: '' as string,
       pilihanDokter: '' as string,
       layanan: [] as string[],
       nomorPasien: '' as string,
+      isPasienLama: false as boolean,
       keluhan: '' as string,
     },
     validators: {
@@ -184,10 +251,10 @@ export default function FormReservasi() {
 
       try {
         const payload = {
-          patient_category: checked ? 'existing' : 'new',
+          patient_category: (checked ? 'existing' : 'new') as 'existing' | 'new',
           name: value.namaLengkap,
           phone: value.nomorHandphone,
-          gender: 'male' as const,
+          gender: value.jenisKelamin,
           address: '-',
           birth_date: value.tanggalLahir
             ? formatDate(value.tanggalLahir)
@@ -201,14 +268,22 @@ export default function FormReservasi() {
               : formatDate(new Date()),
           appointment_time: value.jamReservasi,
           service_ids: value.layanan.map((item) => Number(item)),
+          ...(checked && value.nomorPasien ? { patient_id: Number(value.nomorPasien) } : {}),
         }
-
+        
         const result = await createReservation.mutateAsync(payload)
-        setCreatedPatientId(String(result.patient.id))
+        console.log('✅ Reservasi berhasil:', result)
+        
+        // Store the created patient ID
+        if (result.patient?.id) {
+          setCreatedPatientId(String(result.patient.id))
+        }
+        
         setSuccessOpen(true)
         reset()
         setChecked(false)
       } catch (error) {
+        console.log('❌ Submit Error:', error)
         if (error instanceof ApiError) {
           const payload =
             typeof error.payload === 'object' && error.payload !== null
@@ -230,7 +305,6 @@ export default function FormReservasi() {
 
           return
         }
-
         setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
       }
     },
@@ -323,14 +397,19 @@ export default function FormReservasi() {
               <Field name="jadwalPeriksa">
                 {(field) => {
                   const { errors, isTouched } = field.state.meta
+                  const today = new Date()
 
                   return (
                     <div className="space-y-4">
                       <FieldLabel>Jadwal Periksa</FieldLabel>
                       <DatePicker
                         value={field.state.value}
-                        onChange={(date: Date) => field.handleChange(date)}
+                        onChange={(date: Date) => {
+                          field.handleChange(date)
+                          setSelectedJadwalPeriksa(date)
+                        }}
                         onBlur={field.handleBlur}
+                        minDate={today}
                         placeholder="Pilih jadwal periksa"
                       />
                       {((errors.length > 0 && isTouched) ||
@@ -357,12 +436,40 @@ export default function FormReservasi() {
               </Field>
 
               <Field name="pilihanDokter">
-                {(field) => {
-                  const { errors, isTouched } = field.state.meta
+                {(dokterField) => {
+                  const { errors: dokterErrors, isTouched: dokterTouched } =
+                    dokterField.state.meta
+
+                  // Filter doctors based on selected date
+                  const availableDoctors = selectedJadwalPeriksa
+                    ? doctors.filter((doctor) => {
+                        const availableSlots = isDoctorAvailableOnDate(
+                          doctor.schedule,
+                          selectedJadwalPeriksa,
+                        )
+                        return availableSlots.length > 0
+                      })
+                    : doctors
+
+                  const selectedDoctor = doctors.find(
+                    (d) => d.id === dokterField.state.value,
+                  )
+
+                  const selectedDoctorSlots = selectedJadwalPeriksa
+                    ? isDoctorAvailableOnDate(
+                        selectedDoctor?.schedule,
+                        selectedJadwalPeriksa,
+                      )
+                    : []
 
                   return (
                     <div className="space-y-4">
                       <FieldLabel>Pilihan Dokter</FieldLabel>
+                      {selectedJadwalPeriksa && availableDoctors.length === 0 && (
+                        <FieldDescription className="text-destructive">
+                          Tidak ada dokter yang tersedia pada hari tersebut
+                        </FieldDescription>
+                      )}
                       <DropdownMenu
                         open={dropdownOpen}
                         onOpenChange={setDropdownOpen}
@@ -370,15 +477,22 @@ export default function FormReservasi() {
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-between"
-                            onBlur={field.handleBlur}
+                            className="w-full justify-between border-primary"
+                            onBlur={dokterField.handleBlur}
+                            disabled={
+                              selectedJadwalPeriksa
+                                ? availableDoctors.length === 0
+                                : false
+                            }
                           >
                             <span
                               className={
-                                field.state.value ? '' : 'text-muted-foreground'
+                                dokterField.state.value
+                                  ? ''
+                                  : 'text-muted-foreground'
                               }
                             >
-                              {field.state.value || 'Pilih dokter'}{' '}
+                              {selectedDoctor?.name || 'Pilih dokter'}
                             </span>
                             {dropdownOpen ? (
                               <ChevronUp className="w-4 h-4" />
@@ -388,20 +502,42 @@ export default function FormReservasi() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                          {doctors.map((doctor) => (
+                          {availableDoctors.map((doctor) => (
                             <DropdownMenuItem
                               key={doctor.id}
-                              onSelect={() => field.handleChange(doctor.id)}
+                              onSelect={() =>
+                                dokterField.handleChange(doctor.id)
+                              }
                             >
                               {doctor.name}
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
-                      {((errors.length > 0 && isTouched) ||
+
+                      {selectedDoctor && selectedDoctorSlots.length > 0 && (
+                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                          <p className="text-xs text-muted-foreground mb-2">
+                            Jam Tersedia
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedDoctorSlots.map((time, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                              >
+                                {time}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {((dokterErrors.length > 0 && dokterTouched) ||
                         serverErrors.pilihanDokter) && (
                         <FieldDescription className="text-destructive">
-                          {serverErrors.pilihanDokter || String(errors[0])}
+                          {serverErrors.pilihanDokter ||
+                            String(dokterErrors[0])}
                         </FieldDescription>
                       )}
                     </div>
@@ -522,9 +658,11 @@ export default function FormReservasi() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-            <p className="text-sm text-muted-foreground">Nomor Pasien</p>
-            <p className="text-lg font-bold text-primary">{createdPatientId}</p>
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+            <div>
+              <p className="text-sm text-muted-foreground">No. Pasien</p>
+              <p className="text-lg font-bold text-primary">{createdPatientId}</p>
+            </div>
           </div>
 
           <DialogFooter>

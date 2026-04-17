@@ -113,7 +113,7 @@ function RouteComponent() {
       name: values.name,
       specialization: values.specialization || null,
       statement: values.statement || null,
-      schedule: values.schedule,
+      schedule: JSON.stringify(values.schedule), // ✅ serialize ke JSON string
       photo: values.photoFile,
     })
 
@@ -220,4 +220,4 @@ function RouteComponent() {
       </Dialog>
     </div>
   )
-}
+} 

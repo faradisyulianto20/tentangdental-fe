@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import Artikel from '../components/beranda/Artikel'
 import { useArticles, useArticleBySlug } from '#/hooks/useArtikel'
 import { appEnv } from '@/lib/env'
+import { Skeleton } from '../components/ui/skeleton'
 
 export const Route = createFileRoute('/artikel')({
   validateSearch: (search) => {
@@ -31,12 +32,11 @@ function RouteComponent() {
   }
   const currentArticle = artikel?.find((item) => String(item.id) === String(id))
   const slug = currentArticle?.slug || ''
-  const { data: currentArtikel } = useArticleBySlug(slug)
+  const { data: currentArtikel, isLoading } = useArticleBySlug(slug)
 
   const resolveImage = (value: string | null | undefined) => {
     if (!value) return 'placeholder.png'
     if (value.startsWith('http')) return value
-
     const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
     const cleanPath = value.replace(/^\/+/, '')
     return cleanBase + '/' + cleanPath
@@ -51,15 +51,37 @@ function RouteComponent() {
       .replace(/&amp;/g, '&')
   }
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 w-full">
+        <Skeleton className="w-full my-12 rounded-xl h-96" />
+        <div className="text-left w-full">
+          <Skeleton className="h-10 w-full rounded-md" />
+          <Skeleton className="h-5 w-full rounded-md mt-3" />
+        </div>
+        <div className="my-6 space-y-3 w-full">
+          <Skeleton className="h-4 w-full rounded-md" />
+          <Skeleton className="h-4 w-full rounded-md" />
+          <Skeleton className="h-4 w-5/6 rounded-md" />
+          <div className="space-y-3 mt-6">
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-full rounded-md" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="mx-6 max-w-6xl flex flex-col justify-center items-center xl:mx-auto">
-      <div className="mx-6 max-w-6xl flex justify-center flex-col items-center xl:mx-auto">
+    <div className="w-full">
+      <div className="max-w-7xl mx-auto px-6">
         <motion.div
           variants={fadeUp}
           custom={0}
           initial="hidden"
           animate="visible"
-          className="w-full my-12 rounded-xl max-w-290.65 h-111.75 overflow-hidden"
+          className="w-full my-12 rounded-xl overflow-hidden h-96"
         >
           <img
             src={resolveImage(currentArtikel?.image_url)}
@@ -95,12 +117,13 @@ function RouteComponent() {
           custom={0.5}
           initial="hidden"
           animate="visible"
-          className="max-w-none text-muted-foreground my-6 leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-xl [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+          className="text-muted-foreground my-6 leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-xl [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
           dangerouslySetInnerHTML={{
             __html: decodeHtmlEntities(currentArtikel?.content || ''),
           }}
         />
       </div>
+
       <Artikel />
     </div>
   )

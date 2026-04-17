@@ -13,6 +13,14 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -373,6 +381,9 @@ function ReservationCard({
   const [dropdownJenisKelaminOpen, setDropdownJenisKelaminOpen] =
     useState(false)
   const [dropdownDokterOpen, setDropdownDokterOpen] = useState(false)
+  const [confirmValidate, setConfirmValidate] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
+  const [confirmComplete, setConfirmComplete] = useState(false)
 
   useEffect(() => {
     const detail = detailQuery.data
@@ -435,12 +446,6 @@ function ReservationCard({
           name: form.name,
           phone: form.phone,
           nickname: form.nickname || null,
-          gender:
-            form.gender === 'Laki-laki'
-              ? 'male'
-              : form.gender === 'Perempuan'
-                ? 'female'
-                : null,
           age: form.age ? Number(form.age) : null,
           birth_date: toIsoDate(form.birthDate),
           address: form.address || null,
@@ -521,6 +526,215 @@ function ReservationCard({
     }
   }
 
+  const handleValidate = async () => {
+    try {
+      // Save form data first
+      if (!form) return
+      setSubmitError('')
+
+      const idNumber = Number(patientId)
+      if (!idNumber || Number.isNaN(idNumber)) {
+        setSubmitError('Patient ID tidak valid.')
+        return
+      }
+
+      await updatePatientDetails.mutateAsync({
+        id: toId(item.id),
+        data: {
+          patient_id: idNumber,
+          name: form.name,
+          phone: form.phone,
+          nickname: form.nickname || null,
+          age: form.age ? Number(form.age) : null,
+          birth_date: toIsoDate(form.birthDate),
+          address: form.address || null,
+          village: form.village || null,
+          district: form.district || null,
+          city: form.city || null,
+          occupation: form.occupation || null,
+          parent_name: form.parentName || null,
+          height: form.height ? Number(form.height) : null,
+          weight: form.weight ? Number(form.weight) : null,
+          medical_history: {
+            ...medical,
+            has_allergy: toggles.hasAlergi,
+            allergy_detail: toggles.hasAlergi
+              ? normalizeOptionalText(medical.allergy_detail)
+              : null,
+            has_systemic_disease: toggles.hasPenyakitSistemik,
+            systemic_disease_detail: toggles.hasPenyakitSistemik
+              ? normalizeOptionalText(medical.systemic_disease_detail)
+              : null,
+            undergoing_treatment: toggles.isKonsumsiObat,
+            treatment_detail: toggles.isKonsumsiObat
+              ? normalizeOptionalText(medical.treatment_detail)
+              : null,
+            ever_hospitalized: toggles.isRawatRumahSakit,
+            hospitalized_reason: toggles.isRawatRumahSakit
+              ? normalizeOptionalText(medical.hospitalized_reason)
+              : null,
+            smoking_or_alcohol: toggles.isKebiasaanRokok,
+          },
+          dental_history: {
+            ...dental,
+            frequent_tooth_pain: toggles.isSakitGigi,
+            tooth_pain_detail: toggles.isSakitGigi
+              ? normalizeOptionalText(dental.tooth_pain_detail)
+              : null,
+            bleeding_gums: toggles.isBerdarahSikatGigi,
+            ever_dental_treatment: toggles.isPerawatanGigiSebelumnya,
+            dental_treatment_detail: toggles.isPerawatanGigiSebelumnya
+              ? normalizeOptionalText(dental.dental_treatment_detail)
+              : null,
+            brushing_frequency: normalizeSelectableValue(
+              dental.brushing_frequency,
+            ),
+            use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut,
+            bad_habits: toggles.isKebiasaanBuruk,
+            bad_habits_detail: toggles.isKebiasaanBuruk
+              ? normalizeOptionalText(dental.bad_habits_detail)
+              : null,
+            ever_braces: toggles.isKawatGigi,
+            braces_years: toggles.isKawatGigi
+              ? normalizeOptionalText(dental.braces_years)
+              : null,
+            root_canal_treatment: toggles.isPSA,
+            root_canal_detail: toggles.isPSA
+              ? normalizeOptionalText(dental.root_canal_detail)
+              : null,
+            dentures: toggles.isMemilikiGigiPalsu,
+            routine_checkup: toggles.isRutinKontrol,
+            dental_checkup_frequency: normalizeSelectableValue(
+              dental.dental_checkup_frequency,
+            ),
+            doctor_notes: form.doctorNotes,
+          },
+        },
+      })
+
+      // Then update status to validated
+      await updateStatus.mutateAsync({
+        id: toId(item.id),
+        status: 'validated',
+      })
+      onSaved?.()
+      setConfirmValidate(false)
+    } catch (error) {
+      setSubmitError(readApiErrorMessage(error, 'Gagal memvalidasi reservasi.'))
+    }
+  }
+
+  const handleCancel = async () => {
+    try {
+      await updateStatus.mutateAsync({
+        id: toId(item.id),
+        status: 'cancelled',
+      })
+      onSaved?.()
+      setConfirmCancel(false)
+    } catch (error) {
+      setSubmitError(readApiErrorMessage(error, 'Gagal membatalkan reservasi.'))
+    }
+  }
+
+  const handleComplete = async () => {
+    try {
+      // Save form data first
+      if (!form) return
+      setSubmitError('')
+
+      const idNumber = Number(patientId)
+      if (!idNumber || Number.isNaN(idNumber)) {
+        setSubmitError('Patient ID tidak valid.')
+        return
+      }
+
+      await updatePatientDetails.mutateAsync({
+        id: toId(item.id),
+        data: {
+          patient_id: idNumber,
+          name: form.name,
+          phone: form.phone,
+          nickname: form.nickname || null,
+          age: form.age ? Number(form.age) : null,
+          birth_date: toIsoDate(form.birthDate),
+          address: form.address || null,
+          village: form.village || null,
+          district: form.district || null,
+          city: form.city || null,
+          occupation: form.occupation || null,
+          parent_name: form.parentName || null,
+          height: form.height ? Number(form.height) : null,
+          weight: form.weight ? Number(form.weight) : null,
+          medical_history: {
+            ...medical,
+            has_allergy: toggles.hasAlergi,
+            allergy_detail: toggles.hasAlergi
+              ? normalizeOptionalText(medical.allergy_detail)
+              : null,
+            has_systemic_disease: toggles.hasPenyakitSistemik,
+            systemic_disease_detail: toggles.hasPenyakitSistemik
+              ? normalizeOptionalText(medical.systemic_disease_detail)
+              : null,
+            undergoing_treatment: toggles.isKonsumsiObat,
+            treatment_detail: toggles.isKonsumsiObat
+              ? normalizeOptionalText(medical.treatment_detail)
+              : null,
+            ever_hospitalized: toggles.isRawatRumahSakit,
+            hospitalized_reason: toggles.isRawatRumahSakit
+              ? normalizeOptionalText(medical.hospitalized_reason)
+              : null,
+            smoking_or_alcohol: toggles.isKebiasaanRokok,
+          },
+          dental_history: {
+            ...dental,
+            frequent_tooth_pain: toggles.isSakitGigi,
+            tooth_pain_detail: toggles.isSakitGigi
+              ? normalizeOptionalText(dental.tooth_pain_detail)
+              : null,
+            bleeding_gums: toggles.isBerdarahSikatGigi,
+            ever_dental_treatment: toggles.isPerawatanGigiSebelumnya,
+            dental_treatment_detail: toggles.isPerawatanGigiSebelumnya
+              ? normalizeOptionalText(dental.dental_treatment_detail)
+              : null,
+            brushing_frequency: normalizeSelectableValue(
+              dental.brushing_frequency,
+            ),
+            use_floss_or_mouthwash: toggles.isKebisaanKesehatanMulut,
+            bad_habits: toggles.isKebiasaanBuruk,
+            bad_habits_detail: toggles.isKebiasaanBuruk
+              ? normalizeOptionalText(dental.bad_habits_detail)
+              : null,
+            ever_braces: toggles.isKawatGigi,
+            braces_years: toggles.isKawatGigi
+              ? normalizeOptionalText(dental.braces_years)
+              : null,
+            root_canal_treatment: toggles.isPSA,
+            root_canal_detail: toggles.isPSA
+              ? normalizeOptionalText(dental.root_canal_detail)
+              : null,
+            dentures: toggles.isMemilikiGigiPalsu,
+            routine_checkup: toggles.isRutinKontrol,
+            dental_checkup_frequency: normalizeSelectableValue(
+              dental.dental_checkup_frequency,
+            ),
+            doctor_notes: form.doctorNotes,
+          },
+        },
+      })
+
+      // Then update status to completed
+      await updateStatus.mutateAsync({
+        id: toId(item.id),
+        status: 'completed',
+      })
+      onSaved?.()
+      setConfirmComplete(false)
+    } catch (error) {
+      setSubmitError(readApiErrorMessage(error, 'Gagal menyelesaikan reservasi.'))
+    }
+  }
+
   return (
     <div className="rounded-lg p-4 mb-4 bg-[#E0F4FB]">
       <div className="flex flex-col-reverse lg:flex-row justify-between">
@@ -545,7 +759,11 @@ function ReservationCard({
                 variant="default"
                 className="bg-[#B9D654] text-white hover:bg-[#A8C24A] mt-2 text-sm rounded-2xl"
               >
-                Lihat Detail
+                {item.status === 'pending'
+                  ? 'Validasi'
+                  : item.status === 'validated'
+                    ? 'Konfirmasi'
+                    : 'Lihat Detail'}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-sm p-8">
@@ -1089,19 +1307,99 @@ function ReservationCard({
                   ) : null}
 
                   <DialogFooter className="mt-6">
-                    <DialogClose asChild>
-                      <Button variant="outline">Batal</Button>
-                    </DialogClose>
-                    <Button
-                      type="button"
-                      className="bg-[#B9D654] text-white hover:bg-[#A8C24A]"
-                      onClick={save}
-                    >
-                      {updatePatientDetails.isPending || updateStatus.isPending
-                        ? 'Menyimpan...'
-                        : 'Simpan'}
-                    </Button>
+                    {item.status === 'pending' && (
+                      <>
+                        <Button
+                          type="button"
+                          className="bg-red-400 hover:bg-red-500 text-white"
+                          onClick={() => setConfirmCancel(true)}
+                          disabled={updateStatus.isPending}
+                        >
+                          {updateStatus.isPending ? 'Membatalkan...' : 'Batalkan Reservasi'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="default"
+                          onClick={() => setConfirmValidate(true)}
+                          disabled={updateStatus.isPending}
+                        >
+                          {updateStatus.isPending ? 'Memvalidasi...' : 'Validasi'}
+                        </Button>
+                      </>
+                    )}
+                    {item.status === 'validated' && (
+                      <>
+                        <Button
+                          type="button"
+                          className="bg-red-400 hover:bg-red-500 text-white"
+                          onClick={() => setConfirmCancel(true)}
+                          disabled={updateStatus.isPending}
+                        >
+                          {updateStatus.isPending ? 'Membatalkan...' : 'Batalkan Reservasi'}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="default"
+                          onClick={() => setConfirmComplete(true)}
+                          disabled={updateStatus.isPending}
+                        >
+                          {updateStatus.isPending ? 'Menyelesaikan...' : 'Selesai'}
+                        </Button>
+                      </>
+                    )}
                   </DialogFooter>
+
+                  <AlertDialog open={confirmValidate} onOpenChange={setConfirmValidate}>
+                    <AlertDialogContent>
+                      <AlertDialogTitle>Validasi Reservasi</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin memvalidasi reservasi ini?
+                      </AlertDialogDescription>
+                      <div className="flex justify-end gap-2">
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleValidate}
+                        >
+                          Validasi
+                        </AlertDialogAction>
+                      </div>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
+                  <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+                    <AlertDialogContent>
+                      <AlertDialogTitle>Batalkan Reservasi</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin membatalkan reservasi ini? Tindakan ini tidak dapat dibatalkan.
+                      </AlertDialogDescription>
+                      <div className="flex justify-end gap-2">
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleCancel}
+                          className="bg-red-400 hover:bg-red-500 text-white"
+                        >
+                          Batalkan
+                        </AlertDialogAction>
+                      </div>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
+                  <AlertDialog open={confirmComplete} onOpenChange={setConfirmComplete}>
+                    <AlertDialogContent>
+                      <AlertDialogTitle>Selesaikan Reservasi</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Apakah Anda yakin ingin menyelesaikan reservasi ini?
+                      </AlertDialogDescription>
+                      <div className="flex justify-end gap-2">
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleComplete}
+                        >
+                          Selesai
+                        </AlertDialogAction>
+                      </div>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </>
               )}
             </DialogContent>
@@ -1186,11 +1484,15 @@ function YesNoFieldWithDetail({
 function RouteComponent() {
   const { data: reservasiData } = useAdminReservations()
 
-  const reservations = useMemo(
-    () =>
-      (reservasiData?.reservations || []).filter(
-        (r) => r.status !== 'cancelled',
-      ),
+  const { pending, validated, completed } = useMemo(
+    () => {
+      const all = reservasiData?.reservations || []
+      return {
+        pending: all.filter((r) => r.status === 'pending'),
+        validated: all.filter((r) => r.status === 'validated'),
+        completed: all.filter((r) => r.status === 'completed'),
+      }
+    },
     [reservasiData],
   )
 
@@ -1206,10 +1508,63 @@ function RouteComponent() {
         })}
       </p>
 
-      <div className="mt-4">
-        {reservations.map((item) => (
-          <ReservationCard key={item.id} item={item} />
-        ))}
+      <div className="mt-4 space-y-6">
+        {/* Pending Section */}
+        {pending.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-semibold text-yellow-700">
+                Menunggu ({pending.length})
+              </h2>
+              <div className="flex-1 h-0.5 bg-yellow-200"></div>
+            </div>
+            <div className="space-y-4">
+              {pending.map((item) => (
+                <ReservationCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Validated Section */}
+        {validated.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-semibold text-blue-700">
+                Tervalidasi ({validated.length})
+              </h2>
+              <div className="flex-1 h-0.5 bg-blue-200"></div>
+            </div>
+            <div className="space-y-4">
+              {validated.map((item) => (
+                <ReservationCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Completed Section */}
+        {completed.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-lg font-semibold text-green-700">
+                Selesai ({completed.length})
+              </h2>
+              <div className="flex-1 h-0.5 bg-green-200"></div>
+            </div>
+            <div className="space-y-4">
+              {completed.map((item) => (
+                <ReservationCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {pending.length === 0 && validated.length === 0 && completed.length === 0 && (
+          <p className="text-center text-muted-foreground py-8">
+            Tidak ada reservasi
+          </p>
+        )}
       </div>
     </div>
   )

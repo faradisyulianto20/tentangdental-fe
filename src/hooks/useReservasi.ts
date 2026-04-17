@@ -79,11 +79,11 @@ export function useAdminReservations() {
   })
 }
 
-export function useAdminReservationById(id?: number) {
+export function useAdminReservationById(id?: number, enabled = true) {
   return useQuery<AdminReservationDetail>({
     queryKey: ['admin-reservations', id],
     queryFn: () => getAdminReservationById(id as number),
-    enabled: typeof id === 'number',
+    enabled: enabled && typeof id === 'number',
     staleTime: 1000 * 30,
   })
 }

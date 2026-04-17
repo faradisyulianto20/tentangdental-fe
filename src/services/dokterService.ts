@@ -42,7 +42,7 @@ export type UpdateAdminDoctorPayload = {
   name?: string
   specialization?: string | null
   statement?: string | null
-  schedule?: string[]
+  schedule?: string
   photo?: File | null
 }
 
@@ -146,9 +146,7 @@ export async function createAdminDoctor(
   if (payload.statement !== undefined && payload.statement !== null) {
     formData.append('statement', payload.statement)
   }
-  payload.schedule.forEach((item) => {
-    formData.append('schedule[]', item)
-  })
+  payload.schedule.forEach((item) => formData.append('schedule[]', item))
   formData.append('photo', payload.photo)
 
   const response = await apiRequest<DoctorRawItem>('admin/doctors', {
@@ -172,9 +170,7 @@ export async function updateAdminDoctor(
     formData.append('statement', payload.statement)
   }
   if (payload.schedule !== undefined) {
-    payload.schedule.forEach((item) => {
-      formData.append('schedule[]', item)
-    })
+    formData.append('schedule', payload.schedule)
   }
   if (payload.photo) {
     formData.append('photo', payload.photo)

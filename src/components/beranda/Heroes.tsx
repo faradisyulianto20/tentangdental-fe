@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-const images = ['hero4.png', 'hero3.png', 'hero2.png', 'hero1.png', 'hero.png']
+const images = ['/heroes/hero4.svg', '/heroes/hero3.svg', '/heroes/hero2.svg', '/heroes/hero1.svg', '/heroes/hero.svg']
 
 const containerVariants = {
   hidden: { opacity: 0 },

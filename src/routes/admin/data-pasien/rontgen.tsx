@@ -19,7 +19,7 @@ function RouteComponent() {
   const navigate = useNavigate()
   const { id } = Route.useSearch()
   const patientId = id ? Number(id) : undefined
-
+  
   const rontgensQuery = useAdminPatientRontgens(
     typeof patientId === 'number' && !Number.isNaN(patientId)
       ? patientId
@@ -58,10 +58,22 @@ function RouteComponent() {
     rontgensQuery.error instanceof ApiError &&
     rontgensQuery.error.status === 404
   ) {
+    console.error('❌ API 404 - Pasien tidak ditemukan', {
+      patientId,
+      error: rontgensQuery.error,
+      payload: rontgensQuery.error.payload,
+    })
     return <p className="text-sm text-destructive">Pasien tidak ditemukan.</p>
   }
 
-  const patient = rontgensQuery.data?.patient
+  if (rontgensQuery.error) {
+    console.error('❌ Query Error', {
+      patientId,
+      error: rontgensQuery.error,
+    })
+  }
+
+  const patient = rontgensQuery.data
   const rontgens = rontgensQuery.data?.rontgens || []
   const images = rontgens.flatMap((rontgen) =>
     (rontgen.images || []).map((image) => ({
@@ -76,7 +88,7 @@ function RouteComponent() {
       <div>
         <h1 className="font-bold text-2xl">{patient?.name || '-'}</h1>
         <p className="text-sm text-muted-foreground">
-          Nomor Pasien: {patient?.patient_number || '-'}
+          Nomor Pasien: {patient?.id || '-'}
         </p>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">

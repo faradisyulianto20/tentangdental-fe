@@ -5,8 +5,8 @@ export default function Footer() {
   // const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-(--footer-bg) text-center text-sm text-(--text-muted) border mt-6">
-      <div className="page-wrap py-10 flex justify-evenly md:flex-row flex-col gap-2 mx-6">
+    <footer className="bg-(--footer-bg) text-center text-sm text-(--text-muted) border my-6">
+      <div className="page-wrap py-10 flex justify-evenly md:flex-row flex-col-reverse gap-6 mx-6">
         <div className="flex flex-col gap-2">
           <div className="flex">
             <img src="logo.svg" alt="Logo" className="w-24" />
@@ -42,9 +42,9 @@ export default function Footer() {
             })}
           </div>
         </div>
-        <div className="text-left">
+        <div className="hidden md:flex flex-col w-40 text-left">
           <p className="font-bold text-xl mb-2">Menu</p>
-          <ul className="text-left text-muted-foreground ">
+          <ul className="text-muted-foreground ">
             {menu.map((menu, index) => (
               <li key={index}>
                 <Link
@@ -57,11 +57,11 @@ export default function Footer() {
             ))}
           </ul>
         </div>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col">
           <p className="font-bold text-xl mb-2">Alamat</p>
-          <div className="w-37.5 md:w-75 h-37.5 rounded-xl overflow-hidden">
+          <div className="h-37.5 rounded-xl overflow-hidden">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1!2d106.7!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPuri+Permata+Cipondoh!5e0!3m2!1sen!2sid!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3967.0!2d106.6744397!3d-6.1823326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f900579a25d9:0x4f4a2eb8fddb6166!2sPraktek+dokter+gigi+spesialis+Konservasi+(Tentang+Dental)!5e0!3m2!1sid!2sid!4v1" 
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -93,11 +93,11 @@ const socialMedia = [
     url: 'mailto:tentangdental@gmail.com',
     icon: Mail,
   },
-  {
-    name: 'Maps',
-    url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.1!2d106.7!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sPuri+Permata+Cipondoh!5e0!3m2!1sen!2sid!4v1',
-    icon: MapPin,
-  },
+{
+  name: 'Maps',
+  url: 'https://www.google.com/maps/place/Praktek+dokter+gigi+spesialis+Konservasi+(Tentang+Dental)/@-6.1823326,106.6744397,15z/data=!4m8!3m7!1s0x2e69f900579a25d9:0x4f4a2eb8fddb6166!8m2!3d-6.1823326!4d106.6744397!9m1!1b1!16s%2Fg%2F11yk906587?hl=id&entry=ttu',
+  icon: MapPin,
+},
 ]
 
 const menu = [

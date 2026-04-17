@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useDokter } from '@/hooks/useDokter'
 import type { DoctorApiItem } from '#/services/dokterService'
 import { appEnv } from '@/lib/env'
+import { Skeleton } from '../ui/skeleton'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -47,22 +48,22 @@ export function ProfilDokterCard({
       <div
         className={`${index % 2 === 0 ? 'flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} flex w-full rounded-[6px] bg-white dark:bg-zinc-950`}
       >
-        <div className="p-4">
+        <div className="p-4 flex-1 flex flex-col-reverse md:flex-col justify-center">
           <div
             className="text-muted-foreground text-sm leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
             dangerouslySetInnerHTML={{
               __html: decodeHtmlEntities(String(dokter?.statement || '')),
             }}
           />
-          <p className="font-bold text-lg mt-6">{dokter?.name}</p>
+          <p className="font-bold text-lg md:mt-6">{dokter?.name}</p>
           <p className="font-bold text-muted-foreground">
             {dokter.specialization}
           </p>
         </div>
-        <div className="w-full md:relative h-fit md:h-auto flex justify-center">
+        <div className="w-full md:relative h-fit md:h-auto flex justify-center md:w-72">
           <img
             src={photoUrl}
-            className="md:w-92 object-cover md:absolute md:right-0 z-10 -bottom-4 max-h-100"
+            className={`object-cover md:absolute ${index % 2 === 0 ? 'md:right-0' : 'md:left-0'} z-10 bottom-0 max-h-100`}
           />
         </div>
       </div>
@@ -71,7 +72,20 @@ export function ProfilDokterCard({
 }
 
 export default function ProfilDokter() {
-  const { data: doctors } = useDokter()
+  const { data: doctors, isLoading } = useDokter()
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl relative mx-6 mt-12">
+        <Skeleton className="h-9 w-48 rounded-md" />
+        <Skeleton className="h-14 w-72 rounded-md mt-2" />
+        <div className="flex flex-col gap-4 mt-6 justify-center w-full">
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <Skeleton className="h-48 w-full rounded-lg" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-6xl relative mx-6 mt-12">

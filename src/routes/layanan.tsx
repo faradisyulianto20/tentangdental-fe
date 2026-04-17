@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Button } from '../components/ui/button'
+import { Skeleton } from '../components/ui/skeleton'
 import { useState, useEffect } from 'react'
 import { useLayananById, useLayanan } from '@/hooks/useLayanan'
 import { appEnv } from '@/lib/env'
@@ -84,7 +85,44 @@ function RouteComponent() {
 
   if (isArtikelLoading || isLayananLoading) {
     return (
-      <div className="flex justify-center items-center h-64">Loading...</div>
+      <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto">
+        {/* Title */}
+        <Skeleton className="h-8 w-64 rounded-md" />
+
+        {/* Description */}
+        <Skeleton className="h-5 w-96 rounded-md mt-3" />
+
+        {/* Image */}
+        <Skeleton className="w-full my-12 rounded-xl max-w-290.75 h-111.75" />
+
+        {/* Content */}
+        <div className="flex flex-col md:flex-row w-full gap-6">
+          {/* Main Content */}
+          <div className="flex-1 space-y-3">
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-full rounded-md" />
+            <Skeleton className="h-4 w-5/6 rounded-md" />
+            <div className="space-y-3 mt-6">
+              <Skeleton className="h-4 w-full rounded-md" />
+              <Skeleton className="h-4 w-full rounded-md" />
+              <Skeleton className="h-4 w-full rounded-md" />
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="w-full md:w-1/4">
+            <Skeleton className="h-8 w-40 rounded-md" />
+
+            <div className="flex flex-col gap-3 mt-6">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-lg" />
+              ))}
+            </div>
+
+            <Skeleton className="h-10 w-32 rounded-md mt-6" />
+          </div>
+        </div>
+      </div>
     )
   }
 
@@ -140,13 +178,13 @@ function RouteComponent() {
           custom={0.4}
           initial="hidden"
           animate="visible"
-          className="max-w-none text-muted-foreground flex-1 leading-relaxed [&_p]:mb-2 [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1"
+          className="max-w-none flex-1 leading-relaxed [&_p]:mb-2 [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1"
           dangerouslySetInnerHTML={{
             __html: decodeHtmlEntities(artikel?.article_content ?? ''),
           }}
         />
 
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-1/4">
           <motion.h2
             variants={fadeUp}
             custom={0.45}
@@ -163,23 +201,32 @@ function RouteComponent() {
             animate="visible"
             className="flex flex-col gap-3 mt-6"
           >
-            {layananFiltered.map((item) => (
-              <motion.button
-                key={item.id}
+            {layananFiltered.length === 0 ? (
+              <motion.div
                 variants={itemVariants}
-                onClick={() => handleNavigate(String(item.id))}
-                className="flex items-center text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
+                className="text-center py-8 text-muted-foreground"
               >
-                <img
-                  src={resolveStorageUrl(item.icon_url)}
-                  alt={item.name}
-                  className="w-8 h-8"
-                />
-                <div>
-                  <h2 className="text-base font-bold">{item.name}</h2>
-                </div>
-              </motion.button>
-            ))}
+                Belum ada layanan lainnya
+              </motion.div>
+            ) : (
+              layananFiltered.map((item) => (
+                <motion.button
+                  key={item.id}
+                  variants={itemVariants}
+                  onClick={() => handleNavigate(String(item.id))}
+                  className="flex items-center text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
+                >
+                  <img
+                    src={resolveStorageUrl(item.icon_url)}
+                    alt={item.name}
+                    className="w-8 h-8"
+                  />
+                  <div>
+                    <h2 className="text-base font-bold">{item.name}</h2>
+                  </div>
+                </motion.button>
+              ))
+            )}
           </motion.div>
 
           <motion.div

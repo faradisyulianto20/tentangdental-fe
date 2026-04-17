@@ -15,7 +15,7 @@ const itemVariants = {
 }
 
 export default function FAQ() {
-  const { data: faqData = [], isLoading, isError } = useFaq()
+  const { data: faqData = [] } = useFaq()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
@@ -46,15 +46,24 @@ export default function FAQ() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        {faqData.map((item, index) => (
-          <FAQItem
-            key={index}
-            item={item}
-            index={index}
-            isOpen={openIndex === index}
-            onClick={() => setOpenIndex(openIndex === index ? null : index)}
-          />
-        ))}
+        {faqData.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="p-4 rounded-lg border border-primary text-center text-muted-foreground"
+          >
+            Belum ada pertanyaan yang sering ditanyakan
+          </motion.div>
+        ) : (
+          faqData.map((item, index) => (
+            <FAQItem
+              key={index}
+              item={item}
+              index={index}
+              isOpen={openIndex === index}
+              onClick={() => setOpenIndex(openIndex === index ? null : index)}
+            />
+          ))
+        )}
       </motion.div>
     </div>
   )
