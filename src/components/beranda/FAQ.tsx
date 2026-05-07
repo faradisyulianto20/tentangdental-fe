@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useFaq } from '@/hooks/useFaq'
 import type { FaqApiItem } from '#/services/faqService'
+import { Skeleton } from '../ui/skeleton'
 
 const containerVariants = {
   hidden: {},
@@ -15,29 +16,48 @@ const itemVariants = {
 }
 
 export default function FAQ() {
-  const { data: faqData = [] } = useFaq()
+  const { data: faqData, isLoading } = useFaq()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+
+  const heading = (
+    <div className="text-center my-12 w-full">
+      <motion.h1
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className="text-primary text-xl md:text-3xl font-bold"
+      >
+        Pertanyaan yang Sering Ditanyakan
+      </motion.h1>
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+        className="text-muted-foreground text-sm md:text-base mt-3"
+      >
+        Temukan jawaban atas pertanyaan umum seputar perencanaan UMKM
+      </motion.p>
+    </div>
+  )
+
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-6 w-full">
+        {heading}
+        <div className="flex flex-col gap-2 my-6 mx-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="p-4 rounded-lg border border-muted flex flex-col gap-2">
+              <Skeleton className="h-5 w-3/4 rounded-md" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-6xl mx-6 w-full">
-      <div className="text-center my-12 w-full">
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-primary text-xl md:text-3xl font-bold"
-        >
-          Pertanyaan yang Sering Ditanyakan
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-muted-foreground text-sm md:text-base mt-3"
-        >
-          Temukan jawaban atas pertanyaan umum seputar perencanaan UMKM
-        </motion.p>
-      </div>
+      {heading}
 
       <motion.div
         variants={containerVariants}
@@ -46,7 +66,7 @@ export default function FAQ() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
       >
-        {faqData.length === 0 ? (
+        {!faqData || faqData.length === 0 ? (
           <motion.div
             variants={itemVariants}
             className="p-4 rounded-lg border border-primary text-center text-muted-foreground"

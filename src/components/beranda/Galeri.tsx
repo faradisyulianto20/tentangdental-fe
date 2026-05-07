@@ -17,7 +17,7 @@ const containerVariants = {
 // }
 
 export default function GalleryCarousel() {
-  const { data: galleryData, isLoading, isError } = useGallery()
+  const { data: galleryData, isLoading } = useGallery()
 
   const galleries =
     galleryData?.galleries?.map((item) => {
@@ -129,6 +129,20 @@ export default function GalleryCarousel() {
             </div>
           ))}
         </div>
+      </div>
+    )
+  }
+
+  if (galleries.length === 0) {
+    return (
+      <div className="w-full flex flex-col items-center gap-8 py-12 overflow-hidden max-w-6xl mx-6">
+        <div className="text-center">
+          <h1 className="text-primary text-xl md:text-3xl font-bold">Galeri</h1>
+          <p className="text-muted-foreground text-sm md:text-base mt-3">
+            Temukan Tempat Ternyaman dan Fasilitas Terlengkap di Tentang Dental.
+          </p>
+        </div>
+        <p className="text-muted-foreground">Galeri belum tersedia.</p>
       </div>
     )
   }

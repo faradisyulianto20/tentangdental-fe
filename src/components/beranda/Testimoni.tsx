@@ -130,7 +130,31 @@ export default function Testimoni() {
   }
 
   if (testimonialsSource.length === 0) {
-    return <div>Tidak ada testimoni.</div>
+    return (
+      <section className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between items-center w-full px-6 md:max-w-6xl">
+        <div className="text-center lg:text-left flex flex-col gap-2 justify-center items-center lg:items-start">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5 }}
+            className="font-bold text-primary text-xl md:text-3xl"
+          >
+            Testimoni
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5 }}
+            className="text-black font-bold lg:max-w-md text-2xl md:text-4xl"
+          >
+            Periksa apa yang dikatakan pasien tentang kami.
+          </motion.p>
+          <p className="text-muted-foreground mt-6">Belum ada testimoni yang tersedia.</p>
+        </div>
+      </section>
+    )
   }
 
   const activeIndex = currentTestimonial % testimonialsSource.length

@@ -528,16 +528,23 @@ export default function FormReservasi() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                          {availableDoctors.map((doctor) => (
-                            <DropdownMenuItem
-                              key={doctor.id}
-                              onSelect={() =>
-                                dokterField.handleChange(doctor.id)
-                              }
+                          {
+                            availableDoctors.length === 0 ? (
+                              <div className="px-4 py-2 text-sm text-muted-foreground">
+                                Tidak ada dokter yang tersedia
+                              </div>
+                            ) : (
+                              availableDoctors.map((doctor) => (
+                                <DropdownMenuItem
+                                  key={doctor.id}
+                                  onSelect={() =>
+                                    dokterField.handleChange(doctor.id)
+                                  }
                             >
                               {doctor.name}
                             </DropdownMenuItem>
-                          ))}
+                          )))}
+                          
                         </DropdownMenuContent>
                       </DropdownMenu>
 
@@ -775,7 +782,13 @@ function LayananMultiSelect({
 
       {open && (
         <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-md shadow-md max-h-52 overflow-y-auto">
-          {items.map((item) => (
+          {
+            items.length === 0 ? (
+              <div className="px-4 py-2 text-sm text-muted-foreground">
+                Data layanan belum tersedia
+              </div>
+             ) : (
+              items.map((item) => (
             <div
               key={item.id}
               onMouseDown={(e) => {
@@ -791,7 +804,9 @@ function LayananMultiSelect({
                 <span className="text-xs text-muted-foreground">✓</span>
               )}
             </div>
-          ))}
+          ))
+             )
+          }
         </div>
       )}
     </div>

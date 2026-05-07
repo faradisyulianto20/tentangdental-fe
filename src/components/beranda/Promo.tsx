@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '../ui/button'
 import { motion } from 'framer-motion'
+import { Skeleton } from '../ui/skeleton'
 import { usePromos } from '@/hooks/usePromo'
 import { useMemo } from 'react'
 import type { PromoApiItem } from '#/services/promoService'
@@ -105,7 +106,30 @@ export default function Promo() {
 
   const promosSource = fetchedPromos.length > 0 ? fetchedPromos : []
 
-  if (isLoading && fetchedPromos.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="text-center max-w-6xl mx-6">
+        <Skeleton className="h-9 w-24 rounded-md mx-auto mt-6" />
+        <Skeleton className="h-5 w-64 rounded-md mx-auto mt-3" />
+        <div className="flex flex-wrap justify-center gap-4 mt-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="p-4 rounded-lg border border-muted w-59 flex flex-col gap-2 shadow-md">
+              <Skeleton className="h-6 w-32 rounded" />
+              <Skeleton className="w-52 h-24 rounded-md" />
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-3 w-24 rounded" />
+                <Skeleton className="h-7 w-36 rounded" />
+              </div>
+              <Skeleton className="h-32 w-full rounded" />
+              <Skeleton className="h-9 w-32 rounded-md mx-auto mt-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (fetchedPromos.length === 0) {
     return (
       <div className="text-center max-w-6xl mx-6">
         <motion.h1
@@ -114,8 +138,17 @@ export default function Promo() {
           viewport={{ once: true, amount: 0.2 }}
           className="text-primary text-xl md:text-3xl font-bold mt-6"
         >
-          Loading Promo...
+          Promo
         </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          className="text-muted-foreground text-sm md:text-base mt-3"
+        >
+          Temukan promo terbaik untuk harga terbaik
+        </motion.p>
+        <p className="text-muted-foreground mt-6">Promo belum tersedia.</p>
       </div>
     )
   }

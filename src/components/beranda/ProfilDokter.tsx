@@ -87,6 +87,28 @@ export default function ProfilDokter() {
     )
   }
 
+  if (!doctors || doctors.length === 0) {
+    return (
+      <div className="max-w-6xl relative mx-6 mt-12 text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-primary text-xl md:text-3xl font-bold"
+        >
+          Profil Dokter
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-muted-foreground mb-12 text-sm md:text-base"
+        >
+          Temukan dokter-dokter profesional
+        </motion.p>
+        <p className="text-muted-foreground mt-6">Data dokter belum tersedia.</p>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-6xl relative mx-6 mt-12">
       <img

@@ -76,7 +76,12 @@ function RouteComponent() {
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div
+        {
+          !currentArtikel ? (
+            <p className="text-muted-foreground mt-4 text-center py-12">Artikel tidak ditemukan.</p>
+          ) : (
+          <>
+            <motion.div
           variants={fadeUp}
           custom={0}
           initial="hidden"
@@ -122,9 +127,12 @@ function RouteComponent() {
             __html: decodeHtmlEntities(currentArtikel?.content || ''),
           }}
         />
+          <Artikel />
+            </>
+          )
+        }
       </div>
 
-      <Artikel />
     </div>
   )
 }

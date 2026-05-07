@@ -13,7 +13,7 @@ const navigation = [
 ] as const
 
 export default function Header() {
-  const { data: layananData = [], isLoading, isError } = useLayanan()
+  const { data: layananData = [] } = useLayanan()
   const { location } = useRouterState()
   const currentPath = location.pathname
   const [menuOpen, setMenuOpen] = useState(false)
@@ -39,6 +39,8 @@ export default function Header() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  console.log('Layanan data:', layananData.length, layananData)
 
   return (
     <div
@@ -78,21 +80,26 @@ export default function Header() {
                         className={`transition-transform duration-200 ${layananOpen ? 'rotate-180' : ''}`}
                       />
                     </Button>
-
                     {layananOpen && (
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-105 bg-white rounded-xl shadow-lg border border-gray-100 p-4 grid grid-cols-3 gap-2 z-50">
-                        {layananData.map((item) => (
-                          <Link
-                            key={item.name}
-                            to="/layanan"
-                            search={{ id: String(item.id) }}
-                            onClick={() => setLayananOpen(false)}
-                            className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg p-2 transition"
-                          >
-                            {item.name}
-                          </Link>
-                        ))}
-                      </div>
+                      layananData.length === 0 ? (
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-105 bg-white rounded-xl shadow-lg border border-gray-100 p-4 text-center z-50">
+                          <p className="text-sm text-gray-700">Data layanan belum tersedia.</p>
+                        </div>
+                      ) : (
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-105 bg-white rounded-xl shadow-lg border border-gray-100 p-4 grid grid-cols-3 gap-2 z-50">
+                          {layananData.map((item) => (
+                            <Link
+                              key={item.name}
+                              to="/layanan"
+                              search={{ id: String(item.id) }}
+                              onClick={() => setLayananOpen(false)}
+                              className="text-sm text-gray-700 hover:text-[#58C4EC] hover:bg-blue-50 rounded-lg p-2 transition"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )
                     )}
                   </div>
                 )
@@ -149,6 +156,11 @@ export default function Header() {
                     </Button>
 
                     {layananOpen && (
+                      layananData.length === 0 ? (
+                        <div className="bg-white rounded-lg border border-gray-100 p-4 mt-2 text-center">
+                          <p className="text-sm text-gray-700">Data layanan belum tersedia.</p>
+                        </div>
+                      ) : (
                       <div className="grid grid-cols-2 gap-1 pl-4 pb-2">
                         {layananData.map((item) => (
                           <Link
@@ -165,7 +177,7 @@ export default function Header() {
                           </Link>
                         ))}
                       </div>
-                    )}
+                    ))}
                   </div>
                 )
               }

@@ -47,14 +47,7 @@ export default function Berita() {
 
       <div className="relative mt-12">
         {/* Left Arrow */}
-        <button
-          onClick={() => scroll('left')}
-          className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
-        >
-          <div className="bg-white rounded-full p-1.5">
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
-          </div>
-        </button>
+        
 
         {/* Scroll Container */}
         <motion.div
@@ -76,24 +69,42 @@ export default function Berita() {
                   </div>
                 </div>
               ))
-            : articlesData?.map((item) => (
-                <ArtikelCard
-                  key={item.id}
-                  artikel={item}
-                  onClick={() => navigateBerita(String(item.id))}
-                />
-              ))}
+            : !articlesData || articlesData.length === 0
+              ? null
+              : (
+                <>
+                <button
+                  onClick={() => scroll('left')}
+                  className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+                >
+                  <div className="bg-white rounded-full p-1.5">
+                    <ChevronLeft className="w-5 h-5 text-gray-700" />
+                  </div>
+                </button>
+                {articlesData.map((item) => (
+                  <ArtikelCard
+                    key={item.id}
+                    artikel={item}
+                    onClick={() => navigateBerita(String(item.id))}
+                  />
+                ))}
+                        {/* Right Arrow */}
+                  <button
+                    onClick={() => scroll('right')}
+                    className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+                  >
+                    <div className="bg-white rounded-full p-1.5">
+                      <ChevronRight className="w-5 h-5 text-gray-700" />
+                    </div>
+                  </button>
+                </>
+              )}
         </motion.div>
 
-        {/* Right Arrow */}
-        <button
-          onClick={() => scroll('right')}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
-        >
-          <div className="bg-white rounded-full p-1.5">
-            <ChevronRight className="w-5 h-5 text-gray-700" />
-          </div>
-        </button>
+        {!isLoading && (!articlesData || articlesData.length === 0) && (
+          <p className="text-muted-foreground mt-4">Artikel belum tersedia.</p>
+        )}
+
       </div>
     </div>
   )

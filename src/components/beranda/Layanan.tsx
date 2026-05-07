@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useLayanan } from '@/hooks/useLayanan'
+import { Skeleton } from '../ui/skeleton'
 import type { LayananApiItem } from '@/services/layananService'
 import { appEnv } from '@/lib/env'
 
@@ -49,7 +50,7 @@ export function LayananCard({
 }
 
 export default function Layanan() {
-  const { data: layananData } = useLayanan()
+  const { data: layananData, isLoading, error } = useLayanan()
 
   const navigate = useNavigate()
 
@@ -60,8 +61,8 @@ export default function Layanan() {
     })
   }
 
-  return (
-    <div className="text-center max-w-6xl mx-6 mt-12">
+  const heading = (
+    <>
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -79,6 +80,48 @@ export default function Layanan() {
         Kami melayani berbagai perawatan gigi esensial, aesthetic gigi,
         Prostodonsia, dan perawatan gigi anak.
       </motion.p>
+    </>
+  )
+
+  if (isLoading) {
+    return (
+      <div className="text-center max-w-6xl mx-6 mt-12">
+        {heading}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 border border-muted p-6 rounded-lg">
+              <Skeleton className="w-12 h-12 rounded-full" />
+              <Skeleton className="h-6 w-32 rounded" />
+              <Skeleton className="h-4 w-full rounded" />
+              <Skeleton className="h-4 w-3/4 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center max-w-6xl mx-6 mt-12">
+        {heading}
+        <p className="text-muted-foreground mt-6">Gagal memuat layanan.</p>
+      </div>
+    )
+  }
+
+  if (!layananData || layananData.length === 0) {
+    return (
+      <div className="text-center max-w-6xl mx-6 mt-12">
+        {heading}
+        <p className="text-muted-foreground mt-6">Layanan belum tersedia.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="text-center max-w-6xl mx-6 mt-12">
+      {heading}
       <motion.div
         variants={containerVariants}
         initial="hidden"

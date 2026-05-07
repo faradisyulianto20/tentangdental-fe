@@ -1,5 +1,3 @@
-import { Link } from '@tanstack/react-router'
-import { Button } from '../ui/button'
 import { motion } from 'framer-motion'
 import { usePromos } from '@/hooks/usePromo'
 import { useMemo } from 'react'
@@ -17,27 +15,6 @@ const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
   transition: { duration: 0.5 },
-}
-
-type Promo = {
-  judul: string
-  imgUrl: string
-  hargaAwal: number
-  hargaDiskon: number
-  detail: string
-}
-
-function decodeHtmlEntities(input: string) {
-  return input
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&')
-}
-
-function normalizePromoDetail(detail: string) {
-  return decodeHtmlEntities(String(detail || ''))
 }
 
 export default function PromoPage() {
@@ -71,7 +48,7 @@ export default function PromoPage() {
 
   const promosSource = fetchedPromos.length > 0 ? fetchedPromos : []
 
-  if (isLoading && fetchedPromos.length === 0) {
+  if (isLoading) {
     return (
       <div className="text-center max-w-6xl mx-6">
         <motion.h1
@@ -117,6 +94,30 @@ export default function PromoPage() {
             </div>
           ))}
         </motion.div>
+      </div>
+    )
+  }
+
+  if (fetchedPromos.length === 0) {
+    return (
+      <div className="text-center max-w-6xl mx-6">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          className="text-primary text-2xl md:text-4xl font-bold mt-6"
+        >
+          Semua Promo
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          className="text-muted-foreground text-sm md:text-base mt-3"
+        >
+          Temukan promo terbaik untuk harga terbaik
+        </motion.p>
+        <p className="text-muted-foreground mt-6">Promo belum tersedia.</p>
       </div>
     )
   }
