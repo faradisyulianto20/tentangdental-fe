@@ -19,6 +19,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 // import { MultiSelect } from '@/components/ui/multi-select'
 import { useState, useEffect, useRef } from 'react'
 import type { CheckedState } from '@radix-ui/react-checkbox'
@@ -93,6 +100,15 @@ const isDoctorAvailableOnDate = (
     })
 }
 
+// Helper to extract start time from slot string (e.g., "09:00 - 10:00" -> "09:00")
+const extractStartTime = (slot: string): string => {
+  const match = slot.match(/^(\d{1,2}):(\d{2})/)
+  if (match) {
+    return `${match[1].padStart(2, '0')}:${match[2]}`
+  }
+  return slot
+}
+
 // Zod Validation
 const formSchema = z
   .object({
@@ -122,7 +138,7 @@ const formSchema = z
       ),
     jamReservasi: z
       .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format jam harus HH:MM'),
+      .regex(/^(\d{1,2}):(\d{2})(\s*-\s*\d{1,2}:\d{2})?$/, 'Format jam harus HH:MM atau HH:MM - HH:MM'),
     pilihanDokter: z.string().min(1, 'Pilihan dokter harus diisi'),
     layanan: z
       .array(z.string())
@@ -158,6 +174,7 @@ export default function FormReservasi() {
   const [createdPatientId, setCreatedPatientId] = useState<string>('')
   const [selectedJadwalPeriksa, setSelectedJadwalPeriksa] =
     useState<Date | null>(null)
+  const [selectedPilihanDokter, setSelectedPilihanDokter] = useState<string>('')
 
   const doctors = Array.isArray(doctorsData)
     ? doctorsData.map((doctor) => ({
@@ -289,7 +306,7 @@ export default function FormReservasi() {
             value.jadwalPeriksa !== null
               ? formatDate(value.jadwalPeriksa)
               : formatDate(new Date()),
-          appointment_time: value.jamReservasi,
+          appointment_time: extractStartTime(value.jamReservasi),
           service_ids: value.layanan.map((item) => Number(item)),
           ...(checked && value.nomorPasien
             ? { patient_id: Number(value.nomorPasien) }
@@ -449,15 +466,70 @@ export default function FormReservasi() {
               </Field>
 
               <Field name="jamReservasi">
-                {(field) => (
-                  <TextField
-                    id="jamReservasi"
-                    label="Jam Reservasi"
-                    placeholder="Masukkan jam reservasi (misal: 14:30)"
-                    field={field}
-                    serverError={serverErrors.jamReservasi}
-                  />
-                )}
+                {(jamField) => {
+                  const { errors: jamErrors, isTouched: jamTouched } =
+                    jamField.state.meta
+
+                  const selectedDoctor = doctors.find(
+                    (d) => d.id === selectedPilihanDokter,
+                  )
+
+                  const availableTimeSlots = selectedJadwalPeriksa
+                    ? isDoctorAvailableOnDate(
+                        selectedDoctor?.schedule,
+                        selectedJadwalPeriksa,
+                      )
+                    : []
+
+                  return (
+                    <div className="space-y-4">
+                      <FieldLabel>Jam Reservasi</FieldLabel>
+                      {!selectedJadwalPeriksa ? (
+                        <FieldDescription className="text-muted-foreground">
+                          Pilih jadwal periksa terlebih dahulu
+                        </FieldDescription>
+                      ) : !selectedDoctor ? (
+                        <FieldDescription className="text-muted-foreground">
+                          Pilih dokter terlebih dahulu
+                        </FieldDescription>
+                      ) : availableTimeSlots.length === 0 ? (
+                        <FieldDescription className="text-destructive">
+                          Tidak ada jam yang tersedia
+                        </FieldDescription>
+                      ) : (
+                        <Select
+                          value={jamField.state.value}
+                          onValueChange={jamField.handleChange}
+                        >
+                          <SelectTrigger
+                            disabled={
+                              availableTimeSlots.length === 0 ||
+                              !selectedJadwalPeriksa ||
+                              !selectedDoctor
+                            }
+                            onBlur={jamField.handleBlur}
+                            className='w-full'
+                          >
+                            <SelectValue placeholder="Pilih jam reservasi" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableTimeSlots.map((slot) => (
+                              <SelectItem key={slot} value={slot}>
+                                {slot}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {((jamErrors.length > 0 && jamTouched) ||
+                        serverErrors.jamReservasi) && (
+                        <FieldDescription className="text-destructive">
+                          {serverErrors.jamReservasi || String(jamErrors[0])}
+                        </FieldDescription>
+                      )}
+                    </div>
+                  )
+                }}
               </Field>
 
               <Field name="pilihanDokter">
@@ -537,9 +609,10 @@ export default function FormReservasi() {
                               availableDoctors.map((doctor) => (
                                 <DropdownMenuItem
                                   key={doctor.id}
-                                  onSelect={() =>
+                                  onSelect={() => {
                                     dokterField.handleChange(doctor.id)
-                                  }
+                                    setSelectedPilihanDokter(doctor.id)
+                                  }}
                             >
                               {doctor.name}
                             </DropdownMenuItem>
@@ -547,24 +620,6 @@ export default function FormReservasi() {
                           
                         </DropdownMenuContent>
                       </DropdownMenu>
-
-                      {selectedDoctor && selectedDoctorSlots.length > 0 && (
-                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-                          <p className="text-xs text-muted-foreground mb-2">
-                            Jam Tersedia
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {selectedDoctorSlots.map((time, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20"
-                              >
-                                {time}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
 
                       {((dokterErrors.length > 0 && dokterTouched) ||
                         serverErrors.pilihanDokter) && (

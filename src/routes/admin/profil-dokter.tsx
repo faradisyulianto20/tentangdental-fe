@@ -14,8 +14,8 @@ import {
   useCreateAdminDoctor,
   useDeleteAdminDoctor,
   useUpdateAdminDoctor,
-  useAdminDoctorScheduleOptions,
 } from '@/hooks/useDokter'
+import { useScheduleOptions } from '@/hooks/useSchedule'
 import type { DoctorApiItem } from '@/services/dokterService'
 import { ApiError } from '@/lib/api-client'
 
@@ -92,19 +92,21 @@ function RouteComponent() {
   const [createFormKey, setCreateFormKey] = useState(0)
 
   const doctorsQuery = useAdminDoctors()
-  const scheduleOptionsQuery = useAdminDoctorScheduleOptions()
   const createDoctor = useCreateAdminDoctor()
   const updateDoctor = useUpdateAdminDoctor()
   const deleteDoctor = useDeleteAdminDoctor()
-
-  const jadwalOptions = useMemo(() => {
-    return scheduleOptionsQuery.data?.dropdown_options || []
-  }, [scheduleOptionsQuery.data])
 
   const doctorList = useMemo(
     () => doctorsQuery.data?.doctors || [],
     [doctorsQuery.data],
   )
+
+  const scheduleOptionsQuery = useScheduleOptions()
+
+  // Console log untuk debugging
+  console.log('useScheduleOptions data:', scheduleOptionsQuery.data)
+  console.log('scheduleOptions isLoading:', scheduleOptionsQuery.isLoading)
+  console.log('scheduleOptions isError:', scheduleOptionsQuery.isError)
 
   const handleCreate = async (values: {
     name: string
@@ -165,13 +167,15 @@ function RouteComponent() {
     setSelectedDoctor(null)
   }
 
+  console.log('doctorsQuery', doctorsQuery)
+  console.log('doctorList', doctorList)
+
   return (
     <div>
       <div className="mb-6">
         <ProfilDokterForm
           key={createFormKey}
           submitLabel="Tambahkan Dokter"
-          scheduleOptions={jadwalOptions}
           isSubmitting={createDoctor.isPending}
           submitError={createError}
           onSubmit={async (values) => {
@@ -215,7 +219,6 @@ function RouteComponent() {
           {selectedDoctor ? (
             <ProfilDokterForm
               submitLabel="Simpan Perubahan"
-              scheduleOptions={jadwalOptions}
               isSubmitting={updateDoctor.isPending}
               submitError={updateError}
               initialValues={{

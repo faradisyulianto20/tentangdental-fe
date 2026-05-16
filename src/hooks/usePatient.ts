@@ -6,6 +6,7 @@ import {
   getAdminPatientRontgens,
   getAdminPatients,
   updateAdminPatient,
+  deleteAdminRontgenImage,
 } from '@/services/patientService'
 import type {
   AdminPatientDetail,
@@ -14,6 +15,12 @@ import type {
 } from '@/services/patientService'
 
 type AdminPatientsQueryData = Awaited<ReturnType<typeof getAdminPatients>>
+
+export const rontgenKeys = {
+  all: ['rontgens'] as const,
+  lists: () => [...rontgenKeys.all, 'list'] as const,
+  detail: (id: string) => [...rontgenKeys.all, 'detail', id] as const,
+}
 
 export function useAdminPatients(page = 1, perPage = 10) {
   return useQuery<AdminPatientsQueryData>({
@@ -76,5 +83,24 @@ export function useDeleteAdminPatient() {
 export function useDownloadAdminPatientPdf() {
   return useMutation({
     mutationFn: (id: number) => downloadAdminPatientPdf(id),
+  })
+}
+
+export function useDeleteRontgenImage() {
+  const queryClient = useQueryClient()
+ 
+  return useMutation({
+    mutationFn: ({ id, imageId }: { id: string; imageId: string }) =>
+      deleteAdminRontgenImage(id, imageId),
+ 
+    onSuccess: (_data, { id, imageId }) => {
+      // Invalidate list dan detail agar UI refresh otomatis
+      queryClient.invalidateQueries({ queryKey: rontgenKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: rontgenKeys.detail(id) })
+    },
+ 
+    onError: (error) => {
+      console.error('Gagal menghapus gambar rontgen:', error)
+    },
   })
 }

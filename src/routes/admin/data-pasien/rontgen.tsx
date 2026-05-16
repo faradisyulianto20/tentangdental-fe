@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useNavigate } from '@tanstack/react-router'
-import { Download } from 'lucide-react'
+import { Download, Trash2 } from 'lucide-react'
 import { ApiError } from '@/lib/api-client'
-import { useAdminPatientRontgens } from '@/hooks/usePatient'
+import { useAdminPatientRontgens, useDeleteRontgenImage } from '@/hooks/usePatient'
 
 type RontgenSearch = {
   id?: string
@@ -19,12 +19,14 @@ function RouteComponent() {
   const navigate = useNavigate()
   const { id } = Route.useSearch()
   const patientId = id ? Number(id) : undefined
-  
+
   const rontgensQuery = useAdminPatientRontgens(
     typeof patientId === 'number' && !Number.isNaN(patientId)
       ? patientId
       : undefined,
   )
+
+  const deleteImageMutation = useDeleteRontgenImage()
 
   if (!id || !patientId || Number.isNaN(patientId)) {
     return (
@@ -83,6 +85,15 @@ function RouteComponent() {
     })),
   )
 
+  const handleDelete = (id: number, imageId: number) => {
+  if (!confirm('Yakin ingin menghapus foto rontgen ini?')) return
+  
+  deleteImageMutation.mutate({ 
+    id: String(id), 
+    imageId: String(imageId) 
+  })
+}
+
   return (
     <div>
       <div>
@@ -97,16 +108,34 @@ function RouteComponent() {
             <img
               src={item.imgPath}
               alt={item.title}
-              className="w-full h-48 object-cover rounded-md hover:brightness-90 transition-all"
+              className="w-full h-48 object-cover rounded-md hover:brightness-75 transition-all"
             />
-            <a
-              href={item.imgPath}
-              target="_blank"
-              rel="noreferrer"
-              className="group-hover:opacity-100 opacity-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            >
-              <Download className="w-8 h-8 rounded-full p-1.5 text-green-600 bg-white/80 hover:bg-white transition-all cursor-pointer" />
-            </a>
+            {/* Action buttons overlay */}
+            <div className="group-hover:opacity-100 opacity-0 absolute inset-0 flex items-center justify-center gap-2 transition-all">
+              {/* Download button */}
+              <a
+                href={item.imgPath}
+                download={`${item.title}.jpg`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-green-600 hover:scale-110 transition-all shadow"
+                title="Unduh foto"
+              >
+                <Download className="w-4 h-4" />
+              </a>
+              {/* Delete button */}
+              <button
+                type="button"
+                onClick={() => handleDelete(item.id, item.id)}
+                disabled={deleteImageMutation.isPending}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-destructive hover:scale-110 transition-all shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Hapus foto"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            {/* Image title */}
+            <p className="text-xs text-muted-foreground mt-1 truncate">{item.title}</p>
           </div>
         ))}
       </div>

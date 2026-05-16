@@ -2,9 +2,10 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { FileUpload } from '@/components/ui/file-upload'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MultiSelect } from '@/components/ui/multi-select'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import { useScheduleOptions } from '@/hooks/useSchedule'
 
 export type ProfilDokterFormValues = {
   name: string
@@ -17,7 +18,7 @@ export type ProfilDokterFormValues = {
 type ProfilDokterFormProps = {
   initialValues?: Partial<ProfilDokterFormValues>
   submitLabel: string
-  scheduleOptions: string[]
+  scheduleOptions?: string[]
   isSubmitting?: boolean
   submitError?: string
   onSubmit: (values: ProfilDokterFormValues) => Promise<void> | void
@@ -33,6 +34,17 @@ export default function ProfilDokterForm({
   onSubmit,
   onCancel,
 }: ProfilDokterFormProps) {
+  // Fetch schedule options dari hook jika tidak disediakan dari props
+  const scheduleOptionsQuery = useScheduleOptions()
+
+  // Gunakan scheduleOptions dari props atau dari hook
+  const finalScheduleOptions = useMemo(() => {
+    if (scheduleOptions && scheduleOptions.length > 0) {
+      return scheduleOptions
+    }
+    return scheduleOptionsQuery.data?.dropdown_options || []
+  }, [scheduleOptions, scheduleOptionsQuery.data])
+
   const [values, setValues] = useState<ProfilDokterFormValues>({
     name: initialValues?.name || '',
     specialization: initialValues?.specialization || '',
@@ -98,7 +110,7 @@ export default function ProfilDokterForm({
             <Field>
               <FieldLabel>Jadwal</FieldLabel>
               <MultiSelect
-                items={scheduleOptions}
+                items={finalScheduleOptions}
                 value={values.schedule}
                 onChange={(next) =>
                   setValues((prev) => ({ ...prev, schedule: next }))

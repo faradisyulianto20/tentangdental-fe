@@ -19,10 +19,14 @@ function RouteComponent() {
             <h1 className="font-bold text-lg sm:text-2xl">Reservasi</h1>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
               Gunakan identitas pribadi yang valid untuk membuat janji temu.
-              Setelah reservasi dikirim, jadwal tidak dapat diubah secara
-              mandiri.
-            </p>
+            
+              </p>
+              <p className='text-sx sm:text-sm text-muted-foreground max-w-xl'>Jika ada yang ingin ditanyakan atau perlu melakukan perubahan, silakan hubungi kami melalui <a className="font-bold text-primary" href="https://wa.me/628132059835" target="_blank" rel="noopener noreferrer">
+  0813-2059-835
+</a>
+            </p> 
           </div>
+          
         </div>
 
         <FormReservasi />

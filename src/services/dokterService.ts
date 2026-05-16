@@ -1,4 +1,10 @@
 import { apiRequest } from '#/lib/api-client'
+import { 
+  getScheduleOptions, 
+  formatScheduleLabel, 
+  type ScheduleOptions,
+  type DoctorScheduleMap,
+} from './scheduleService'
 
 export type DoctorApiItem = {
   id: number
@@ -29,14 +35,9 @@ export type AdminDoctorPagination = {
   total: number
 }
 
-export type DoctorScheduleMap = Record<string, string[]>
+export type AdminDoctorScheduleOptions = ScheduleOptions
 
-export type AdminDoctorScheduleOptions = {
-  days: string[]
-  time_slot_options: string[]
-  default_schedule: DoctorScheduleMap
-  dropdown_options: string[]
-}
+export type { DoctorScheduleMap } from './scheduleService'
 
 export type CreateAdminDoctorPayload = {
   name: string
@@ -78,7 +79,7 @@ const dayLabelMap: Record<string, string> = {
   minggu: 'Minggu',
 }
 
-function formatScheduleLabel(day: string, slot: string): string {
+function formatScheduleLabelInternal(day: string, slot: string): string {
   const labelDay = dayLabelMap[day.toLowerCase()] ?? day
   return labelDay + ' ' + slot.replace('-', ' - ')
 }
@@ -96,7 +97,7 @@ function normalizeSchedule(value: unknown): string[] {
       if (Array.isArray(entry)) {
         entry.forEach((item) => {
           if (typeof item === 'string') {
-            collected.push(formatScheduleLabel(day, item))
+            collected.push(formatScheduleLabelInternal(day, item))
           }
         })
       }
@@ -226,35 +227,5 @@ export async function deleteAdminDoctor(id: number): Promise<null> {
 }
 
 export async function getAdminDoctorScheduleOptions(): Promise<AdminDoctorScheduleOptions> {
-  const response = await apiRequest<{
-    default_schedule: DoctorScheduleMap
-    time_slot_options: string[]
-    days: string[]
-  }>('admin/doctors/schedule-options', {
-    method: 'GET',
-    auth: true,
-  })
-
-  const days = Array.isArray(response?.days) ? response.days : []
-  const timeSlotOptions = Array.isArray(response?.time_slot_options)
-    ? response.time_slot_options
-    : []
-  const defaultSchedule =
-    typeof response?.default_schedule === 'object' &&
-    response?.default_schedule !== null
-      ? (response.default_schedule as DoctorScheduleMap)
-      : {}
-  const dropdownOptions: string[] = []
-  Object.entries(defaultSchedule).forEach(([day, slots]) => {
-    slots.forEach((slot) => {
-      dropdownOptions.push(formatScheduleLabel(day, slot))
-    })
-  })
-
-  return {
-    days,
-    time_slot_options: timeSlotOptions,
-    default_schedule: defaultSchedule,
-    dropdown_options: dropdownOptions,
-  }
+  return getScheduleOptions()
 }

@@ -164,6 +164,12 @@ export type UpdateAdminPatientPayload = {
   }
 }
 
+export interface DeleteRontgenImageResponse {
+  success: boolean
+  data: null
+  message: string // "Foto rontgen berhasil dihapus"
+}
+
 function normalizePatientsResponse(
   input: AdminPatientsResponse | null | undefined,
 ) {
@@ -278,4 +284,15 @@ export async function downloadAdminPatientPdf(id: number): Promise<Blob> {
   }
 
   return response.blob()
+}
+
+
+export async function deleteAdminRontgenImage(id: string, imageId: string) {
+  return apiRequest<DeleteRontgenImageResponse>(
+    `admin/rontgens/${id}/images/${imageId}`,
+    {
+      method: 'DELETE',
+      auth: true,
+    }
+  )
 }
