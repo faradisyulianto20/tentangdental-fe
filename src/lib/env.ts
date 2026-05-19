@@ -11,10 +11,13 @@ function toBool(value: string | undefined, fallback: boolean): boolean {
 
 export const appEnv = {
   appName: import.meta.env.VITE_APP_NAME || 'Tentang Dental',
-  appMode: import.meta.env.VITE_APP_ENV || 'development',
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api',
+  appMode: import.meta.env.VITE_APP_ENV || 'production',
+  apiBaseUrl:
+    import.meta.env.VITE_API_BASE_URL ||
+    'https://tentang-dental-be-production.up.railway.app/api',
   storageBaseUrl:
-    import.meta.env.VITE_STORAGE_BASE_URL || 'http://127.0.0.1:8000/storage',
+    import.meta.env.VITE_STORAGE_BASE_URL ||
+    'https://tentang-dental-be-production.up.railway.app/storage',
   apiTimeoutMs: toNumber(import.meta.env.VITE_API_TIMEOUT_MS, 15000),
   authTokenKey:
     import.meta.env.VITE_AUTH_TOKEN_KEY || 'tentangdental_admin_token',
