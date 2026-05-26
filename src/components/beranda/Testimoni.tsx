@@ -254,7 +254,7 @@ export default function Testimoni() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-muted-foreground text-lg mt-3 overflow-y-auto pr-1 leading-relaxed break-all whitespace-normal [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-xl [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+              className="text-md overflow-y-auto pr-1 leading-tight whitespace-normal prose prose-slate max-w-none prose-p:leading-tight no-scrollbar"
               dangerouslySetInnerHTML={{
                 __html: decodeHtmlEntities(testimonial.description),
               }}

@@ -5,7 +5,7 @@ export default function Footer() {
   // const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-(--footer-bg) text-center text-sm text-(--text-muted) border my-6">
+    <footer className="bg-(--footer-bg) text-center text-sm text-(--text-muted) border py-6">
       <div className="page-wrap py-10 flex justify-evenly md:flex-row flex-col-reverse gap-6 mx-6">
         <div className="flex flex-col gap-2">
           <div className="flex">
@@ -18,10 +18,10 @@ export default function Footer() {
             </div>
           </div>
           <div className="text-left font-medium text-muted-foreground">
-            Sab, Min, Sen, Kam:{' '}
+            Rab, Kam, Sab, Min, Sen:{' '}
             <span className="text-primary">08:00 - 21:00</span> (dg reservasi){' '}
             <br></br>
-            Rab & Jum: <span className="text-primary">14:00 - 21:00 </span>(dg
+            Jum: <span className="text-primary">15:00 - 21:00 </span>(dg
             reservasi) <br></br>
             Sel : <span className="text-primary">Libur</span>
           </div>
@@ -115,7 +115,7 @@ const menu = [
   },
   {
     title: 'Profil Dokter',
-    url: '/profildokter',
+    url: '/profil-dokter',
   },
   {
     title: 'Reservasi',

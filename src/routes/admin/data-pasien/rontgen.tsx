@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Download, Trash2 } from 'lucide-react'
 import { ApiError } from '@/lib/api-client'
 import { useAdminPatientRontgens, useDeleteRontgenImage } from '@/hooks/usePatient'
+import { getAdminRontgenDownloadUrl } from '@/services/patientService'
 
 type RontgenSearch = {
   id?: string
@@ -60,25 +61,14 @@ function RouteComponent() {
     rontgensQuery.error instanceof ApiError &&
     rontgensQuery.error.status === 404
   ) {
-    console.error('❌ API 404 - Pasien tidak ditemukan', {
-      patientId,
-      error: rontgensQuery.error,
-      payload: rontgensQuery.error.payload,
-    })
     return <p className="text-sm text-destructive">Pasien tidak ditemukan.</p>
-  }
-
-  if (rontgensQuery.error) {
-    console.error('❌ Query Error', {
-      patientId,
-      error: rontgensQuery.error,
-    })
   }
 
   const patient = rontgensQuery.data
   const rontgens = rontgensQuery.data?.rontgens || []
   const images = rontgens.flatMap((rontgen) =>
     (rontgen.images || []).map((image) => ({
+      rontgenId: rontgen.id,
       id: image.id,
       imgPath: image.image_url,
       title: image.image_type || `Rontgen ${rontgen.id}`,
@@ -86,13 +76,13 @@ function RouteComponent() {
   )
 
   const handleDelete = (id: number, imageId: number) => {
-  if (!confirm('Yakin ingin menghapus foto rontgen ini?')) return
-  
-  deleteImageMutation.mutate({ 
-    id: String(id), 
-    imageId: String(imageId) 
-  })
-}
+    if (!confirm('Yakin ingin menghapus foto rontgen ini?')) return
+
+    deleteImageMutation.mutate({
+      id: String(id),
+      imageId: String(imageId),
+    })
+  }
 
   return (
     <div>
@@ -114,8 +104,8 @@ function RouteComponent() {
             <div className="group-hover:opacity-100 opacity-0 absolute inset-0 flex items-center justify-center gap-2 transition-all">
               {/* Download button */}
               <a
-                href={item.imgPath}
-                download={`${item.title}.jpg`}
+                href={getAdminRontgenDownloadUrl(item.rontgenId)}
+                download
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-green-600 hover:scale-110 transition-all shadow"
@@ -126,7 +116,7 @@ function RouteComponent() {
               {/* Delete button */}
               <button
                 type="button"
-                onClick={() => handleDelete(item.id, item.id)}
+                onClick={() => handleDelete(item.rontgenId, item.id)}
                 disabled={deleteImageMutation.isPending}
                 className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-destructive hover:scale-110 transition-all shadow disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Hapus foto"

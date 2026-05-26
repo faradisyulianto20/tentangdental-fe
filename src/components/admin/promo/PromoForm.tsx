@@ -30,6 +30,8 @@ export default function PromoForm({
   onSubmit,
   onCancel,
 }: PromoFormProps) {
+  const maxPromoImageSizeBytes = 2048 * 1024
+
   const [values, setValues] = useState<PromoFormValues>({
     name: initialValues?.name || '',
     originalPrice: initialValues?.originalPrice || '',
@@ -60,8 +62,10 @@ export default function PromoForm({
           <FieldGroup>
             <Field>
               <FileUpload
-                label="Unggah Gambar Promo"
+                label={<span>Unggah Gambar Promo <span className="text-red-500">*</span></span>}
                 acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+                maxFileSizeBytes={maxPromoImageSizeBytes}
+                maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
                 onChange={(event) => {
                   const file = event.target.files?.[0] || null
                   setValues((prev) => ({ ...prev, imageFile: file }))
@@ -70,7 +74,7 @@ export default function PromoForm({
             </Field>
 
             <Field>
-              <FieldLabel>Judul Promo</FieldLabel>
+              <FieldLabel>Judul Promo <span className="text-red-500">*</span></FieldLabel>
               <Input
                 type="text"
                 placeholder="Masukkan Judul Promo"
@@ -83,7 +87,7 @@ export default function PromoForm({
 
             <FieldGroup className="grid grid-cols-2">
               <Field>
-                <FieldLabel>Harga Awal</FieldLabel>
+                <FieldLabel>Harga Awal <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   type="number"
                   placeholder="Masukkan Harga Awal"
@@ -97,7 +101,7 @@ export default function PromoForm({
                 />
               </Field>
               <Field>
-                <FieldLabel>Harga Diskon</FieldLabel>
+                <FieldLabel>Harga Diskon <span className="text-red-500">*</span></FieldLabel>
                 <Input
                   type="number"
                   placeholder="Masukkan Harga Diskon"
@@ -113,7 +117,7 @@ export default function PromoForm({
             </FieldGroup>
 
             <Field>
-              <FieldLabel>Deskripsi Promo</FieldLabel>
+              <FieldLabel>Deskripsi Promo <span className="text-red-500">*</span></FieldLabel>
               <RichTextEditor
                 value={values.detail}
                 onChange={(next) =>

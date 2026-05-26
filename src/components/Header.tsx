@@ -40,8 +40,6 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  console.log('Layanan data:', layananData.length, layananData)
-
   return (
     <div
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 max-w-screen ${

@@ -36,6 +36,7 @@ export default function ProfilDokterForm({
 }: ProfilDokterFormProps) {
   // Fetch schedule options dari hook jika tidak disediakan dari props
   const scheduleOptionsQuery = useScheduleOptions()
+  const maxDoctorImageSizeBytes = 2048 * 1024
 
   // Gunakan scheduleOptions dari props atau dari hook
   const finalScheduleOptions = useMemo(() => {
@@ -74,7 +75,7 @@ export default function ProfilDokterForm({
         <FieldSet>
           <FieldGroup>
             <Field>
-              <FieldLabel>Nama</FieldLabel>
+              <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
               <Input
                 type="text"
                 placeholder="Masukkan Nama Dokter"
@@ -85,7 +86,7 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Spesialis</FieldLabel>
+              <FieldLabel>Spesialis <span className="text-red-500">*</span></FieldLabel>
               <Input
                 type="text"
                 placeholder="Masukkan Spesialis Dokter"
@@ -99,7 +100,7 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Pernyataan</FieldLabel>
+              <FieldLabel>Pernyataan <span className="text-red-500">*</span></FieldLabel>
               <RichTextEditor
                 value={values.statement}
                 onChange={(next) =>
@@ -108,7 +109,7 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Jadwal</FieldLabel>
+              <FieldLabel>Jadwal <span className="text-red-500">*</span></FieldLabel>
               <MultiSelect
                 items={finalScheduleOptions}
                 value={values.schedule}
@@ -119,10 +120,12 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Foto</FieldLabel>
+              <FieldLabel>Foto <span className="text-red-500">*</span></FieldLabel>
               <FileUpload
                 label="Unggah Foto"
                 acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+                maxFileSizeBytes={maxDoctorImageSizeBytes}
+                maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
                 onChange={(event) => {
                   const file = event.target.files?.[0] || null
                   setValues((prev) => ({ ...prev, photoFile: file }))

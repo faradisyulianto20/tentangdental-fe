@@ -1,11 +1,12 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '../ui/button'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Skeleton } from '../ui/skeleton'
 import { usePromos } from '@/hooks/usePromo'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { PromoApiItem } from '#/services/promoService'
 import { appEnv } from '@/lib/env'
+import { X } from 'lucide-react'
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -39,6 +40,51 @@ function normalizePromoDetail(detail: string) {
   return decodeHtmlEntities(String(detail || ''))
 }
 
+// Modal lightbox untuk gambar penuh
+function ImageLightbox({
+  imgUrl,
+  judul,
+  onClose,
+}: {
+  imgUrl: string
+  judul: string
+  onClose: () => void
+}) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          className="relative max-w-2xl w-fit  mx-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors cursor-pointer"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <img
+            src={imgUrl}
+            alt={judul}
+            className="w-full h-auto rounded-xl shadow-2xl object-contain max-h-[80vh]"
+          />
+          <p className="text-white text-center mt-3 font-semibold text-lg">{judul}</p>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
 export function PromoCard({
   promo,
   variants,
@@ -46,32 +92,77 @@ export function PromoCard({
   promo: Promo
   variants: any
 }) {
+  const [isHovered, setIsHovered] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
   return (
-    <motion.div
-      variants={variants}
-      whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      className="p-4 rounded-lg border border-primary w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
-    >
-      <div className="text-xl font-bold text-primary">{promo.judul}</div>
-      <img src={promo.imgUrl} className="w-52 h-24 object-cover rounded-md" />
-      <div className="flex flex-col mx-auto text-left">
-        <div className="text-primary text-xs line-through opacity-70">
-          Rp {promo.hargaAwal.toLocaleString('id-ID')}
+    <>
+      <motion.div
+        variants={variants}
+        whileHover={{ y: -5, transition: { duration: 0.2 } }}
+        className="p-4 rounded-lg border border-primary w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
+      >
+        <div className="text-xl font-bold text-primary">{promo.judul}</div>
+
+        {/* Image dengan hover zoom & klik untuk lightbox */}
+        <div
+          className="relative w-52 h-24 rounded-md overflow-hidden cursor-zoom-in"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onClick={() => setLightboxOpen(true)}
+        >
+          <motion.img
+            src={promo.imgUrl}
+            alt={promo.judul}
+            animate={{ scale: isHovered ? 1.1 : 1 }}
+            transition={{ duration: 0.3 }}
+            className="w-full h-full object-cover"
+          />
+          {/* Overlay hint saat hover */}
+          <AnimatePresence>
+            {isHovered && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/30 flex items-center justify-center"
+              >
+                <span className="text-white text-xs font-medium bg-black/40 px-2 py-1 rounded-full">
+                  Lihat Penuh
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <div className="text-2xl font-bold text-primary">
-          Rp {promo.hargaDiskon.toLocaleString('id-ID')}
+
+        <div className="flex flex-col mx-auto text-left">
+          <div className="text-primary text-xs line-through opacity-70">
+            Rp {promo.hargaAwal.toLocaleString('id-ID')}
+          </div>
+          <div className="text-2xl font-bold text-primary">
+            Rp {promo.hargaDiskon.toLocaleString('id-ID')}
+          </div>
         </div>
-      </div>
-      <div
-        dangerouslySetInnerHTML={{ __html: normalizePromoDetail(promo.detail) }}
-        className="text-primary text-xs text-left overflow-auto h-32 leading-relaxed [&_p]:mb-1.5 [&_strong]:font-bold [&_em]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-1"
-      />
-      <Link to="/reservasi" className="mx-auto items-justify-end mt-auto">
-        <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
-          Pesan Sekarang
-        </Button>
-      </Link>
-    </motion.div>
+        <div
+          dangerouslySetInnerHTML={{ __html: normalizePromoDetail(promo.detail) }}
+          className="text-primary text-xs text-left overflow-auto h-32 leading-tight [&_p]:mb-1.5 [&_strong]:font-bold [&_em]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-1"
+        />
+        <Link to="/reservasi" className="mx-auto items-justify-end mt-auto">
+          <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
+            Pesan Sekarang
+          </Button>
+        </Link>
+      </motion.div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <ImageLightbox
+          imgUrl={promo.imgUrl}
+          judul={promo.judul}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
+    </>
   )
 }
 
@@ -85,11 +176,9 @@ export default function Promo() {
       if (typeof item.image_url !== 'string' || item.image_url.length === 0) {
         return '/hero.png'
       }
-
       if (item.image_url.startsWith('http')) {
         return item.image_url
       }
-
       const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
       const cleanPath = item.image_url.replace(/^\/+/, '')
       return cleanBase + '/' + cleanPath

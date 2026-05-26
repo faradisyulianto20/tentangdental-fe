@@ -30,6 +30,9 @@ export default function LayananForm({
   onSubmit,
   onCancel,
 }: LayananFormProps) {
+  const maxSupportImageSizeBytes = 2048 * 1024
+  const maxIconSizeBytes = 1024 * 1024
+
   const [values, setValues] = useState<LayananFormValues>({
     name: initialValues?.name || '',
     detail: initialValues?.detail || '',
@@ -59,7 +62,7 @@ export default function LayananForm({
         <FieldSet>
           <FieldGroup>
             <Field>
-              <FieldLabel>Nama</FieldLabel>
+              <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
               <Input
                 type="text"
                 placeholder="Masukkan Nama Layanan"
@@ -70,7 +73,7 @@ export default function LayananForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Detail Layanan</FieldLabel>
+              <FieldLabel>Detail Layanan <span className="text-red-500">*</span></FieldLabel>
               <Input
                 type="text"
                 placeholder="Masukkan Detail Layanan"
@@ -81,7 +84,7 @@ export default function LayananForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Artikel</FieldLabel>
+              <FieldLabel>Artikel </FieldLabel>
               <RichTextEditor
                 value={values.articleContent}
                 onChange={(next) =>
@@ -91,10 +94,12 @@ export default function LayananForm({
             </Field>
             <FieldGroup className="grid md:grid-cols-2">
               <Field>
-                <FieldLabel>Gambar Pendukung</FieldLabel>
+                <FieldLabel>Gambar Pendukung <span className="text-red-500">*</span></FieldLabel>
                 <FileUpload
                   label="Unggah Gambar"
                   acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                  maxFileSizeBytes={maxSupportImageSizeBytes}
+                  maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
                   onChange={(event) => {
                     const file = event.target.files?.[0] || null
                     setValues((prev) => ({ ...prev, supportImageFile: file }))
@@ -102,10 +107,12 @@ export default function LayananForm({
                 />
               </Field>
               <Field>
-                <FieldLabel>Icon</FieldLabel>
+                <FieldLabel>Icon <span className="text-red-500">*</span></FieldLabel>
                 <FileUpload
                   label="Unggah Icon"
                   acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                  maxFileSizeBytes={maxIconSizeBytes}
+                  maxFileSizeMessage="File terlalu besar, upload file kurang dari 1MB"
                   onChange={(event) => {
                     const file = event.target.files?.[0] || null
                     setValues((prev) => ({ ...prev, iconFile: file }))

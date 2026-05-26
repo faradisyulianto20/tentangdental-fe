@@ -37,13 +37,15 @@ export default function TestimoniForm({
     photoFile: initialValues?.photoFile || null,
   })
 
+  const maxPromoImageSizeBytes = 2048 * 1024
+
   useEffect(() => {
     setValues({
       name: initialValues?.name || '',
       rating: initialValues?.rating || 5,
       testimoni: initialValues?.testimoni || '<p></p>',
       photoFile: initialValues?.photoFile || null,
-    })
+    }) // ✨ Memperbaiki kurung penutup setValues di sini
   }, [initialValues])
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -53,30 +55,21 @@ export default function TestimoniForm({
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {/* FIELD NAMA */}
       <Field>
-        <FieldLabel>Foto</FieldLabel>
-        <FileUpload
-          label="Unggah Foto"
-          acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
-          onChange={(event) => {
-            const file = event.target.files?.[0] || null
-            setValues((prev) => ({ ...prev, photoFile: file }))
-          }}
-        />
-      </Field>
-      <Field>
-        <FieldLabel>Nama</FieldLabel>
+        <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
         <Input
-          type="text"
-          placeholder="Masukkan Nama"
+          required
           value={values.name}
           onChange={(event) =>
             setValues((prev) => ({ ...prev, name: event.target.value }))
           }
         />
       </Field>
-      <Field className="gap-0">
-        <FieldLabel>Rating</FieldLabel>
+
+      {/* FIELD RATING */}
+      <Field className="gap-1">
+        <FieldLabel>Rating <span className="text-red-500">*</span></FieldLabel>
         <div className="flex gap-1">
           {Array.from({ length: 5 }, (_, i: number) => (
             <span
@@ -89,8 +82,25 @@ export default function TestimoniForm({
           ))}
         </div>
       </Field>
+
+      {/* FIELD FOTO */}
       <Field>
-        <FieldLabel>Testimoni</FieldLabel>
+        <FieldLabel>Foto <span className="text-red-500">*</span></FieldLabel>
+        <FileUpload
+           maxFileSizeBytes={maxPromoImageSizeBytes}
+           maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
+          label="Unggah Foto"
+          acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+          onChange={(event) => {
+            const file = event.target.files?.[0] || null
+            setValues((prev) => ({ ...prev, photoFile: file }))
+          }}
+        />
+      </Field>
+
+      {/* FIELD TESTIMONI (RICH TEXT EDITOR) */}
+      <Field>
+        <FieldLabel>Testimoni <span className="text-red-500">*</span></FieldLabel>
         <RichTextEditor
           value={values.testimoni}
           onChange={(next) =>
@@ -99,11 +109,13 @@ export default function TestimoniForm({
         />
       </Field>
 
+      {/* ERROR MESSAGE */}
       {submitError ? (
-        <p className="text-sm text-destructive">{submitError}</p>
+        <p className="text-sm text-destructive font-medium">{submitError}</p>
       ) : null}
 
-      <Field orientation="horizontal" className="gap-2">
+      {/* TOMBOL AKSI */}
+      <div className="flex items-center gap-2 pt-2">
         {onCancel ? (
           <Button type="button" variant="outline" onClick={onCancel}>
             Batal
@@ -112,7 +124,7 @@ export default function TestimoniForm({
         <Button type="submit" disabled={Boolean(isSubmitting)}>
           {isSubmitting ? 'Memproses...' : submitLabel}
         </Button>
-      </Field>
+      </div>
     </form>
   )
 }

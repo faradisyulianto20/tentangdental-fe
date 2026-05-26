@@ -256,6 +256,7 @@ export default function FormReservasi() {
       keluhan: '' as string,
     },
     validators: {
+      onChange: () => undefined,
       onSubmit: ({ value }) => {
         const result = formSchema.safeParse(value)
         if (!result.success) {
@@ -314,18 +315,26 @@ export default function FormReservasi() {
         }
 
         const result = await createReservation.mutateAsync(payload)
-        console.log('✅ Reservasi berhasil:', result)
 
-        // Store the created patient ID
+        // Fungsi helper untuk mengubah format ID
+        function formatPatientId(id: number | string): string {
+          // Mengubah id menjadi string, lalu di-pad dengan angka '0' sebanyak 5 digit di depan
+          const paddedId = String(id).padStart(5, '0');
+          
+          // Gabungkan dengan prefix 'AA'
+          return `AA${paddedId}`;
+        }
+
+        // Penerapan di kode Anda:
         if (result.patient?.id) {
-          setCreatedPatientId(String(result.patient.id))
+          const formattedId = formatPatientId(result.patient.id);
+          setCreatedPatientId(formattedId);
         }
 
         setSuccessOpen(true)
         reset()
         setChecked(false)
       } catch (error) {
-        console.log('❌ Submit Error:', error)
         if (error instanceof ApiError) {
           const payload =
             typeof error.payload === 'object' && error.payload !== null
@@ -371,6 +380,7 @@ export default function FormReservasi() {
                     placeholder="Masukkan nama lengkap Anda"
                     field={field}
                     serverError={serverErrors.namaLengkap}
+                    required
                   />
                 )}
               </Field>
@@ -432,6 +442,7 @@ export default function FormReservasi() {
                     placeholder="Masukkan nomor handphone Anda"
                     field={field}
                     serverError={serverErrors.nomorHandphone}
+                    required
                   />
                 )}
               </Field>
@@ -443,7 +454,7 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Jadwal Periksa</FieldLabel>
+                      <FieldLabel>Jadwal Periksa <span className="text-red-500">*</span></FieldLabel>
                       <DatePicker
                         value={field.state.value}
                         onChange={(date: Date) => {
@@ -483,7 +494,7 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Jam Reservasi</FieldLabel>
+                      <FieldLabel>Jam Reservasi <span className="text-red-500">*</span></FieldLabel>
                       {!selectedJadwalPeriksa ? (
                         <FieldDescription className="text-muted-foreground">
                           Pilih jadwal periksa terlebih dahulu
@@ -561,7 +572,7 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Pilihan Dokter</FieldLabel>
+                      <FieldLabel>Pilihan Dokter <span className="text-red-500">*</span></FieldLabel>
                       {selectedJadwalPeriksa &&
                         availableDoctors.length === 0 && (
                           <FieldDescription className="text-destructive">
@@ -639,7 +650,7 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Layanan</FieldLabel>
+                      <FieldLabel>Layanan <span className="text-red-500">*</span></FieldLabel>
                       <LayananMultiSelect
                         value={field.state.value}
                         items={services}
@@ -688,6 +699,7 @@ export default function FormReservasi() {
                       placeholder="Masukkan nomor pasien Anda"
                       field={field}
                       serverError={serverErrors.nomorPasien}
+                      required
                     />
                   )}
                 </Field>
@@ -701,7 +713,7 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Keluhan</FieldLabel>
+                      <FieldLabel>Keluhan <span className="text-red-500">*</span></FieldLabel>
                       <Textarea
                         placeholder="Masukkan keluhan Anda"
                         className="resize-none"
@@ -811,7 +823,7 @@ function LayananMultiSelect({
   return (
     <div ref={containerRef} className="relative">
       <div
-        className="min-h-9 w-full flex flex-wrap gap-1 items-center px-3 py-1.5 border border-input rounded-md bg-background cursor-pointer text-sm hover:bg-accent/50 transition-colors"
+        className="min-h-9 w-full flex flex-wrap gap-1 items-center px-3 py-1.5 border border-input rounded-md cursor-pointer text-sm hover:bg-accent/50 transition-colors bg-white"
         onClick={() => setOpen((o) => !o)}
       >
         {value.length === 0 && (
@@ -873,6 +885,7 @@ type TextFieldProps = {
   label: string
   placeholder: string
   serverError?: string
+  required?: boolean
   field: {
     state: { value: string; meta: { errors: unknown[]; isTouched: boolean } }
     handleChange: (val: string) => void
@@ -886,11 +899,12 @@ function TextField({
   placeholder,
   field,
   serverError,
+  required = false,
 }: TextFieldProps) {
   const { errors, isTouched } = field.state.meta
   return (
     <div className="space-y-4">
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel htmlFor={id}>{label}{required && <span className="text-red-500">*</span>}</FieldLabel>
       <Input
         id={id}
         placeholder={placeholder}

@@ -26,7 +26,7 @@ const fadeUp = {
 function RouteComponent() {
   let { id } = Route.useSearch()
   const { data: artikel } = useArticles()
-  const lastArticleId = artikel?.length ? artikel[artikel.length - 1].id : null
+  const lastArticleId = artikel?.length ? artikel[0].id : null
   if (!id) {
     id = String(lastArticleId)
   }
@@ -86,7 +86,7 @@ function RouteComponent() {
           custom={0}
           initial="hidden"
           animate="visible"
-          className="w-full my-12 rounded-xl overflow-hidden h-96"
+          className="w-full my-12 rounded-xl overflow-hidden"
         >
           <img
             src={resolveImage(currentArtikel?.image_url)}
@@ -122,7 +122,7 @@ function RouteComponent() {
           custom={0.5}
           initial="hidden"
           animate="visible"
-          className="text-muted-foreground my-6 leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:text-xl [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+          className="my-6 leading-relaxed prose prose-slate max-w-none w-full"
           dangerouslySetInnerHTML={{
             __html: decodeHtmlEntities(currentArtikel?.content || ''),
           }}

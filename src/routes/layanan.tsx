@@ -161,7 +161,7 @@ function RouteComponent() {
         custom={0.3}
         initial="hidden"
         animate="visible"
-        className="w-full my-12 rounded-xl max-w-290.75 h-111.75 overflow-hidden"
+        className=" my-12 rounded-xl h-111.75 overflow-hidden"
       >
         <img
           src={resolveStorageUrl(
@@ -173,6 +173,10 @@ function RouteComponent() {
       </motion.div>
 
       <div className="flex flex-col md:flex-row w-full gap-6">
+        
+          { artikel?.article_content === "" ? (
+            <p className="text-muted-foreground">Content not available.</p>
+          ) : (
         <motion.div
           variants={fadeUp}
           custom={0.4}
@@ -183,6 +187,7 @@ function RouteComponent() {
             __html: decodeHtmlEntities(artikel?.article_content ?? ''),
           }}
         />
+          )}
 
         <div className="w-full md:w-1/4">
           <motion.h2

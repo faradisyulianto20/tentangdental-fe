@@ -80,7 +80,6 @@ function RouteComponent() {
           item.status === 'rejected' ||
           item.status === 'cancelled',
       )
-      .slice(0, 5)
       .map((item) => ({
         id: item.id,
         patient_name: item.patient?.name || '-',
@@ -90,11 +89,6 @@ function RouteComponent() {
         appointment_time: item.appointment_time || '',
         status: item.status || 'pending',
       })) || []
-
-  console.log(totalReservations)
-
-  console.log(recentReservationItems)
-
   return (
     <div>
       <div>
@@ -122,8 +116,10 @@ function RouteComponent() {
 
         <StatisticsDashboard monthLabel={monthLabel} services={serviceItems} />
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <RecentReservations items={recentReservationItems} />
+        <div className="flex flex-col md:flex-row gap-6 mt-6 md:flex">
+          <div className="flex-1">
+            <RecentReservations items={recentReservationItems} />
+          </div>
           <DoctorSchedule />
         </div>
       </div>

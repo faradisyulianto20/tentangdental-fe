@@ -234,6 +234,16 @@ function parseDate(input?: string | null) {
   return date
 }
 
+function getReservationSortTime(item: ReservasiApiItem) {
+  const reservationDate = parseDate(item.reservation_date)?.getTime()
+  if (typeof reservationDate === 'number') return reservationDate
+
+  const createdAt = parseDate(item.created_at)?.getTime()
+  if (typeof createdAt === 'number') return createdAt
+
+  return Number.POSITIVE_INFINITY
+}
+
 function readApiErrorMessage(error: unknown, fallback: string) {
   if (!(error instanceof ApiError)) return fallback
   const payload =
@@ -1494,7 +1504,9 @@ function RouteComponent() {
 
   const { pending, validated, completed, cancelled } = useMemo(
     () => {
-      const all = reservasiData?.reservations || []
+      const all = [...(reservasiData?.reservations || [])].sort(
+        (a, b) => getReservationSortTime(a) - getReservationSortTime(b),
+      )
       return {
         pending: all.filter((r) => r.status === 'pending'),
         validated: all.filter((r) => r.status === 'validated'),

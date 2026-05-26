@@ -42,12 +42,36 @@ function toPromoCard(item: AdminPromoItem) {
 }
 
 function readApiErrorMessage(error: unknown, fallback: string) {
-  if (!(error instanceof ApiError)) return fallback
+  if (!(error instanceof ApiError)) {
+    return error instanceof Error && error.message ? error.message : fallback
+  }
 
   const payload =
     typeof error.payload === 'object' && error.payload !== null
       ? (error.payload as Record<string, unknown>)
       : null
+
+  const fieldErrors = payload?.errors
+  if (fieldErrors && typeof fieldErrors === 'object') {
+    const queue: unknown[] = [fieldErrors]
+
+    while (queue.length > 0) {
+      const current = queue.shift()
+
+      if (typeof current === 'string' && current.trim().length > 0) {
+        return current
+      }
+
+      if (Array.isArray(current)) {
+        queue.push(...current)
+        continue
+      }
+
+      if (current && typeof current === 'object') {
+        queue.push(...Object.values(current as Record<string, unknown>))
+      }
+    }
+  }
 
   if (
     payload &&
@@ -177,7 +201,7 @@ function RouteComponent() {
         open={!!selectedPromo}
         onOpenChange={(open) => !open && setSelectedPromo(null)}
       >
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar">
           {selectedPromo ? (
             <PromoForm
               submitLabel="Simpan Perubahan"

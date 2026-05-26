@@ -68,19 +68,46 @@ function statusColor(status: string) {
 }
 
 export default function RecentReservations({ items }: RecentReservationsProps) {
-  const navigate = useNavigate()
   
-  // Filter out completed status and sort by pending, validated, then cancelled
-  const sortedItems = items
-    .filter((item) => item.status !== 'completed')
-    .sort((a, b) => {
-      const statusOrder: Record<string, number> = {
-        pending: 1,
-        validated: 2,
-        cancelled: 3,
-      }
-      return (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999)
-    })
+  // 1. Filter out completed dan urutkan berdasarkan status (Pending -> Validated -> Cancelled)
+const baseSortedItems = items
+  .filter((item) => item.status !== 'completed')
+  .sort((a, b) => {
+    const statusOrder: Record<string, number> = {
+      pending: 1,
+      validated: 2,
+      cancelled: 3,
+    }
+    return (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999)
+  })
+
+// 2. Urutkan lagi berdasarkan TANGGAL TERBARU (cukup lakukan 1 kali di sini)
+const sortedByDateItems = [...baseSortedItems].sort((a, b) => {
+  return new Date(a.reservation_date).getTime() - new Date(b.reservation_date).getTime()
+})
+
+// Buat pembanding waktu hari ini (di-set ke jam 00:00:00 agar murni membandingkan tanggal)
+const today = new Date()
+today.setHours(0, 0, 0, 0)
+
+// 3. Kelompokkan menggunakan .filter() dari array yang sudah rapi di atas
+const todayReservations = sortedByDateItems.filter((item) => {
+  const resDate = new Date(item.reservation_date)
+  resDate.setHours(0, 0, 0, 0)
+  return resDate.getTime() === today.getTime()
+})
+
+const outdatedReservations = sortedByDateItems.filter((item) => {
+  const resDate = new Date(item.reservation_date)
+  resDate.setHours(0, 0, 0, 0)
+  return resDate.getTime() < today.getTime() // Pasti akurat untuk tanggal sebelum hari ini
+})
+
+const upcomingReservations = sortedByDateItems.filter((item) => {
+  const resDate = new Date(item.reservation_date)
+  resDate.setHours(0, 0, 0, 0)
+  return resDate.getTime() > today.getTime() // Pasti akurat untuk tanggal setelah hari ini
+})
 
   return (
     <div className="p-4 shadow-md rounded-lg">
@@ -90,13 +117,48 @@ export default function RecentReservations({ items }: RecentReservationsProps) {
       </p>
 
       <div className="space-y-3">
-        {sortedItems.length === 0 ? (
+        {baseSortedItems.length === 0 ? (
           <div className="rounded-lg border p-4 text-sm text-muted-foreground">
             Belum ada reservasi terbaru.
           </div>
         ) : (
-          sortedItems.map((item) => (
-            <div
+          <> 
+          <div>
+            Reservasi Hari Ini ({todayReservations.length})
+          </div>
+          {
+            todayReservations.length > 0 && todayReservations.map((item) => (
+            <ReservationItem item={item} />
+          ))
+           }
+          <div>
+            Reservasi Mendatang ({baseSortedItems.length - todayReservations.length})
+          </div>
+          {
+            upcomingReservations.length > 0 && upcomingReservations.map((item) => (
+              <ReservationItem item={item} />
+            ))
+          }
+          <div>
+            Reservasi Terdahulu ({outdatedReservations.length})
+          </div>
+          {
+            outdatedReservations.length > 0 && outdatedReservations.map((item) => (
+              <ReservationItem item={item} />
+          ))
+          }
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ReservationItem({ item }: { item: RecentReservationItem }) {
+  const navigate = useNavigate()
+
+  return (
+    <div
               key={item.id}
               className="rounded-lg border bg-[#E0F4FB] p-4 cursor-pointer hover:bg-[#D0E8F5] transition-colors"
               onClick={() => navigate({ to: '/admin/reservasi' })}
@@ -122,9 +184,5 @@ export default function RecentReservations({ items }: RecentReservationsProps) {
                 {formatTime(item.appointment_time)}
               </p>
             </div>
-          ))
-        )}
-      </div>
-    </div>
   )
 }

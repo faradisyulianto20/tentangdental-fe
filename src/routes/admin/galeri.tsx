@@ -36,12 +36,36 @@ function mapImageUrl(url: string | null) {
 }
 
 function readApiErrorMessage(error: unknown, fallback: string) {
-  if (!(error instanceof ApiError)) return fallback
+  if (!(error instanceof ApiError)) {
+    return error instanceof Error && error.message ? error.message : fallback
+  }
 
   const payload =
     typeof error.payload === 'object' && error.payload !== null
       ? (error.payload as Record<string, unknown>)
       : null
+
+  const fieldErrors = payload?.errors
+  if (fieldErrors && typeof fieldErrors === 'object') {
+    const queue: unknown[] = [fieldErrors]
+
+    while (queue.length > 0) {
+      const current = queue.shift()
+
+      if (typeof current === 'string' && current.trim().length > 0) {
+        return current
+      }
+
+      if (Array.isArray(current)) {
+        queue.push(...current)
+        continue
+      }
+
+      if (current && typeof current === 'object') {
+        queue.push(...Object.values(current as Record<string, unknown>))
+      }
+    }
+  }
 
   if (
     payload &&
@@ -59,10 +83,9 @@ function RouteComponent() {
   const [selectedGaleri, setSelectedGaleri] = useState<GalleryApiItem | null>(
     null,
   )
-  const [submitError, setSubmitError] = useState('')
 
   const galleriesQuery = useAdminGalleries()
-  const createGallery = useCreateAdminGallery()
+  const createGallery = useCreateAdminGallery() // 💡 Disederhanakan agar state loading/error lebih bersih dibaca
   const deleteGallery = useDeleteAdminGallery()
 
   const galleries = useMemo(
@@ -71,32 +94,36 @@ function RouteComponent() {
   )
 
   const handleCreate = async () => {
-    setSubmitError('')
-
     if (!selectedImageFile) {
-      setSubmitError('Pilih gambar terlebih dahulu.')
+      setSubmitError('Silakan pilih file gambar terlebih dahulu.')
       return
     }
 
     try {
-      await createGallery.mutateAsync({
-        image: selectedImageFile,
-      })
-      setSelectedImageFile(null)
+      await createGallery.mutateAsync({ image: selectedImageFile })
+      setSelectedImageFile(null) // Reset file input setelah berhasil upload
     } catch (error) {
-      setSubmitError(readApiErrorMessage(error, 'Gagal menambahkan gambar.'))
+      const msg = readApiErrorMessage(error, 'Gagal menambahkan gambar galeri.')
+      setSubmitError(msg)
     }
   }
+
+  const [submitError, setSubmitError] = useState('') // State error global untuk operasi create/delete galeri
+
+  
 
   return (
     <div>
       <Field>
-        <FieldLabel>Unggah Gambar Galeri</FieldLabel>
+        <FieldLabel>Unggah Gambar Galeri <span className="text-red-500">*</span></FieldLabel>
         <FileUpload
           acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+          maxFileSizeBytes={2048 * 1024}
+          maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
           onChange={(event) => {
             const file = event.target.files?.[0] || null
             setSelectedImageFile(file)
+            setSubmitError('')
           }}
         />
       </Field>
@@ -129,7 +156,10 @@ function RouteComponent() {
             />
             <button
               type="button"
-              onClick={() => setSelectedGaleri(item)}
+              onClick={() => {
+                setSubmitError('') // Reset error lama saat hendak menghapus gambar lain
+                setSelectedGaleri(item)
+              }}
               className="group-hover:opacity-100 opacity-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full p-1.5 text-red-600 bg-white/80 hover:bg-white transition-all cursor-pointer"
             >
               <Trash className="w-full h-full" />
@@ -154,14 +184,21 @@ function RouteComponent() {
             <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
-              onClick={async () => {
+              disabled={deleteGallery.isPending}
+              onClick={async (e) => {
                 if (!selectedGaleri) return
+                
+                // Mencegah modal langsung tertutup jika terjadi error saat hit API
+                e.preventDefault() 
 
                 try {
                   await deleteGallery.mutateAsync(selectedGaleri.id)
                   setSelectedGaleri(null)
-                } catch {
-                  setSubmitError('Gagal menghapus gambar galeri.')
+                } catch (error) {
+                  // 💡 Mengambil pesan error asli dari mutate hapus gambar
+                  const msg = readApiErrorMessage(error, 'Gagal menghapus gambar galeri.')
+                  setSubmitError(msg)
+                  setSelectedGaleri(null) // Tutup modal setelah merekam pesan error ke state global
                 }
               }}
             >

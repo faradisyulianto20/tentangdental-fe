@@ -59,12 +59,36 @@ function resolveImage(value: string | null) {
 }
 
 function readApiErrorMessage(error: unknown, fallback: string) {
-  if (!(error instanceof ApiError)) return fallback
+  if (!(error instanceof ApiError)) {
+    return error instanceof Error && error.message ? error.message : fallback
+  }
 
   const payload =
     typeof error.payload === 'object' && error.payload !== null
       ? (error.payload as Record<string, unknown>)
       : null
+
+  const fieldErrors = payload?.errors
+  if (fieldErrors && typeof fieldErrors === 'object') {
+    const queue: unknown[] = [fieldErrors]
+
+    while (queue.length > 0) {
+      const current = queue.shift()
+
+      if (typeof current === 'string' && current.trim().length > 0) {
+        return current
+      }
+
+      if (Array.isArray(current)) {
+        queue.push(...current)
+        continue
+      }
+
+      if (current && typeof current === 'object') {
+        queue.push(...Object.values(current as Record<string, unknown>))
+      }
+    }
+  }
 
   if (
     payload &&
@@ -85,6 +109,8 @@ function ArtikelForm({
   onSubmit,
   onCancel,
 }: ArtikelFormProps) {
+  const maxArticleImageSizeBytes = 2048 * 1024
+
   const [values, setValues] = useState<ArtikelFormValues>({
     title: initialValues?.title || '',
     content: initialValues?.content || '<p></p>',
@@ -110,10 +136,12 @@ function ArtikelForm({
       <FieldGroup>
         <FieldSet>
           <Field>
-            <FieldLabel>Gambar Artikel</FieldLabel>
+            <FieldLabel>Gambar Artikel  <span className="text-red-500">*</span></FieldLabel>
             <FileUpload
               label="Unggah Gambar Artikel"
               acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+              maxFileSizeBytes={maxArticleImageSizeBytes}
+              maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
               onChange={(event) => {
                 const file = event.target.files?.[0] || null
                 setValues((prev) => ({ ...prev, imageFile: file }))
@@ -121,7 +149,7 @@ function ArtikelForm({
             />
           </Field>
           <Field>
-            <FieldLabel>Judul Artikel</FieldLabel>
+            <FieldLabel>Judul Artikel  <span className="text-red-500">*</span></FieldLabel>
             <Input
               type="text"
               placeholder="Masukkan Judul Artikel"

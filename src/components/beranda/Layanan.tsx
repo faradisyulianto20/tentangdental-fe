@@ -38,10 +38,10 @@ export function LayananCard({
     <motion.button
       variants={variants}
       onClick={onClick}
-      className="flex flex-col items-center gap-2 border p-6 border-primary rounded-lg cursor-pointer hover:shadow-md"
+      className="flex flex-col items-center gap-2 border p-6 border-primary rounded-lg cursor-pointer hover:shadow-md h-full"
     >
-      <img src={resolvedIcon} alt={layanan.name} className="w-12 h-12" />
-      <h2 className="text-2xl font-bold">{layanan.name}</h2>
+      <img src={resolvedIcon} alt={layanan.name} className="w-20 h-20" />
+      <h2 className="text-xl font-bold">{layanan.name}</h2>
       <p className="text-muted-foreground text-center text-sm line-clamp-3">
         {layanan.detail}
       </p>

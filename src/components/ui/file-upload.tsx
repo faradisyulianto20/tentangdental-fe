@@ -3,8 +3,10 @@ import { Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface FileUploadProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
+  label?: React.ReactNode
   acceptedFileTypes?: string
+  maxFileSizeBytes?: number
+  maxFileSizeMessage?: string
 }
 
 const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
@@ -13,6 +15,8 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
       className,
       label = 'Unggah Gambar',
       acceptedFileTypes = 'image/*',
+      maxFileSizeBytes,
+      maxFileSizeMessage,
       ...props
     },
     ref,
@@ -20,7 +24,36 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     const [isDragActive, setIsDragActive] = React.useState(false)
     const [fileName, setFileName] = React.useState<string>('')
     const [previewUrl, setPreviewUrl] = React.useState<string>('')
+    const [fileError, setFileError] = React.useState<string>('')
     const wrapperRef = React.useRef<HTMLDivElement>(null)
+
+    const clearSelection = React.useCallback(() => {
+      setFileName('')
+      setPreviewUrl((currentUrl) => {
+        if (currentUrl) URL.revokeObjectURL(currentUrl)
+        return ''
+      })
+    }, [])
+
+    const validateFile = React.useCallback(
+      (file: File) => {
+        if (
+          typeof maxFileSizeBytes === 'number' &&
+          maxFileSizeBytes > 0 &&
+          file.size > maxFileSizeBytes
+        ) {
+          clearSelection()
+          setFileError(
+            maxFileSizeMessage || 'File terlalu besar, upload file kurang dari 2MB',
+          )
+          return false
+        }
+
+        setFileError('')
+        return true
+      },
+      [clearSelection, maxFileSizeBytes, maxFileSizeMessage],
+    )
 
     const handleDrag = (e: React.DragEvent) => {
       e.preventDefault()
@@ -39,8 +72,9 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
 
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         const file = e.dataTransfer.files[0]
+        if (!validateFile(file)) return
+
         setFileName(file.name)
-        if (previewUrl) URL.revokeObjectURL(previewUrl)
         setPreviewUrl(URL.createObjectURL(file))
 
         const inputElement = wrapperRef.current?.querySelector(
@@ -58,10 +92,13 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
         const file = e.target.files[0]
+        if (!validateFile(file)) {
+          e.target.value = ''
+          return
+        }
+
         setFileName(file.name)
 
-        // Revoke URL lama biar ga memory leak
-        if (previewUrl) URL.revokeObjectURL(previewUrl)
         setPreviewUrl(URL.createObjectURL(file))
       }
       props.onChange?.(e)
@@ -126,6 +163,10 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
             </p>
           </div>
         )}
+
+        {fileError ? (
+          <p className="mt-2 text-xs text-destructive text-center">{fileError}</p>
+        ) : null}
       </div>
     )
   },

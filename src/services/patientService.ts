@@ -286,6 +286,10 @@ export async function downloadAdminPatientPdf(id: number): Promise<Blob> {
   return response.blob()
 }
 
+export function getAdminRontgenDownloadUrl(id: string | number): string {
+  return joinUrl(appEnv.apiBaseUrl, `admin/rontgens/${id}/download`)
+}
+
 
 export async function deleteAdminRontgenImage(id: string, imageId: string) {
   return apiRequest<DeleteRontgenImageResponse>(

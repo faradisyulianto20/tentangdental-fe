@@ -98,9 +98,5 @@ export function useDeleteRontgenImage() {
       queryClient.invalidateQueries({ queryKey: rontgenKeys.lists() })
       queryClient.invalidateQueries({ queryKey: rontgenKeys.detail(id) })
     },
- 
-    onError: (error) => {
-      console.error('Gagal menghapus gambar rontgen:', error)
-    },
   })
 }

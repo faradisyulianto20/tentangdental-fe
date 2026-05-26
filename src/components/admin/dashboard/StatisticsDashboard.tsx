@@ -1,6 +1,6 @@
-import { ChartContainer } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
+import { useEffect, useRef, useState } from 'react'
 
 type ServiceAnalyticsItem = {
   service_name: string
@@ -28,6 +28,26 @@ export default function StatisticsDashboard({
     total: item.reservation_count,
   }))
 
+  const BAR_WIDTH = 80 // px per kolom, sesuaikan selera
+  const MIN_WIDTH = 400
+
+
+  const containerRef = useRef<HTMLDivElement>(null)
+const [containerWidth, setContainerWidth] = useState(0)
+
+useEffect(() => {
+  if (!containerRef.current) return
+  const observer = new ResizeObserver(([entry]) => {
+    setContainerWidth(entry.contentRect.width)
+  })
+  observer.observe(containerRef.current)
+  return () => observer.disconnect()
+}, [])
+
+const chartWidth = containerWidth > 0
+  ? Math.max(containerWidth, chartData.length * BAR_WIDTH)
+  : chartData.length * BAR_WIDTH
+
   return (
     <div className="bg-[#E0F4FB] rounded-lg p-4 md:p-6 space-y-4 md:space-y-6 my-6 w-full overflow-hidden shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -41,13 +61,10 @@ export default function StatisticsDashboard({
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <div style={{ minWidth: 640 }}>
-          <ChartContainer
-            config={chartConfig}
-            className="min-h-50 md:min-h-60 w-full"
-          >
+      <div className="w-full overflow-x-auto" ref={containerRef}>
             <BarChart
+              width={chartWidth}
+              height={260}
               data={chartData}
               accessibilityLayer
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -76,9 +93,7 @@ export default function StatisticsDashboard({
               />
               <Bar dataKey="total" fill={chartConfig.total.color} radius={2} />
             </BarChart>
-          </ChartContainer>
-        </div>
-      </div>
+                    </div>
     </div>
   )
 }
