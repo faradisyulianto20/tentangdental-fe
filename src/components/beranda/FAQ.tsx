@@ -35,7 +35,7 @@ export default function FAQ() {
         transition={{ duration: 0.8, delay: 0.4 }}
         className="text-muted-foreground text-sm md:text-base mt-3"
       >
-        Temukan jawaban atas pertanyaan umum seputar perencanaan UMKM
+        Temukan jawaban atas pertanyaan umum seputar Tentang Dental
       </motion.p>
     </div>
   )

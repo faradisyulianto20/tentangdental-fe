@@ -42,7 +42,7 @@ export function ProfilDokterCard({
 
   return (
     <motion.div
-      className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-0.5 bg-linear-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6`}
+      className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-0.5 bg-linear-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6 min-w-full md:min-w-0`}
       variants={itemVariants}
     >
       <div
@@ -50,7 +50,7 @@ export function ProfilDokterCard({
       >
         <div className="p-4 flex-1 flex flex-col-reverse md:flex-col justify-center">
           <div
-            className="text-muted-foreground text-sm leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            className="text-muted-foreground text-sm leading-relaxed [&_strong]:font-bold [&_em]:italic [&_h2]:text-xl [&_h2]:font-bold [&_h3]:text-lg [&_h3]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 mt-2 md:mt-0"
             dangerouslySetInnerHTML={{
               __html: decodeHtmlEntities(String(dokter?.statement || '')),
             }}
@@ -125,12 +125,12 @@ export default function ProfilDokter() {
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-muted-foreground mb-12 text-sm md:text-base"
+        className="text-muted-foreground text-sm md:text-base"
       >
         Temukan dokter-dokter profesional
       </motion.p>
       <motion.div
-        className="flex flex-col gap-4 mt-6 justify-center w-full"
+        className="flex flex-col gap-4 justify-center w-full"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"

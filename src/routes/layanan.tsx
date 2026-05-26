@@ -123,7 +123,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto w-full">
+    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto md:max-w-full">
       <motion.h1
         variants={fadeUp}
         custom={0}
@@ -139,7 +139,7 @@ function RouteComponent() {
         custom={0.15}
         initial="hidden"
         animate="visible"
-        className="text-muted-foreground text-sm md:text-base mt-3"
+        className="text-muted-foreground text-sm md:text-base mt-3 text-center"
       >
         {artikel?.detail}
       </motion.p>

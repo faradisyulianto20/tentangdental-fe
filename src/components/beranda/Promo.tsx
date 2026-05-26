@@ -100,13 +100,13 @@ export function PromoCard({
       <motion.div
         variants={variants}
         whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        className="p-4 rounded-lg border border-primary w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
+        className="p-4 rounded-lg border border-primary sm:w-1/2 items-center md:w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
       >
         <div className="text-xl font-bold text-primary">{promo.judul}</div>
 
         {/* Image dengan hover zoom & klik untuk lightbox */}
         <div
-          className="relative w-52 h-24 rounded-md overflow-hidden cursor-zoom-in"
+          className="relative md:w-52 rounded-md overflow-hidden cursor-zoom-in"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onClick={() => setLightboxOpen(true)}
@@ -116,7 +116,7 @@ export function PromoCard({
             alt={promo.judul}
             animate={{ scale: isHovered ? 1.1 : 1 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full object-cover"
+            className="w-full md:h-full object-cover"
           />
           {/* Overlay hint saat hover */}
           <AnimatePresence>
@@ -145,7 +145,7 @@ export function PromoCard({
         </div>
         <div
           dangerouslySetInnerHTML={{ __html: normalizePromoDetail(promo.detail) }}
-          className="text-primary text-xs text-left overflow-auto h-32 leading-tight [&_p]:mb-1.5 [&_strong]:font-bold [&_em]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-1"
+          className="text-primary text-xs text-left overflow-auto md:h-32 leading-tight [&_p]:mb-1.5 [&_strong]:font-bold [&_em]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-1"
         />
         <Link to="/reservasi" className="mx-auto items-justify-end mt-auto">
           <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">

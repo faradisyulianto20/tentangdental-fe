@@ -260,7 +260,7 @@ export default function Testimoni() {
               }}
             />
             <div className="mt-auto flex flex-col md:flex-row gap-6 md:items-end justify-between">
-              <div className="flex gap-4 mt-6 w-fit">
+              <div className="flex gap-4 w-fit">
                 <motion.img
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -269,8 +269,8 @@ export default function Testimoni() {
                   alt="Testimoni Image"
                   className="w-16 h-16 rounded-full shadow-lg object-cover"
                 />
-                <div className="flex flex-col w-full">
-                  <p className="text-muted-foreground max-w-md md:text-lg">
+                <div className="flex flex-col w-full mt-2">
+                  <p className="font-bold max-w-md md:text-lg">
                     {testimonial.name}
                   </p>
                   <div className="flex w-4 h-4 gap-1">
@@ -287,6 +287,7 @@ export default function Testimoni() {
                           fill={
                             index < testimonial.rating ? 'currentColor' : 'none'
                           }
+                          size={14}
                         />
                       </span>
                     ))}

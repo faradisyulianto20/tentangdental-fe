@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-const images = ['/heroes/hero4.png', '/heroes/hero3.png', '/heroes/hero2.png', '/heroes/hero1.png', '/heroes/hero1.png']
+const images = ['/heroes/hero5.png', '/heroes/hero4.png', '/heroes/hero3.png', '/heroes/hero2.png', '/heroes/hero1.png']
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -29,7 +29,7 @@ export default function Heroes() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="text-left flex flex-col gap-3 max-w-screen my-12"
+        className="text-left flex flex-col gap-3 max-w-screen mt-12 mb-6"
       >
         <h1 className="font-bold text-primary text-3xl sm:text-4xl md:text-6xl">
           Smile Makes A Lasting Impression
@@ -38,7 +38,7 @@ export default function Heroes() {
           Senyumanmu memberikan kesan yang mendalam dan tak terlupakan.
         </p>
       </motion.div>
-      <div className="flex justify-end items-end gap-2">
+      <div className="flex justify-end items-end gap-2 w-full">
         {/* Mobile: grid 2 kolom, Desktop: layout custom */}
 
         {/* Mobile layout */}
