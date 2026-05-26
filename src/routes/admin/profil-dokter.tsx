@@ -125,7 +125,6 @@ function RouteComponent() {
     [doctorsQuery.data],
   )
 
-  const scheduleOptionsQuery = useScheduleOptions()
 
   const handleCreate = async (values: {
     name: string
