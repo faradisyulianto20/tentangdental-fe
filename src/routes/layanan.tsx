@@ -83,43 +83,31 @@ function RouteComponent() {
     .filter((item) => item.id !== parseInt(id))
     .slice(0, totalLayanan)
 
+  // Memeriksa apakah konten artikel tersedia dan tidak kosong
+  const hasArticleContent =
+    artikel?.article_content &&
+    artikel?.article_content !== '' &&
+    artikel?.article_content !== '<p></p>'
+
   if (isArtikelLoading || isLayananLoading) {
     return (
       <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto">
-        {/* Title */}
         <Skeleton className="h-8 w-64 rounded-md" />
-
-        {/* Description */}
         <Skeleton className="h-5 w-96 rounded-md mt-3" />
-
-        {/* Image */}
         <Skeleton className="w-full my-12 rounded-xl max-w-290.75 h-111.75" />
-
-        {/* Content */}
         <div className="flex flex-col md:flex-row w-full gap-6">
-          {/* Main Content */}
           <div className="flex-1 space-y-3">
             <Skeleton className="h-4 w-full rounded-md" />
             <Skeleton className="h-4 w-full rounded-md" />
             <Skeleton className="h-4 w-5/6 rounded-md" />
-            <div className="space-y-3 mt-6">
-              <Skeleton className="h-4 w-full rounded-md" />
-              <Skeleton className="h-4 w-full rounded-md" />
-              <Skeleton className="h-4 w-full rounded-md" />
-            </div>
           </div>
-
-          {/* Sidebar */}
           <div className="w-full md:w-1/4">
             <Skeleton className="h-8 w-40 rounded-md" />
-
             <div className="flex flex-col gap-3 mt-6">
               {[...Array(4)].map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full rounded-lg" />
               ))}
             </div>
-
-            <Skeleton className="h-10 w-32 rounded-md mt-6" />
           </div>
         </div>
       </div>
@@ -135,7 +123,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto">
+    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto w-full">
       <motion.h1
         variants={fadeUp}
         custom={0}
@@ -161,35 +149,34 @@ function RouteComponent() {
         custom={0.3}
         initial="hidden"
         animate="visible"
-        className=" my-12 rounded-xl h-111.75 overflow-hidden"
+        className="my-12 rounded-xl h-111.75 overflow-hidden w-full"
       >
         <img
           src={resolveStorageUrl(
             artikel?.support_image_url || artikel?.support_img_url,
           )}
           alt={artikel?.name ?? ''}
-          className="object-cover w-full h-full"
+          className="object-cover h-full mx-auto"
         />
       </motion.div>
 
       <div className="flex flex-col md:flex-row w-full gap-6">
-        
-          { artikel?.article_content === "" ? (
-            <p className="text-muted-foreground">Content not available.</p>
-          ) : (
-        <motion.div
-          variants={fadeUp}
-          custom={0.4}
-          initial="hidden"
-          animate="visible"
-          className="max-w-none flex-1 leading-relaxed [&_p]:mb-2 [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1"
-          dangerouslySetInnerHTML={{
-            __html: decodeHtmlEntities(artikel?.article_content ?? ''),
-          }}
-        />
-          )}
+        {/* Kolom Artikel (Hanya tampil jika ada konten) */}
+        {hasArticleContent && (
+          <motion.div
+            variants={fadeUp}
+            custom={0.4}
+            initial="hidden"
+            animate="visible"
+            className="max-w-none flex-1 leading-relaxed [&_p]:mb-2 [&_strong]:font-bold [&_em]:italic [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1"
+            dangerouslySetInnerHTML={{
+              __html: decodeHtmlEntities(artikel.article_content),
+            }}
+          />
+        )}
 
-        <div className="w-full md:w-1/4">
+        {/* Kolom Layanan Lainnya */}
+        <div className={hasArticleContent ? 'w-full md:w-1/4' : 'w-full'}>
           <motion.h2
             variants={fadeUp}
             custom={0.45}
@@ -204,12 +191,16 @@ function RouteComponent() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col gap-3 mt-6"
+            className={`mt-6 gap-3 ${
+              hasArticleContent
+                ? 'flex flex-col'
+                : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4'
+            }`}
           >
             {layananFiltered.length === 0 ? (
               <motion.div
                 variants={itemVariants}
-                className="text-center py-8 text-muted-foreground"
+                className="text-center py-8 text-muted-foreground col-span-full"
               >
                 Belum ada layanan lainnya
               </motion.div>
@@ -219,15 +210,15 @@ function RouteComponent() {
                   key={item.id}
                   variants={itemVariants}
                   onClick={() => handleNavigate(String(item.id))}
-                  className="flex items-center text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md"
+                  className="flex items-center text-left gap-2 border px-4 py-2 border-primary rounded-lg cursor-pointer hover:shadow-md w-full"
                 >
                   <img
                     src={resolveStorageUrl(item.icon_url)}
                     alt={item.name}
-                    className="w-8 h-8"
+                    className="w-8 h-8 shrink-0"
                   />
-                  <div>
-                    <h2 className="text-base font-bold">{item.name}</h2>
+                  <div className="truncate">
+                    <h2 className="text-base font-bold truncate">{item.name}</h2>
                   </div>
                 </motion.button>
               ))
@@ -240,6 +231,7 @@ function RouteComponent() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
+            className={hasArticleContent ? '' : 'flex justify-center'}
           >
             <Button
               className="mt-6"

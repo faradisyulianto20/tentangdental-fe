@@ -15,7 +15,6 @@ import {
   useDeleteAdminDoctor,
   useUpdateAdminDoctor,
 } from '@/hooks/useDokter'
-import { useScheduleOptions } from '@/hooks/useSchedule'
 import type { DoctorApiItem } from '@/services/dokterService'
 import { ApiError } from '@/lib/api-client'
 
