@@ -29,7 +29,6 @@ export default function StatisticsDashboard({
   }))
 
   const BAR_WIDTH = 80 // px per kolom, sesuaikan selera
-  const MIN_WIDTH = 400
 
 
   const containerRef = useRef<HTMLDivElement>(null)

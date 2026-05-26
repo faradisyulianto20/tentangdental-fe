@@ -563,12 +563,12 @@ export default function FormReservasi() {
                     (d) => d.id === dokterField.state.value,
                   )
 
-                  const selectedDoctorSlots = selectedJadwalPeriksa
-                    ? isDoctorAvailableOnDate(
-                        selectedDoctor?.schedule,
-                        selectedJadwalPeriksa,
-                      )
-                    : []
+                  // const selectedDoctorSlots = selectedJadwalPeriksa
+                  //   ? isDoctorAvailableOnDate(
+                  //       selectedDoctor?.schedule,
+                  //       selectedJadwalPeriksa,
+                  //     )
+                  //   : []
 
                   return (
                     <div className="space-y-4">
