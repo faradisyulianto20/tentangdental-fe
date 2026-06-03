@@ -70,24 +70,29 @@ export default function ProfilDokterForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={handleSubmit} data-testid="dokter-form">
       <FieldGroup>
         <FieldSet>
           <FieldGroup>
             <Field>
               <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
               <Input
+                id="dokter-nama"
+                name="dokter-nama"
                 type="text"
                 placeholder="Masukkan Nama Dokter"
                 value={values.name}
                 onChange={(event) =>
                   setValues((prev) => ({ ...prev, name: event.target.value }))
                 }
+                data-testid="dokter-nama-input"
               />
             </Field>
             <Field>
               <FieldLabel>Spesialis <span className="text-red-500">*</span></FieldLabel>
               <Input
+                id="dokter-spesialis"
+                name="dokter-spesialis"
                 type="text"
                 placeholder="Masukkan Spesialis Dokter"
                 value={values.specialization}
@@ -97,6 +102,7 @@ export default function ProfilDokterForm({
                     specialization: event.target.value,
                   }))
                 }
+                data-testid="dokter-spesialis-input"
               />
             </Field>
             <Field>
@@ -106,6 +112,7 @@ export default function ProfilDokterForm({
                 onChange={(next) =>
                   setValues((prev) => ({ ...prev, statement: next }))
                 }
+                data-testid="dokter-pernyataan-editor"
               />
             </Field>
             <Field>
@@ -117,6 +124,7 @@ export default function ProfilDokterForm({
                   setValues((prev) => ({ ...prev, schedule: next }))
                 }
                 placeholder="Pilih jadwal..."
+                data-testid="dokter-jadwal-multiselect"
               />
             </Field>
             <Field>
@@ -130,22 +138,23 @@ export default function ProfilDokterForm({
                   const file = event.target.files?.[0] || null
                   setValues((prev) => ({ ...prev, photoFile: file }))
                 }}
+                data-testid="dokter-foto-upload"
               />
             </Field>
           </FieldGroup>
         </FieldSet>
 
         {submitError ? (
-          <p className="text-sm text-destructive">{submitError}</p>
+          <p className="text-sm text-destructive" data-testid="dokter-error-message">{submitError}</p>
         ) : null}
 
         <Field orientation="horizontal" className="gap-2">
           {onCancel ? (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={onCancel} data-testid="dokter-cancel-button">
               Batal
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(isSubmitting)}>
+          <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="dokter-submit-button">
             {isSubmitting ? 'Memproses...' : submitLabel}
           </Button>
         </Field>

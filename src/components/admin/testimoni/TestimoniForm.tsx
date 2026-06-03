@@ -54,16 +54,19 @@ export default function TestimoniForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={handleSubmit} data-testid="testimoni-form">
       {/* FIELD NAMA */}
       <Field>
         <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
         <Input
+          id="testimoni-nama"
+          name="testimoni-nama"
           required
           value={values.name}
           onChange={(event) =>
             setValues((prev) => ({ ...prev, name: event.target.value }))
           }
+          data-testid="testimoni-nama-input"
         />
       </Field>
 
@@ -76,6 +79,7 @@ export default function TestimoniForm({
               key={i}
               className={`cursor-pointer ${i < values.rating ? 'text-yellow-400' : 'text-gray-300'}`}
               onClick={() => setValues((prev) => ({ ...prev, rating: i + 1 }))}
+              data-testid={`testimoni-star-${i + 1}`}
             >
               <Star fill={i < values.rating ? 'currentColor' : 'none'} />
             </span>
@@ -95,6 +99,7 @@ export default function TestimoniForm({
             const file = event.target.files?.[0] || null
             setValues((prev) => ({ ...prev, photoFile: file }))
           }}
+          data-testid="testimoni-foto-upload"
         />
       </Field>
 
@@ -106,22 +111,23 @@ export default function TestimoniForm({
           onChange={(next) =>
             setValues((prev) => ({ ...prev, testimoni: next }))
           }
+          data-testid="testimoni-konten-editor"
         />
       </Field>
 
       {/* ERROR MESSAGE */}
       {submitError ? (
-        <p className="text-sm text-destructive font-medium">{submitError}</p>
+        <p className="text-sm text-destructive font-medium" data-testid="testimoni-error-message">{submitError}</p>
       ) : null}
 
       {/* TOMBOL AKSI */}
       <div className="flex items-center gap-2 pt-2">
         {onCancel ? (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} data-testid="testimoni-cancel-button">
             Batal
           </Button>
         ) : null}
-        <Button type="submit" disabled={Boolean(isSubmitting)}>
+        <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="testimoni-submit-button">
           {isSubmitting ? 'Memproses...' : submitLabel}
         </Button>
       </div>

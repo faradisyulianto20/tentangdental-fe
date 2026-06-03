@@ -110,7 +110,7 @@ const upcomingReservations = sortedByDateItems.filter((item) => {
 })
 
   return (
-    <div className="p-4 shadow-md rounded-lg">
+    <div className="p-4 shadow-md rounded-lg" data-testid="recent-reservations-section">
       <h2 className="text-2xl font-bold">Reservasi Terbaru</h2>
       <p className="text-sm text-muted-foreground mb-4">
         Daftar reservasi terbaru dari pasien
@@ -118,33 +118,33 @@ const upcomingReservations = sortedByDateItems.filter((item) => {
 
       <div className="space-y-3">
         {baseSortedItems.length === 0 ? (
-          <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+          <div className="rounded-lg border p-4 text-sm text-muted-foreground" data-testid="recent-reservations-empty-state">
             Belum ada reservasi terbaru.
           </div>
         ) : (
           <> 
-          <div>
+          <div data-testid="reservations-today-header">
             Reservasi Hari Ini ({todayReservations.length})
           </div>
           {
             todayReservations.length > 0 && todayReservations.map((item) => (
-            <ReservationItem item={item} />
+            <ReservationItem item={item} key={item.id} groupKey="today" />
           ))
            }
-          <div>
+          <div data-testid="reservations-upcoming-header">
             Reservasi Mendatang ({baseSortedItems.length - todayReservations.length})
           </div>
           {
             upcomingReservations.length > 0 && upcomingReservations.map((item) => (
-              <ReservationItem item={item} />
+              <ReservationItem item={item} key={item.id} groupKey="upcoming" />
             ))
           }
-          <div>
+          <div data-testid="reservations-outdated-header">
             Reservasi Terdahulu ({outdatedReservations.length})
           </div>
           {
             outdatedReservations.length > 0 && outdatedReservations.map((item) => (
-              <ReservationItem item={item} />
+              <ReservationItem item={item} key={item.id} groupKey="outdated" />
           ))
           }
           </>
@@ -154,7 +154,7 @@ const upcomingReservations = sortedByDateItems.filter((item) => {
   )
 }
 
-function ReservationItem({ item }: { item: RecentReservationItem }) {
+function ReservationItem({ item, groupKey }: { item: RecentReservationItem; groupKey: string }) {
   const navigate = useNavigate()
 
   return (
@@ -162,24 +162,26 @@ function ReservationItem({ item }: { item: RecentReservationItem }) {
               key={item.id}
               className="rounded-lg border bg-[#E0F4FB] p-4 cursor-pointer hover:bg-[#D0E8F5] transition-colors"
               onClick={() => navigate({ to: '/admin/reservasi' })}
+              data-testid={`reservation-item-${groupKey}-${item.id}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold">{item.patient_name}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-semibold" data-testid={`reservation-patient-${item.id}`}>{item.patient_name}</p>
+                  <p className="text-sm text-muted-foreground" data-testid={`reservation-service-${item.id}`}>
                     {item.service_name}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground" data-testid={`reservation-doctor-${item.id}`}>
                     {item.doctor_name}
                   </p>
                 </div>
                 <span
                   className={`rounded-full px-2.5 py-1 text-xs font-medium ${statusColor(item.status)}`}
+                  data-testid={`reservation-status-${item.id}`}
                 >
                   {formatStatus(item.status)}
                 </span>
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-sm text-muted-foreground" data-testid={`reservation-datetime-${item.id}`}>
                 {formatDateOnly(item.reservation_date)} •{' '}
                 {formatTime(item.appointment_time)}
               </p>

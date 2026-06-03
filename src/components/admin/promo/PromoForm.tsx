@@ -56,7 +56,7 @@ export default function PromoForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={handleSubmit} data-testid="promo-form">
       <FieldGroup>
         <FieldSet>
           <FieldGroup>
@@ -70,18 +70,22 @@ export default function PromoForm({
                   const file = event.target.files?.[0] || null
                   setValues((prev) => ({ ...prev, imageFile: file }))
                 }}
+                data-testid="promo-image-upload"
               />
             </Field>
 
             <Field>
               <FieldLabel>Judul Promo <span className="text-red-500">*</span></FieldLabel>
               <Input
+                id="promo-judul"
+                name="promo-judul"
                 type="text"
                 placeholder="Masukkan Judul Promo"
                 value={values.name}
                 onChange={(event) =>
                   setValues((prev) => ({ ...prev, name: event.target.value }))
                 }
+                data-testid="promo-judul-input"
               />
             </Field>
 
@@ -89,6 +93,8 @@ export default function PromoForm({
               <Field>
                 <FieldLabel>Harga Awal <span className="text-red-500">*</span></FieldLabel>
                 <Input
+                  id="promo-original-price"
+                  name="promo-original-price"
                   type="number"
                   placeholder="Masukkan Harga Awal"
                   value={values.originalPrice}
@@ -98,11 +104,14 @@ export default function PromoForm({
                       originalPrice: event.target.value,
                     }))
                   }
+                  data-testid="promo-original-price-input"
                 />
               </Field>
               <Field>
                 <FieldLabel>Harga Diskon <span className="text-red-500">*</span></FieldLabel>
                 <Input
+                  id="promo-discount-price"
+                  name="promo-discount-price"
                   type="number"
                   placeholder="Masukkan Harga Diskon"
                   value={values.promoPrice}
@@ -112,6 +121,7 @@ export default function PromoForm({
                       promoPrice: event.target.value,
                     }))
                   }
+                  data-testid="promo-discount-price-input"
                 />
               </Field>
             </FieldGroup>
@@ -123,22 +133,23 @@ export default function PromoForm({
                 onChange={(next) =>
                   setValues((prev) => ({ ...prev, detail: next }))
                 }
+                data-testid="promo-deskripsi-editor"
               />
             </Field>
           </FieldGroup>
         </FieldSet>
 
         {submitError ? (
-          <p className="text-sm text-destructive">{submitError}</p>
+          <p className="text-sm text-destructive" data-testid="promo-error-message">{submitError}</p>
         ) : null}
 
         <Field orientation="horizontal" className="gap-2">
           {onCancel ? (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={onCancel} data-testid="promo-cancel-button">
               Batal
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(isSubmitting)}>
+          <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="promo-submit-button">
             {isSubmitting ? 'Memproses...' : submitLabel}
           </Button>
         </Field>

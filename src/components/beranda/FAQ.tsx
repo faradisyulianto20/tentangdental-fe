@@ -65,11 +65,13 @@ export default function FAQ() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
+        data-testid="faq-list"
       >
         {!faqData || faqData.length === 0 ? (
           <motion.div
             variants={itemVariants}
             className="p-4 rounded-lg border border-primary text-center text-muted-foreground"
+            data-testid="faq-empty-state"
           >
             Belum ada pertanyaan yang sering ditanyakan
           </motion.div>
@@ -91,6 +93,7 @@ export default function FAQ() {
 
 export function FAQItem({
   item,
+  index,
   isOpen,
   onClick,
 }: {
@@ -104,15 +107,18 @@ export function FAQItem({
       variants={itemVariants}
       className="p-4 rounded-lg border border-primary flex flex-col gap-2 text-primary cursor-pointer"
       onClick={onClick}
+      data-testid={`faq-item-${index}`}
     >
       <div className="flex justify-between">
         <p
           className={`font-bold text-sm md:text-base ${isOpen ? 'line-clamp-none' : 'line-clamp-1'}`}
+          data-testid={`faq-question-${index}`}
         >
           {item.question}
         </p>
         <ChevronRight
           className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}
+          data-testid={`faq-toggle-${index}`}
         />
       </div>
 
@@ -133,6 +139,7 @@ export function FAQItem({
                 .replace(/&#39;/g, "'")
                 .replace(/&amp;/g, '&'),
             }}
+            data-testid={`faq-answer-${index}`}
           ></motion.div>
         )}
       </AnimatePresence>

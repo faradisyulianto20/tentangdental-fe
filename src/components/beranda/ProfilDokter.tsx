@@ -44,6 +44,7 @@ export function ProfilDokterCard({
     <motion.div
       className={`${index % 2 === 0 ? 'ms-auto flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} p-0.5 bg-linear-to-r from-[#01C7FE] to-[#89FBA4] flex md:w-3/4 rounded-lg shadow-md mt-6 min-w-full md:min-w-0`}
       variants={itemVariants}
+      data-testid={`dokter-card-${index}`}
     >
       <div
         className={`${index % 2 === 0 ? 'flex-col-reverse md:flex-row' : 'flex-col-reverse md:flex-row-reverse'} flex w-full rounded-[6px] bg-white dark:bg-zinc-950`}
@@ -54,9 +55,10 @@ export function ProfilDokterCard({
             dangerouslySetInnerHTML={{
               __html: decodeHtmlEntities(String(dokter?.statement || '')),
             }}
+            data-testid={`dokter-statement-${index}`}
           />
-          <p className="font-bold text-lg md:mt-6">{dokter?.name}</p>
-          <p className="font-bold text-muted-foreground">
+          <p className="font-bold text-lg md:mt-6" data-testid={`dokter-name-${index}`}>{dokter?.name}</p>
+          <p className="font-bold text-muted-foreground" data-testid={`dokter-specialization-${index}`}>
             {dokter.specialization}
           </p>
         </div>
@@ -64,6 +66,7 @@ export function ProfilDokterCard({
           <img
             src={photoUrl}
             className={`object-cover md:absolute ${index % 2 === 0 ? 'md:right-0' : 'md:left-0'} z-10 bottom-0 max-h-100`}
+            data-testid={`dokter-photo-${index}`}
           />
         </div>
       </div>
@@ -94,6 +97,7 @@ export default function ProfilDokter() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-primary text-xl md:text-3xl font-bold"
+          data-testid="dokter-heading"
         >
           Profil Dokter
         </motion.h1>
@@ -101,10 +105,11 @@ export default function ProfilDokter() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-muted-foreground mb-12 text-sm md:text-base"
+          data-testid="dokter-subtitle"
         >
           Temukan dokter-dokter profesional
         </motion.p>
-        <p className="text-muted-foreground mt-6">Data dokter belum tersedia.</p>
+        <p className="text-muted-foreground mt-6" data-testid="dokter-empty-state">Data dokter belum tersedia.</p>
       </div>
     )
   }
@@ -119,6 +124,7 @@ export default function ProfilDokter() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-primary text-xl md:text-3xl font-bold"
+        data-testid="dokter-heading"
       >
         Profil Dokter
       </motion.h1>
@@ -126,6 +132,7 @@ export default function ProfilDokter() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-muted-foreground text-sm md:text-base"
+        data-testid="dokter-subtitle"
       >
         Temukan dokter-dokter profesional
       </motion.p>
@@ -135,6 +142,7 @@ export default function ProfilDokter() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
+        data-testid="dokter-list"
       >
         {doctors?.map((dokter, index) => (
           <ProfilDokterCard key={index} dokter={dokter} index={index} />

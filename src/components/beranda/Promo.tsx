@@ -101,8 +101,9 @@ export function PromoCard({
         variants={variants}
         whileHover={{ y: -5, transition: { duration: 0.2 } }}
         className="p-4 rounded-lg border border-primary sm:w-1/2 items-center md:w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
+        data-testid={`promo-card-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}
       >
-        <div className="text-xl font-bold text-primary">{promo.judul}</div>
+        <div className="text-xl font-bold text-primary" data-testid={`promo-title-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}>{promo.judul}</div>
 
         {/* Image dengan hover zoom & klik untuk lightbox */}
         <div
@@ -110,6 +111,7 @@ export function PromoCard({
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onClick={() => setLightboxOpen(true)}
+          data-testid={`promo-image-container-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}
         >
           <motion.img
             src={promo.imgUrl}
@@ -117,6 +119,7 @@ export function PromoCard({
             animate={{ scale: isHovered ? 1.1 : 1 }}
             transition={{ duration: 0.3 }}
             className="w-full md:h-full object-cover"
+            data-testid={`promo-image-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}
           />
           {/* Overlay hint saat hover */}
           <AnimatePresence>
@@ -136,19 +139,20 @@ export function PromoCard({
         </div>
 
         <div className="flex flex-col mx-auto text-left">
-          <div className="text-primary text-xs line-through opacity-70">
+          <div className="text-primary text-xs line-through opacity-70" data-testid={`promo-original-price-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}>
             Rp {promo.hargaAwal.toLocaleString('id-ID')}
           </div>
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-2xl font-bold text-primary" data-testid={`promo-discount-price-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}>
             Rp {promo.hargaDiskon.toLocaleString('id-ID')}
           </div>
         </div>
         <div
           dangerouslySetInnerHTML={{ __html: normalizePromoDetail(promo.detail) }}
           className="text-primary text-xs text-left overflow-auto md:h-32 leading-tight [&_p]:mb-1.5 [&_strong]:font-bold [&_em]:italic [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:space-y-1"
+          data-testid={`promo-detail-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}
         />
         <Link to="/reservasi" className="mx-auto items-justify-end mt-auto">
-          <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md">
+          <Button className="bg-linear-to-r from-[#01C7FE] to-[#89FBA4] hover:shadow-md" data-testid={`promo-book-button-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}>
             Pesan Sekarang
           </Button>
         </Link>
@@ -160,6 +164,7 @@ export function PromoCard({
           imgUrl={promo.imgUrl}
           judul={promo.judul}
           onClose={() => setLightboxOpen(false)}
+          data-testid={`promo-lightbox-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}
         />
       )}
     </>
@@ -249,6 +254,7 @@ export default function Promo() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         className="text-primary text-xl md:text-3xl font-bold mt-6"
+        data-testid="promo-heading"
       >
         Promo
       </motion.h1>
@@ -257,6 +263,7 @@ export default function Promo() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
         className="text-muted-foreground text-sm md:text-base mt-3"
+        data-testid="promo-subtitle"
       >
         Temukan promo terbaik untuk harga terbaik
       </motion.p>
@@ -266,13 +273,14 @@ export default function Promo() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
         className="flex flex-wrap justify-center gap-4 mt-6"
+        data-testid="promo-list"
       >
         {promosSource.slice(0, 4).map((promo, index) => (
           <PromoCard key={index} promo={promo} variants={itemVariants} />
         ))}
       </motion.div>
       <Link to="/promo" className="mt-6 inline-block">
-        <Button>Lihat Semua Promo</Button>
+        <Button data-testid="promo-view-all-button">Lihat Semua Promo</Button>
       </Link>
     </div>
   )

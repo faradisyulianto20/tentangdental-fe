@@ -41,6 +41,7 @@ export default function Berita() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-primary text-xl md:text-3xl font-bold"
+        data-testid="artikel-heading"
       >
         Artikel Terkini
       </motion.h1>
@@ -57,6 +58,7 @@ export default function Berita() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
+          data-testid="artikel-list"
         >
           {isLoading
             ? [...Array(5)].map((_, index) => (
@@ -76,15 +78,17 @@ export default function Berita() {
                 <button
                   onClick={() => scroll('left')}
                   className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+                  data-testid="artikel-prev-button"
                 >
                   <div className="bg-white rounded-full p-1.5">
                     <ChevronLeft className="w-5 h-5 text-gray-700" />
                   </div>
                 </button>
-                {articlesData.map((item) => (
+                {articlesData.map((item, index) => (
                   <ArtikelCard
                     key={item.id}
                     artikel={item}
+                    index={index}
                     onClick={() => navigateBerita(String(item.id))}
                   />
                 ))}
@@ -92,6 +96,7 @@ export default function Berita() {
                   <button
                     onClick={() => scroll('right')}
                     className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+                    data-testid="artikel-next-button"
                   >
                     <div className="bg-white rounded-full p-1.5">
                       <ChevronRight className="w-5 h-5 text-gray-700" />
@@ -102,7 +107,7 @@ export default function Berita() {
         </motion.div>
 
         {!isLoading && (!articlesData || articlesData.length === 0) && (
-          <p className="text-muted-foreground mt-4">Artikel belum tersedia.</p>
+          <p className="text-muted-foreground mt-4" data-testid="artikel-empty-state">Artikel belum tersedia.</p>
         )}
 
       </div>
@@ -112,9 +117,11 @@ export default function Berita() {
 
 export function ArtikelCard({
   artikel,
+  index,
   onClick,
 }: {
   artikel: ArticleApiItem
+  index: number
   onClick?: () => void
 }) {
   const imageUrl = (() => {
@@ -130,17 +137,19 @@ export function ArtikelCard({
       className="flex flex-col shrink-0 w-64 snap-start cursor-pointer hover:shadow-md rounded-md border"
       onClick={onClick}
       variants={itemVariants}
+      data-testid={`artikel-card-${artikel.id}`}
     >
       <img
         src={imageUrl}
         alt={artikel.title}
         className="rounded-t-xl w-64 h-44 object-cover"
+        data-testid={`artikel-image-${artikel.id}`}
       />
       <div className="flex flex-col text-left p-4">
-        <h2 className="text-lg font-semibold leading-5 line-clamp-2">
+        <h2 className="text-lg font-semibold leading-5 line-clamp-2" data-testid={`artikel-title-${artikel.id}`}>
           {artikel.title}
         </h2>
-        <p className="text-gray-600 mt-2 line-clamp-3 text-sm">
+        <p className="text-gray-600 mt-2 line-clamp-3 text-sm" data-testid={`artikel-meta-${artikel.id}`}>
           {artikel.writer} • {artikel.published_at}
         </p>
       </div>

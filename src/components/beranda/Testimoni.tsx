@@ -168,7 +168,7 @@ export default function Testimoni() {
   const index5 = (activeIndex + 5) % testimonialsSource.length
 
   return (
-    <section className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between items-center w-full px-6 md:max-w-6xl">
+    <section className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between items-center w-full px-6 md:max-w-6xl" data-testid="testimoni-carousel">
       {/* Sembunyikan seluruh decorative element di mobile */}
       <div className="hidden  lg:flex gap-2 items-end relative">
         <div className="bg-primary w-38.75 h-60.5 rounded-tr-4xl rounded-bl-4xl rounded" />
@@ -182,6 +182,7 @@ export default function Testimoni() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
+            data-testid={`testimoni-preview-img-${index1}`}
           />
           <motion.img
             key={`img2-${index2}`}
@@ -191,6 +192,7 @@ export default function Testimoni() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.65 }}
+            data-testid={`testimoni-preview-img-${index2}`}
           />
           <motion.img
             key={`img3-${index3}`}
@@ -200,6 +202,7 @@ export default function Testimoni() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.75 }}
+            data-testid={`testimoni-preview-img-${index3}`}
           />
           <motion.img
             key={`img4-${index4}`}
@@ -209,6 +212,7 @@ export default function Testimoni() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.85 }}
+            data-testid={`testimoni-preview-img-${index4}`}
           />
           <motion.img
             key={`img5-${index5}`}
@@ -218,6 +222,7 @@ export default function Testimoni() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.95 }}
+            data-testid={`testimoni-preview-img-${index5}`}
           />
         </div>
       </div>
@@ -228,6 +233,7 @@ export default function Testimoni() {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5 }}
           className="font-bold text-primary text-xl md:text-3xl"
+          data-testid="testimoni-heading"
         >
           Testimoni
         </motion.h1>
@@ -237,6 +243,7 @@ export default function Testimoni() {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.5 }}
           className="text-black font-bold lg:max-w-md text-2xl md:text-4xl"
+          data-testid="testimoni-subtitle"
         >
           Periksa apa yang dikatakan pasien tentang kami.
         </motion.p>
@@ -244,11 +251,13 @@ export default function Testimoni() {
           <motion.div
             key={activeIndex}
             className="bg-[#E0F4FB] p-4 gap-2 rounded-lg flex flex-col  w-full lg:w-142 h-72 mt-6 "
+            data-testid={`testimoni-item-${activeIndex}`}
           >
             <img
               src="/icons/petik.svg"
               alt="Testimoni Image"
               className="w-6 h-6 object-cover"
+              data-testid="testimoni-quote-icon"
             />
             <motion.div
               initial={{ opacity: 0 }}
@@ -258,6 +267,7 @@ export default function Testimoni() {
               dangerouslySetInnerHTML={{
                 __html: decodeHtmlEntities(testimonial.description),
               }}
+              data-testid="testimoni-content"
             />
             <div className="mt-auto flex flex-col md:flex-row gap-6 md:items-end justify-between">
               <div className="flex gap-4 w-fit">
@@ -268,9 +278,10 @@ export default function Testimoni() {
                   src={testimonial.imgUrl}
                   alt="Testimoni Image"
                   className="w-16 h-16 rounded-full shadow-lg object-cover"
+                  data-testid="testimoni-author-photo"
                 />
                 <div className="flex flex-col w-full mt-2">
-                  <p className="font-bold max-w-md md:text-lg">
+                  <p className="font-bold max-w-md md:text-lg" data-testid="testimoni-author-name">
                     {testimonial.name}
                   </p>
                   <div className="flex w-4 h-4 gap-1">
@@ -282,6 +293,7 @@ export default function Testimoni() {
                             ? 'text-yellow-400'
                             : 'text-gray-300'
                         }`}
+                        data-testid={`testimoni-star-${index + 1}`}
                       >
                         <Star
                           fill={
@@ -305,12 +317,14 @@ export default function Testimoni() {
                         testimonialsSource.length,
                     )
                   }
+                  data-testid="testimoni-prev-button"
                 />
                 <div className="flex items-center gap-1 mx-2">
                   {testimonialsSource.map((_, index) => (
                     <div
                       className={`w-2 h-2 ${activeIndex === index ? 'bg-[#B4E5F6]' : 'bg-[#B4E5F6]/50'} rounded-full`}
                       key={index}
+                      data-testid={`testimoni-dot-${index}`}
                     ></div>
                   ))}
                 </div>
@@ -323,6 +337,7 @@ export default function Testimoni() {
                       (currentTestimonial + 1) % testimonialsSource.length,
                     )
                   }
+                  data-testid="testimoni-next-button"
                 />
               </div>
             </div>

@@ -80,7 +80,7 @@ function RouteComponent() {
             Silahkan login menggunakan akun admin.
           </p>
           <div>
-            <form className="space-y-4" onSubmit={handleLogin}>
+            <form className="space-y-4" onSubmit={handleLogin} data-testid="login-form">
               <FieldGroup>
                 <FieldSet>
                   <Field>
@@ -88,11 +88,14 @@ function RouteComponent() {
                       Email
                     </FieldLabel>
                     <Input
+                      id="login-email"
+                      name="login-email"
                       type="email"
                       placeholder="Masukkan email admin"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       autoComplete="email"
+                      data-testid="login-email-input"
                     />
                   </Field>
                   <Field>
@@ -100,23 +103,27 @@ function RouteComponent() {
                       Kata Sandi
                     </FieldLabel>
                     <Input
+                      id="login-password"
+                      name="login-password"
                       type="password"
                       placeholder="Masukkan kata sandi"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       autoComplete="current-password"
+                      data-testid="login-password-input"
                     />
                   </Field>
                 </FieldSet>
               </FieldGroup>
               {errorMessage && (
-                <p className="text-sm text-red-600">{errorMessage}</p>
+                <p className="text-sm text-red-600" data-testid="login-error-message">{errorMessage}</p>
               )}
               <Field orientation="horizontal" className="w-full">
                 <Button
                   type="submit"
                   disabled={loading}
                   className="w-full bg-[#A2C341] hover:bg-[#8AA83A] text-white"
+                  data-testid="login-submit-button"
                 >
                   {loading ? 'Memproses...' : 'Login'}
                 </Button>
