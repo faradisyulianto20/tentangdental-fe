@@ -29,12 +29,30 @@ function RouteComponent() {
     }
   }, [auth.status, navigate])
 
+  const isValidEmail = (value: string): boolean => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailPattern.test(value)
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage(null)
 
-    if (!email.trim() || !password.trim()) {
-      setErrorMessage('Email dan password wajib diisi.')
+    const trimmedEmail = email.trim()
+    const trimmedPassword = password.trim()
+
+    if (!trimmedEmail) {
+      setErrorMessage('Email wajib diisi.')
+      return
+    }
+
+    if (!isValidEmail(trimmedEmail)) {
+      setErrorMessage('Format email tidak valid.')
+      return
+    }
+
+    if (!trimmedPassword) {
+      setErrorMessage('Password wajib diisi.')
       return
     }
 
@@ -42,14 +60,14 @@ function RouteComponent() {
 
     try {
       await loginWithPassword({
-        email: email.trim(),
-        password,
+        email: trimmedEmail,
+        password: trimmedPassword,
       })
       await navigate({ to: '/admin' })
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
-          setErrorMessage('Email atau password salah.')
+          setErrorMessage('Email atau password yang Anda masukkan salah.')
         } else if (error.status === 422) {
           setErrorMessage('Validasi gagal. Periksa input Anda.')
         } else {
