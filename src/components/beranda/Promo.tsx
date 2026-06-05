@@ -78,7 +78,9 @@ function ImageLightbox({
             alt={judul}
             className="w-full h-auto rounded-xl shadow-2xl object-contain max-h-[80vh]"
           />
-          <p className="text-white text-center mt-3 font-semibold text-lg">{judul}</p>
+          <p className="text-white text-center mt-3 font-semibold text-lg min-h-8">
+            {judul}
+          </p>
         </motion.div>
       </motion.div>
     </AnimatePresence>

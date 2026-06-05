@@ -24,7 +24,7 @@ const itemVariants = {
 
 export default function Heroes() {
   return (
-    <section className="page-wrap flex flex-col md:flex-row items-center gap-6 md:py-20 text-center max-w-6xl mx-6">
+    <section className="page-wrap flex flex-col md:flex-row items-center gap-6 md:py-20 text-center max-w-6xl mx-6 min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
