@@ -176,56 +176,121 @@ export default function Testimoni() {
         <div className="bg-primary w-38.75 h-60.5 rounded-tr-4xl rounded-bl-4xl rounded" />
         <div className="bg-[#B9D654] w-39 h-24.5 rounded rounded-tl-4xl rounded-br-4xl" />
         <div className="absolute -right-40 -top-45 w-75 h-75">
-          <motion.img
-            key={`img1-${index1}`}
-            src={testimonialsSource[index1].imgUrl ?? testimonialsSource[index1].placeholder}
-            alt="Testimoni Image"
-            className="w-30 rounded-full h-30 object-cover absolute top-12 right-12"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            data-testid={`testimoni-preview-img-${index1}`}
-          />
-          <motion.img
-            key={`img2-${index2}`}
-            src={testimonialsSource[index2].imgUrl ?? testimonialsSource[index2].placeholder}
-            alt="Testimoni Image"
-            className="w-18.5 rounded-full h-18.5 object-cover absolute top-12 -left-20"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.65 }}
-            data-testid={`testimoni-preview-img-${index2}`}
-          />
-          <motion.img
-            key={`img3-${index3}`}
-            src={testimonialsSource[index3].imgUrl ?? testimonialsSource[index3].placeholder}
-            alt="Testimoni Image"
-            className="w-25 rounded-full h-25 object-cover absolute top-32"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.75 }}
-            data-testid={`testimoni-preview-img-${index3}`}
-          />
-          <motion.img
-            key={`img4-${index4}`}
-            src={testimonialsSource[index4].imgUrl ?? testimonialsSource[index4].placeholder}
-            alt="Testimoni Image"
-            className="w-22.5 rounded-full h-22.5 object-cover absolute top-52 right-30"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.85 }}
-            data-testid={`testimoni-preview-img-${index4}`}
-          />
-          <motion.img
-            key={`img5-${index5}`}
-            src={testimonialsSource[index5].imgUrl ?? testimonialsSource[index5].placeholder}
-            alt="Testimoni Image"
-            className="w-18.75 rounded-full h-18.75 object-cover absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.95 }}
-            data-testid={`testimoni-preview-img-${index5}`}
-          />
+          {testimonialsSource[index1].imgUrl ? (
+            <motion.img
+              key={`img1-${index1}`}
+              src={testimonialsSource[index1].imgUrl}
+              alt="Testimoni Image"
+              className="w-30 rounded-full h-30 object-cover aspect-square absolute top-12 right-12"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              data-testid={`testimoni-preview-img-${index1}`}
+            />
+          ) : (
+            <motion.div
+              key={`img1-${index1}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-30 rounded-full h-30 aspect-square absolute top-12 right-12 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-2xl"
+              data-testid={`testimoni-preview-img-${index1}`}
+            >
+              {testimonialsSource[index1].name ? testimonialsSource[index1].name.charAt(0).toUpperCase() : 'P'}
+            </motion.div>
+          )}
+          {testimonialsSource[index2].imgUrl ? (
+            <motion.img
+              key={`img2-${index2}`}
+              src={testimonialsSource[index2].imgUrl}
+              alt="Testimoni Image"
+              className="w-18.5 rounded-full h-18.5 object-cover aspect-square absolute top-12 -left-20"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.65 }}
+              data-testid={`testimoni-preview-img-${index2}`}
+            />
+          ) : (
+            <motion.div
+              key={`img2-${index2}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.65 }}
+              className="w-18.5 rounded-full h-18.5 aspect-square absolute top-12 -left-20 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
+              data-testid={`testimoni-preview-img-${index2}`}
+            >
+              {testimonialsSource[index2].name ? testimonialsSource[index2].name.charAt(0).toUpperCase() : 'P'}
+            </motion.div>
+          )}
+          {testimonialsSource[index3].imgUrl ? (
+            <motion.img
+              key={`img3-${index3}`}
+              src={testimonialsSource[index3].imgUrl}
+              alt="Testimoni Image"
+              className="w-25 rounded-full h-25 object-cover aspect-square absolute top-32"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.75 }}
+              data-testid={`testimoni-preview-img-${index3}`}
+            />
+          ) : (
+            <motion.div
+              key={`img3-${index3}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.75 }}
+              className="w-25 rounded-full h-25 aspect-square absolute top-32 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
+              data-testid={`testimoni-preview-img-${index3}`}
+            >
+              {testimonialsSource[index3].name ? testimonialsSource[index3].name.charAt(0).toUpperCase() : 'P'}
+            </motion.div>
+          )}
+          {testimonialsSource[index4].imgUrl ? (
+            <motion.img
+              key={`img4-${index4}`}
+              src={testimonialsSource[index4].imgUrl}
+              alt="Testimoni Image"
+              className="w-22.5 rounded-full h-22.5 object-cover aspect-square absolute top-52 right-30"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.85 }}
+              data-testid={`testimoni-preview-img-${index4}`}
+            />
+          ) : (
+            <motion.div
+              key={`img4-${index4}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.85 }}
+              className="w-22.5 rounded-full h-22.5 aspect-square absolute top-52 right-30 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
+              data-testid={`testimoni-preview-img-${index4}`}
+            >
+              {testimonialsSource[index4].name ? testimonialsSource[index4].name.charAt(0).toUpperCase() : 'P'}
+            </motion.div>
+          )}
+          {testimonialsSource[index5].imgUrl ? (
+            <motion.img
+              key={`img5-${index5}`}
+              src={testimonialsSource[index5].imgUrl}
+              alt="Testimoni Image"
+              className="w-18.75 rounded-full h-18.75 object-cover aspect-square absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.95 }}
+              data-testid={`testimoni-preview-img-${index5}`}
+            />
+          ) : (
+            <motion.div
+              key={`img5-${index5}`}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.95 }}
+              className="w-18.75 rounded-full h-18.75 aspect-square absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-lg"
+              data-testid={`testimoni-preview-img-${index5}`}
+            >
+              {testimonialsSource[index5].name ? testimonialsSource[index5].name.charAt(0).toUpperCase() : 'P'}
+            </motion.div>
+          )}
         </div>
       </div>
       <div className="text-center lg:text-left flex flex-col gap-2 justify-center items-center lg:items-start">
@@ -280,7 +345,7 @@ export default function Testimoni() {
                     transition={{ duration: 0.5, delay: 0.2 }}
                     src={testimonial.imgUrl}
                     alt="Testimoni Image"
-                    className="w-16 h-16 rounded-full shadow-lg object-cover"
+                    className="w-16 h-16 rounded-full shadow-lg object-cover aspect-square"
                     data-testid="testimoni-author-photo"
                   />
                 ) : (
@@ -288,7 +353,7 @@ export default function Testimoni() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
+                    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl aspect-square"
                     data-testid="testimoni-author-photo"
                   >
                     {testimonial.name ? testimonial.name.charAt(0).toUpperCase() : 'P'}
