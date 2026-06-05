@@ -13,9 +13,9 @@ export default function Testimoni() {
   const fetchedTestimonials = useMemo(() => {
     if (!Array.isArray(testimonialsData)) return []
 
-    const resolvePhoto = (item: TestimonialApiItem, index: number) => {
+    const resolvePhoto = (item: TestimonialApiItem) => {
       if (typeof item.photo_url !== 'string' || item.photo_url.length === 0) {
-        return '/muka' + ((index % 6) + 1) + '.svg'
+        return null
       }
 
       if (item.photo_url.startsWith('http')) {
@@ -30,7 +30,9 @@ export default function Testimoni() {
     return testimonialsData.map((item: TestimonialApiItem, index: number) => ({
       name: String(item.name || 'Pasien ' + (index + 1)),
       description: String(item.testimoni || ''),
-      imgUrl: resolvePhoto(item, index),
+      // imgUrl is null when no photo provided; placeholder used for decorative previews
+      imgUrl: resolvePhoto(item),
+      placeholder: '/muka' + ((index % 6) + 1) + '.svg',
       rating: Math.max(1, Math.min(5, Number(item.rating || 5))),
     }))
   }, [testimonialsData])
@@ -176,7 +178,7 @@ export default function Testimoni() {
         <div className="absolute -right-40 -top-45 w-75 h-75">
           <motion.img
             key={`img1-${index1}`}
-            src={testimonialsSource[index1].imgUrl}
+            src={testimonialsSource[index1].imgUrl ?? testimonialsSource[index1].placeholder}
             alt="Testimoni Image"
             className="w-30 rounded-full h-30 object-cover absolute top-12 right-12"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -186,7 +188,7 @@ export default function Testimoni() {
           />
           <motion.img
             key={`img2-${index2}`}
-            src={testimonialsSource[index2].imgUrl}
+            src={testimonialsSource[index2].imgUrl ?? testimonialsSource[index2].placeholder}
             alt="Testimoni Image"
             className="w-18.5 rounded-full h-18.5 object-cover absolute top-12 -left-20"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -196,7 +198,7 @@ export default function Testimoni() {
           />
           <motion.img
             key={`img3-${index3}`}
-            src={testimonialsSource[index3].imgUrl}
+            src={testimonialsSource[index3].imgUrl ?? testimonialsSource[index3].placeholder}
             alt="Testimoni Image"
             className="w-25 rounded-full h-25 object-cover absolute top-32"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -206,7 +208,7 @@ export default function Testimoni() {
           />
           <motion.img
             key={`img4-${index4}`}
-            src={testimonialsSource[index4].imgUrl}
+            src={testimonialsSource[index4].imgUrl ?? testimonialsSource[index4].placeholder}
             alt="Testimoni Image"
             className="w-22.5 rounded-full h-22.5 object-cover absolute top-52 right-30"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -216,7 +218,7 @@ export default function Testimoni() {
           />
           <motion.img
             key={`img5-${index5}`}
-            src={testimonialsSource[index5].imgUrl}
+            src={testimonialsSource[index5].imgUrl ?? testimonialsSource[index5].placeholder}
             alt="Testimoni Image"
             className="w-18.75 rounded-full h-18.75 object-cover absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4"
             initial={{ opacity: 0, scale: 0.8 }}
@@ -271,15 +273,27 @@ export default function Testimoni() {
             />
             <div className="mt-auto flex flex-col md:flex-row gap-6 md:items-end justify-between">
               <div className="flex gap-4 w-fit">
-                <motion.img
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
-                  src={testimonial.imgUrl}
-                  alt="Testimoni Image"
-                  className="w-16 h-16 rounded-full shadow-lg object-cover"
-                  data-testid="testimoni-author-photo"
-                />
+                {testimonial.imgUrl ? (
+                  <motion.img
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    src={testimonial.imgUrl}
+                    alt="Testimoni Image"
+                    className="w-16 h-16 rounded-full shadow-lg object-cover"
+                    data-testid="testimoni-author-photo"
+                  />
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
+                    data-testid="testimoni-author-photo"
+                  >
+                    {testimonial.name ? testimonial.name.charAt(0).toUpperCase() : 'P'}
+                  </motion.div>
+                )}
                 <div className="flex flex-col w-full mt-2">
                   <p className="font-bold max-w-md md:text-lg" data-testid="testimoni-author-name">
                     {testimonial.name}
