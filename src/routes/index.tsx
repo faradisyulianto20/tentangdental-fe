@@ -12,7 +12,7 @@ export const Route = createFileRoute('/')({ component: App })
 
 function App() {
   return (
-    <div className="overflow-hidden w-full">
+    <div className="overflow-hidden w-full ">
       <div className="flex flex-col items-center justify-center mx-auto relative">
         <img
           className="absolute -top-10 -right-100 -z-10 w-3/4 pointer-events-none"

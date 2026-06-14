@@ -105,7 +105,7 @@ export function PromoCard({
         className="p-4 rounded-lg border border-primary sm:w-1/2 items-center md:w-59 flex flex-col gap-2 text-[#1682B1] shadow-md"
         data-testid={`promo-card-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}
       >
-        <div className="text-xl font-bold text-primary" data-testid={`promo-title-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}>{promo.judul}</div>
+        <div className="text-xl font-bold text-primary min-h-12 items-center flex" data-testid={`promo-title-${promo.judul.replace(/\s+/g, '-').toLowerCase()}`}>{promo.judul}</div>
 
         {/* Image dengan hover zoom & klik untuk lightbox */}
         <div

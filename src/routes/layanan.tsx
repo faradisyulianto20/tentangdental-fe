@@ -123,7 +123,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto md:max-w-full">
+    <div className="mx-6 max-w-6xl flex justify-center flex-col items-center my-12 xl:mx-auto">
       <motion.h1
         variants={fadeUp}
         custom={0}
