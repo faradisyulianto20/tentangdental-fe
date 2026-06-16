@@ -138,7 +138,10 @@ const formSchema = z
       ),
     jamReservasi: z
       .string()
-      .regex(/^(\d{1,2}):(\d{2})(\s*-\s*\d{1,2}:\d{2})?$/, 'Format jam harus HH:MM atau HH:MM - HH:MM'),
+      .regex(
+        /^(\d{1,2}):(\d{2})(\s*-\s*\d{1,2}:\d{2})?$/,
+        'Format jam harus HH:MM atau HH:MM - HH:MM',
+      ),
     pilihanDokter: z.string().min(1, 'Pilihan dokter harus diisi'),
     layanan: z
       .array(z.string())
@@ -310,25 +313,14 @@ export default function FormReservasi() {
           appointment_time: extractStartTime(value.jamReservasi),
           service_ids: value.layanan.map((item) => Number(item)),
           ...(checked && value.nomorPasien
-            ? { patient_id: Number(value.nomorPasien) }
+            ? { patient_id: value.nomorPasien }
             : {}),
         }
 
         const result = await createReservation.mutateAsync(payload)
 
-        // Fungsi helper untuk mengubah format ID
-        function formatPatientId(id: number | string): string {
-          // Mengubah id menjadi string, lalu di-pad dengan angka '0' sebanyak 5 digit di depan
-          const paddedId = String(id).padStart(5, '0');
-          
-          // Gabungkan dengan prefix 'AA'
-          return `AA${paddedId}`;
-        }
-
-        // Penerapan di kode Anda:
         if (result.patient?.id) {
-          const formattedId = formatPatientId(result.patient.id);
-          setCreatedPatientId(formattedId);
+          setCreatedPatientId(result.patient.patient_number)
         }
 
         setSuccessOpen(true)
@@ -454,7 +446,9 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Jadwal Periksa <span className="text-red-500">*</span></FieldLabel>
+                      <FieldLabel>
+                        Jadwal Periksa <span className="text-red-500">*</span>
+                      </FieldLabel>
                       <DatePicker
                         value={field.state.value}
                         onChange={(date: Date) => {
@@ -494,7 +488,9 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Jam Reservasi <span className="text-red-500">*</span></FieldLabel>
+                      <FieldLabel>
+                        Jam Reservasi <span className="text-red-500">*</span>
+                      </FieldLabel>
                       {!selectedJadwalPeriksa ? (
                         <FieldDescription className="text-muted-foreground">
                           Pilih jadwal periksa terlebih dahulu
@@ -519,7 +515,7 @@ export default function FormReservasi() {
                               !selectedDoctor
                             }
                             onBlur={jamField.handleBlur}
-                            className='w-full'
+                            className="w-full"
                           >
                             <SelectValue placeholder="Pilih jam reservasi" />
                           </SelectTrigger>
@@ -572,7 +568,9 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Pilihan Dokter <span className="text-red-500">*</span></FieldLabel>
+                      <FieldLabel>
+                        Pilihan Dokter <span className="text-red-500">*</span>
+                      </FieldLabel>
                       {selectedJadwalPeriksa &&
                         availableDoctors.length === 0 && (
                           <FieldDescription className="text-destructive">
@@ -611,24 +609,23 @@ export default function FormReservasi() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                          {
-                            availableDoctors.length === 0 ? (
-                              <div className="px-4 py-2 text-sm text-muted-foreground">
-                                Tidak ada dokter yang tersedia
-                              </div>
-                            ) : (
-                              availableDoctors.map((doctor) => (
-                                <DropdownMenuItem
-                                  key={doctor.id}
-                                  onSelect={() => {
-                                    dokterField.handleChange(doctor.id)
-                                    setSelectedPilihanDokter(doctor.id)
-                                  }}
-                            >
-                              {doctor.name}
-                            </DropdownMenuItem>
-                          )))}
-                          
+                          {availableDoctors.length === 0 ? (
+                            <div className="px-4 py-2 text-sm text-muted-foreground">
+                              Tidak ada dokter yang tersedia
+                            </div>
+                          ) : (
+                            availableDoctors.map((doctor) => (
+                              <DropdownMenuItem
+                                key={doctor.id}
+                                onSelect={() => {
+                                  dokterField.handleChange(doctor.id)
+                                  setSelectedPilihanDokter(doctor.id)
+                                }}
+                              >
+                                {doctor.name}
+                              </DropdownMenuItem>
+                            ))
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
 
@@ -650,7 +647,9 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Layanan <span className="text-red-500">*</span></FieldLabel>
+                      <FieldLabel>
+                        Layanan <span className="text-red-500">*</span>
+                      </FieldLabel>
                       <LayananMultiSelect
                         value={field.state.value}
                         items={services}
@@ -713,7 +712,9 @@ export default function FormReservasi() {
 
                   return (
                     <div className="space-y-4">
-                      <FieldLabel>Keluhan <span className="text-red-500">*</span></FieldLabel>
+                      <FieldLabel>
+                        Keluhan <span className="text-red-500">*</span>
+                      </FieldLabel>
                       <Textarea
                         placeholder="Masukkan keluhan Anda"
                         className="resize-none"
@@ -849,31 +850,29 @@ function LayananMultiSelect({
 
       {open && (
         <div className="absolute z-50 mt-1 w-full bg-popover border border-border rounded-md shadow-md max-h-52 overflow-y-auto">
-          {
-            items.length === 0 ? (
-              <div className="px-4 py-2 text-sm text-muted-foreground">
-                Data layanan belum tersedia
-              </div>
-             ) : (
-              items.map((item) => (
-            <div
-              key={item.id}
-              onMouseDown={(e) => {
-                e.preventDefault()
-                toggle(item.id)
-              }}
-              className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground ${
-                value.includes(item.id) ? 'bg-accent/40 font-medium' : ''
-              }`}
-            >
-              {item.name}
-              {value.includes(item.id) && (
-                <span className="text-xs text-muted-foreground">✓</span>
-              )}
+          {items.length === 0 ? (
+            <div className="px-4 py-2 text-sm text-muted-foreground">
+              Data layanan belum tersedia
             </div>
-          ))
-             )
-          }
+          ) : (
+            items.map((item) => (
+              <div
+                key={item.id}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  toggle(item.id)
+                }}
+                className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground ${
+                  value.includes(item.id) ? 'bg-accent/40 font-medium' : ''
+                }`}
+              >
+                {item.name}
+                {value.includes(item.id) && (
+                  <span className="text-xs text-muted-foreground">✓</span>
+                )}
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
@@ -904,7 +903,10 @@ function TextField({
   const { errors, isTouched } = field.state.meta
   return (
     <div className="space-y-4">
-      <FieldLabel htmlFor={id}>{label}{required && <span className="text-red-500">*</span>}</FieldLabel>
+      <FieldLabel htmlFor={id}>
+        {label}
+        {required && <span className="text-red-500">*</span>}
+      </FieldLabel>
       <Input
         id={id}
         placeholder={placeholder}

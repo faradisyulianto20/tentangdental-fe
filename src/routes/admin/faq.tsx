@@ -144,7 +144,9 @@ function RouteComponent() {
     <div>
       <div className="space-y-4">
         <Field>
-          <FieldLabel>Pertanyaan <span className="text-red-500">*</span></FieldLabel>
+          <FieldLabel>
+            Pertanyaan <span className="text-red-500">*</span>
+          </FieldLabel>
           <Input
             placeholder="Masukkan pertanyaan"
             value={newForm.question}
@@ -154,7 +156,9 @@ function RouteComponent() {
           />
         </Field>
         <Field>
-          <FieldLabel>Jawaban <span className="text-red-500">*</span></FieldLabel>
+          <FieldLabel>
+            Jawaban <span className="text-red-500">*</span>
+          </FieldLabel>
           <RichTextEditor
             value={newForm.answer}
             onChange={(next) => setNewForm({ ...newForm, answer: next })}
