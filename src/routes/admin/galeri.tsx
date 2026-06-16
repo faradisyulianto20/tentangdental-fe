@@ -114,7 +114,7 @@ function RouteComponent() {
 
   return (
     <div>
-      <Field>
+      <Field data-testid="galeri-upload-section">
         <FieldLabel>Unggah Gambar Galeri <span className="text-red-500">*</span></FieldLabel>
         <FileUpload
           acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
@@ -125,42 +125,46 @@ function RouteComponent() {
             setSelectedImageFile(file)
             setSubmitError('')
           }}
+          data-testid="galeri-file-upload"
         />
       </Field>
 
       {submitError ? (
-        <p className="text-sm text-destructive mt-3">{submitError}</p>
+        <p className="text-sm text-destructive mt-3" data-testid="galeri-error-message">{submitError}</p>
       ) : null}
 
       <Button
         className="mt-4"
         disabled={createGallery.isPending}
         onClick={handleCreate}
+        data-testid="galeri-tambah-button"
       >
         {createGallery.isPending ? 'Menambahkan...' : 'Tambahkan Gambar'}
       </Button>
 
       {galleriesQuery.isError ? (
-        <p className="text-sm text-destructive mt-4">
+        <p className="text-sm text-destructive mt-4" data-testid="galeri-load-error">
           Gagal memuat daftar galeri.
         </p>
       ) : null}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6" data-testid="galeri-list">
         {galleries.map((item) => (
-          <div className="group relative" key={item.id}>
+          <div className="group relative" key={item.id} data-testid={`galeri-item-${item.id}`}>
             <img
               src={mapImageUrl(item.image_url)}
               alt={`Galeri ${item.id}`}
               className="w-full h-48 object-cover rounded-md hover:brightness-90 transition-all"
+              data-testid={`galeri-image-${item.id}`}
             />
             <button
               type="button"
               onClick={() => {
-                setSubmitError('') // Reset error lama saat hendak menghapus gambar lain
+                setSubmitError('')
                 setSelectedGaleri(item)
               }}
-              className="group-hover:opacity-100 opacity-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full p-1.5 text-red-600 bg-white/80 hover:bg-white transition-all cursor-pointer"
+              className="opacity-80 hover:opacity-100 absolute top-2 right-2 w-8 h-8 rounded-full p-1.5 text-red-600 bg-white/80 hover:bg-white transition-all cursor-pointer"
+              data-testid={`galeri-hapus-button-${item.id}`}
             >
               <Trash className="w-full h-full" />
             </button>
@@ -172,7 +176,7 @@ function RouteComponent() {
         open={!!selectedGaleri}
         onOpenChange={(open) => !open && setSelectedGaleri(null)}
       >
-        <AlertDialogContent size="sm">
+        <AlertDialogContent size="sm" data-testid="galeri-hapus-dialog">
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Gambar</AlertDialogTitle>
             <AlertDialogDescription>
@@ -181,24 +185,23 @@ function RouteComponent() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel data-testid="galeri-hapus-batal">Batal</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
               disabled={deleteGallery.isPending}
+              data-testid="galeri-hapus-konfirmasi"
               onClick={async (e) => {
                 if (!selectedGaleri) return
                 
-                // Mencegah modal langsung tertutup jika terjadi error saat hit API
-                e.preventDefault() 
+                e.preventDefault()
 
                 try {
                   await deleteGallery.mutateAsync(selectedGaleri.id)
                   setSelectedGaleri(null)
                 } catch (error) {
-                  // 💡 Mengambil pesan error asli dari mutate hapus gambar
                   const msg = readApiErrorMessage(error, 'Gagal menghapus gambar galeri.')
                   setSubmitError(msg)
-                  setSelectedGaleri(null) // Tutup modal setelah merekam pesan error ke state global
+                  setSelectedGaleri(null)
                 }
               }}
             >

@@ -98,7 +98,7 @@ function RouteComponent() {
             Silahkan login menggunakan akun admin.
           </p>
           <div>
-            <form className="space-y-4" onSubmit={handleLogin} data-testid="login-form">
+            <form className="space-y-4" method="POST" onSubmit={handleLogin} data-testid="login-form">
               <FieldGroup>
                 <FieldSet>
                   <Field>
@@ -107,7 +107,6 @@ function RouteComponent() {
                     </FieldLabel>
                     <Input
                       id="login-email"
-                      name="login-email"
                       type="email"
                       placeholder="Masukkan email admin"
                       value={email}
@@ -122,7 +121,6 @@ function RouteComponent() {
                     </FieldLabel>
                     <Input
                       id="login-password"
-                      name="login-password"
                       type="password"
                       placeholder="Masukkan kata sandi"
                       value={password}

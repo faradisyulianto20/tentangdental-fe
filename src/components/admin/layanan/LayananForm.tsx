@@ -67,6 +67,7 @@ export default function LayananForm({
                 id="layanan-nama"
                 name="layanan-nama"
                 type="text"
+                required
                 placeholder="Masukkan Nama Layanan"
                 value={values.name}
                 onChange={(event) =>
@@ -81,6 +82,7 @@ export default function LayananForm({
                 id="layanan-detail"
                 name="layanan-detail"
                 type="text"
+                required
                 placeholder="Masukkan Detail Layanan"
                 value={values.detail}
                 onChange={(event) =>

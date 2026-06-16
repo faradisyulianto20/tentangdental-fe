@@ -80,6 +80,7 @@ export default function ProfilDokterForm({
                 id="dokter-nama"
                 name="dokter-nama"
                 type="text"
+                required
                 placeholder="Masukkan Nama Dokter"
                 value={values.name}
                 onChange={(event) =>
@@ -94,6 +95,7 @@ export default function ProfilDokterForm({
                 id="dokter-spesialis"
                 name="dokter-spesialis"
                 type="text"
+                required
                 placeholder="Masukkan Spesialis Dokter"
                 value={values.specialization}
                 onChange={(event) =>

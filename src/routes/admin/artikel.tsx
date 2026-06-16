@@ -128,6 +128,7 @@ function ArtikelForm({
   return (
     <form
       className="space-y-4"
+      data-testid="artikel-form"
       onSubmit={async (event) => {
         event.preventDefault()
         await onSubmit(values)
@@ -146,17 +147,20 @@ function ArtikelForm({
                 const file = event.target.files?.[0] || null
                 setValues((prev) => ({ ...prev, imageFile: file }))
               }}
+              data-testid="artikel-image-upload"
             />
           </Field>
           <Field>
             <FieldLabel>Judul Artikel  <span className="text-red-500">*</span></FieldLabel>
             <Input
               type="text"
+              required
               placeholder="Masukkan Judul Artikel"
               value={values.title}
               onChange={(event) =>
                 setValues((prev) => ({ ...prev, title: event.target.value }))
               }
+              data-testid="artikel-judul-input"
             />
           </Field>
           <Field>
@@ -166,21 +170,22 @@ function ArtikelForm({
               onChange={(next) =>
                 setValues((prev) => ({ ...prev, content: next }))
               }
+              data-testid="artikel-konten-editor"
             />
           </Field>
         </FieldSet>
 
         {submitError ? (
-          <p className="text-sm text-destructive">{submitError}</p>
+          <p className="text-sm text-destructive" data-testid="artikel-error-message">{submitError}</p>
         ) : null}
 
         <Field orientation="horizontal" className="gap-2">
           {onCancel ? (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={onCancel} data-testid="artikel-cancel-button">
               Batal
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(isSubmitting)}>
+          <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="artikel-submit-button">
             {isSubmitting ? 'Memproses...' : submitLabel}
           </Button>
         </Field>
@@ -200,17 +205,19 @@ function ArticleCard({
     <div
       className="flex flex-col shrink-0 w-64 rounded-md border cursor-pointer hover:shadow-md"
       onClick={onClick}
+      data-testid={`artikel-card-${item.id}`}
     >
       <img
         src={resolveImage(item.image_url)}
         alt={item.title}
         className="rounded-t-xl w-64 h-44 object-cover"
+        data-testid={`artikel-image-${item.id}`}
       />
       <div className="flex flex-col text-left p-4">
-        <h2 className="text-lg font-semibold leading-5 line-clamp-2">
+        <h2 className="text-lg font-semibold leading-5 line-clamp-2" data-testid={`artikel-title-${item.id}`}>
           {item.title}
         </h2>
-        <p className="text-gray-600 mt-2 line-clamp-1 text-sm">{item.writer}</p>
+        <p className="text-gray-600 mt-2 line-clamp-1 text-sm" data-testid={`artikel-meta-${item.id}`}>{item.writer}</p>
       </div>
     </div>
   )
@@ -292,12 +299,12 @@ function RouteComponent() {
       </div>
 
       {articlesQuery.isError ? (
-        <p className="text-sm text-destructive mb-4">
+        <p className="text-sm text-destructive mb-4" data-testid="artikel-load-error">
           Gagal memuat daftar artikel.
         </p>
       ) : null}
 
-      <div className="flex flex-wrap justify-center gap-6 mt-6">
+      <div className="flex flex-wrap justify-center gap-6 mt-6" data-testid="artikel-list">
         {articleList.map((item) => (
           <ArticleCard
             key={item.id}
@@ -314,7 +321,7 @@ function RouteComponent() {
         open={!!selectedArtikel}
         onOpenChange={(open) => !open && setSelectedArtikel(null)}
       >
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto" data-testid="artikel-edit-dialog">
           {selectedArtikel ? (
             <ArtikelForm
               submitLabel="Simpan Perubahan"
@@ -338,12 +345,13 @@ function RouteComponent() {
 
           <DialogFooter className="gap-2">
             <DialogClose asChild>
-              <Button variant="outline">Batal</Button>
+              <Button variant="outline" data-testid="artikel-edit-batal">Batal</Button>
             </DialogClose>
             <Button
               type="button"
               className="bg-red-400 hover:bg-red-500"
               disabled={deleteArticle.isPending}
+              data-testid="artikel-hapus-button"
               onClick={async () => {
                 try {
                   await handleDelete()
