@@ -1,0 +1,13 @@
+node_modules
+.git
+.gitignore
+dist
+.env.local
+.netlify
+*.md
+.npm/
+.cache/
+.vscode/
+.prettierignore
+prettier.config.js
+eslint.config.js

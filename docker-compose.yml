@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        - VITE_API_BASE_URL=http://10.33.35.95:10000/api
+        - VITE_STORAGE_BASE_URL=http://10.33.35.95:10000/storage
+        - VITE_API_TIMEOUT_MS=15000
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    environment:
+      - BACKEND_URL=http://10.33.35.95:10000
+    volumes:
+      - ./nginx.conf:/etc/nginx/templates/default.conf.template
+    depends_on:
+      - frontend
+    restart: unless-stopped
