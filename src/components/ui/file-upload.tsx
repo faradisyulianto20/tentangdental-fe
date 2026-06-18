@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Upload } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface FileUploadProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -7,6 +7,7 @@ interface FileUploadProps extends React.InputHTMLAttributes<HTMLInputElement> {
   acceptedFileTypes?: string
   maxFileSizeBytes?: number
   maxFileSizeMessage?: string
+  defaultImageUrl?: string
 }
 
 const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
@@ -17,6 +18,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
       acceptedFileTypes = 'image/*',
       maxFileSizeBytes,
       maxFileSizeMessage,
+      defaultImageUrl,
       ...props
     },
     ref,
@@ -27,12 +29,15 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
     const [fileError, setFileError] = React.useState<string>('')
     const wrapperRef = React.useRef<HTMLDivElement>(null)
 
+    const [showDefault, setShowDefault] = React.useState(true)
+
     const clearSelection = React.useCallback(() => {
       setFileName('')
       setPreviewUrl((currentUrl) => {
         if (currentUrl) URL.revokeObjectURL(currentUrl)
         return ''
       })
+      setShowDefault(true)
     }, [])
 
     const validateFile = React.useCallback(
@@ -77,6 +82,7 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
 
         setFileName(file.name)
         setPreviewUrl(URL.createObjectURL(file))
+        setShowDefault(false)
 
         const inputElement = wrapperRef.current?.querySelector(
           'input[type="file"]',
@@ -99,8 +105,8 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         }
 
         setFileName(file.name)
-
         setPreviewUrl(URL.createObjectURL(file))
+        setShowDefault(false)
       }
       props.onChange?.(e)
     }
@@ -127,6 +133,17 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         <div className="flex flex-col items-center justify-center gap-3">
           {previewUrl ? (
             <div className="relative w-full">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  clearSelection()
+                }}
+                className="absolute top-2 right-2 z-10 bg-black/60 text-white rounded-full p-1 hover:bg-black/80 transition-colors"
+                aria-label="Hapus file"
+              >
+                <X size={16} />
+              </button>
               <img
                 src={previewUrl}
                 alt="Preview"
@@ -134,6 +151,17 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
               />
               <p className="text-xs text-center text-muted-foreground mt-2">
                 {fileName}
+              </p>
+            </div>
+          ) : defaultImageUrl && showDefault ? (
+            <div className="relative w-full">
+              <img
+                src={defaultImageUrl}
+                alt="Gambar saat ini"
+                className="w-full max-h-64 object-contain rounded-lg"
+              />
+              <p className="text-xs text-center text-muted-foreground mt-2">
+                Gambar saat ini
               </p>
             </div>
           ) : (

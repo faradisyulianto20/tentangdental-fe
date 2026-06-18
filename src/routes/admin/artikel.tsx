@@ -38,6 +38,7 @@ type ArtikelFormProps = {
   submitError?: string
   onSubmit: (values: ArtikelFormValues) => Promise<void> | void
   onCancel?: () => void
+  existingImageUrl?: string | null
 }
 
 function decodeHtmlEntities(input: string) {
@@ -49,7 +50,7 @@ function decodeHtmlEntities(input: string) {
     .replace(/&amp;/g, '&')
 }
 
-function resolveImage(value: string | null) {
+function resolveImage(value: string | null | undefined) {
   if (!value) return '/berita1.png'
   if (value.startsWith('http')) return value
 
@@ -108,6 +109,7 @@ function ArtikelForm({
   submitError,
   onSubmit,
   onCancel,
+  existingImageUrl,
 }: ArtikelFormProps) {
   const maxArticleImageSizeBytes = 2048 * 1024
 
@@ -145,6 +147,7 @@ function ArtikelForm({
               acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
               maxFileSizeBytes={maxArticleImageSizeBytes}
               maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
+              defaultImageUrl={existingImageUrl ? resolveImage(existingImageUrl) : undefined}
               onChange={(event) => {
                 const file = event.target.files?.[0] || null
                 setValues((prev) => ({ ...prev, imageFile: file }))
@@ -362,6 +365,7 @@ function RouteComponent() {
               submitLabel="Simpan Perubahan"
               isSubmitting={updateArticle.isPending}
               submitError={updateError}
+              existingImageUrl={selectedArtikel.image_url}
               initialValues={{
                 title: selectedArtikel.title,
                 content: decodeHtmlEntities(selectedArtikel.content),

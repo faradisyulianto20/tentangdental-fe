@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { FileUpload } from '@/components/ui/file-upload'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import { appEnv } from '@/lib/env'
 
 export type LayananFormValues = {
   name: string
@@ -20,6 +21,16 @@ type LayananFormProps = {
   submitError?: string
   onSubmit: (values: LayananFormValues) => Promise<void> | void
   onCancel?: () => void
+  existingIconUrl?: string | null
+  existingSupportImageUrl?: string | null
+}
+
+function resolveImageUrl(value: string | null | undefined): string {
+  if (!value) return ''
+  if (value.startsWith('http')) return value
+  const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+  const cleanPath = value.replace(/^\/+/, '')
+  return cleanBase + '/' + cleanPath
 }
 
 export default function LayananForm({
@@ -29,6 +40,8 @@ export default function LayananForm({
   submitError,
   onSubmit,
   onCancel,
+  existingIconUrl,
+  existingSupportImageUrl,
 }: LayananFormProps) {
   const maxSupportImageSizeBytes = 2048 * 1024
   const maxIconSizeBytes = 1024 * 1024
@@ -119,6 +132,7 @@ export default function LayananForm({
                   acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                   maxFileSizeBytes={maxSupportImageSizeBytes}
                   maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
+                  defaultImageUrl={resolveImageUrl(existingSupportImageUrl)}
                   onChange={(event) => {
                     const file = event.target.files?.[0] || null
                     setValues((prev) => ({ ...prev, supportImageFile: file }))
@@ -135,6 +149,7 @@ export default function LayananForm({
                   acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
                   maxFileSizeBytes={maxIconSizeBytes}
                   maxFileSizeMessage="File terlalu besar, upload file kurang dari 1MB"
+                  defaultImageUrl={resolveImageUrl(existingIconUrl)}
                   onChange={(event) => {
                     const file = event.target.files?.[0] || null
                     setValues((prev) => ({ ...prev, iconFile: file }))

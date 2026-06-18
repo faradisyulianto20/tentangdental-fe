@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { MultiSelect } from '@/components/ui/multi-select'
 import RichTextEditor from '@/components/admin/RichTextEditor'
 import { useScheduleOptions } from '@/hooks/useSchedule'
+import { appEnv } from '@/lib/env'
 
 export type ProfilDokterFormValues = {
   name: string
@@ -23,6 +24,15 @@ type ProfilDokterFormProps = {
   submitError?: string
   onSubmit: (values: ProfilDokterFormValues) => Promise<void> | void
   onCancel?: () => void
+  existingPhotoUrl?: string | null
+}
+
+function resolveImageUrl(value: string | null | undefined): string {
+  if (!value) return ''
+  if (value.startsWith('http')) return value
+  const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+  const cleanPath = value.replace(/^\/+/, '')
+  return cleanBase + '/' + cleanPath
 }
 
 export default function ProfilDokterForm({
@@ -33,6 +43,7 @@ export default function ProfilDokterForm({
   submitError,
   onSubmit,
   onCancel,
+  existingPhotoUrl,
 }: ProfilDokterFormProps) {
   // Fetch schedule options dari hook jika tidak disediakan dari props
   const scheduleOptionsQuery = useScheduleOptions()
@@ -150,6 +161,7 @@ export default function ProfilDokterForm({
                 acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
                 maxFileSizeBytes={maxDoctorImageSizeBytes}
                 maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
+                defaultImageUrl={resolveImageUrl(existingPhotoUrl)}
                 onChange={(event) => {
                   const file = event.target.files?.[0] || null
                   setValues((prev) => ({ ...prev, photoFile: file }))

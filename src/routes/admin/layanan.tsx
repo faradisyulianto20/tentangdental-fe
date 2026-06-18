@@ -219,6 +219,8 @@ function RouteComponent() {
               submitLabel="Simpan Perubahan"
               isSubmitting={updateService.isPending}
               submitError={updateError}
+              existingIconUrl={selectedService.icon_url}
+              existingSupportImageUrl={selectedService.support_image_url}
               initialValues={{
                 name: selectedService.name,
                 detail: selectedService.detail,

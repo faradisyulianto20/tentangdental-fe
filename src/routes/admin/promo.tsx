@@ -220,6 +220,7 @@ function RouteComponent() {
               submitLabel="Simpan Perubahan"
               isSubmitting={updatePromo.isPending}
               submitError={updateError}
+              existingImageUrl={selectedPromo.image_url}
               initialValues={{
                 name: selectedPromo.name,
                 originalPrice: String(selectedPromo.original_price),

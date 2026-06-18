@@ -194,6 +194,7 @@ function RouteComponent() {
               submitLabel="Simpan Perubahan"
               isSubmitting={updateTestimonial.isPending}
               submitError={updateError}
+              existingPhotoUrl={selectedTestimoni.photo_url}
               initialValues={{
                 name: selectedTestimoni.name,
                 rating: selectedTestimoni.rating,

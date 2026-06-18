@@ -4,6 +4,7 @@ import { Input } from '#/components/ui/input'
 import { Button } from '#/components/ui/button'
 import { FileUpload } from '#/components/ui/file-upload'
 import RichTextEditor from '#/components/admin/RichTextEditor'
+import { appEnv } from '@/lib/env'
 
 export type PromoFormValues = {
   name: string
@@ -20,6 +21,15 @@ type PromoFormProps = {
   submitError?: string
   onSubmit: (values: PromoFormValues) => Promise<void> | void
   onCancel?: () => void
+  existingImageUrl?: string | null
+}
+
+function resolveImageUrl(value: string | null | undefined): string {
+  if (!value) return ''
+  if (value.startsWith('http')) return value
+  const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+  const cleanPath = value.replace(/^\/+/, '')
+  return cleanBase + '/' + cleanPath
 }
 
 export default function PromoForm({
@@ -29,6 +39,7 @@ export default function PromoForm({
   submitError,
   onSubmit,
   onCancel,
+  existingImageUrl,
 }: PromoFormProps) {
   const maxPromoImageSizeBytes = 2048 * 1024
 
@@ -74,6 +85,7 @@ export default function PromoForm({
                 acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
                 maxFileSizeBytes={maxPromoImageSizeBytes}
                 maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
+                defaultImageUrl={resolveImageUrl(existingImageUrl)}
                 onChange={(event) => {
                   const file = event.target.files?.[0] || null
                   setValues((prev) => ({ ...prev, imageFile: file }))

@@ -5,6 +5,7 @@ import { FileUpload } from '#/components/ui/file-upload'
 import { Input } from '#/components/ui/input'
 import { Star } from 'lucide-react'
 import RichTextEditor from '@/components/admin/RichTextEditor'
+import { appEnv } from '@/lib/env'
 
 export type TestimoniFormValues = {
   name: string
@@ -20,6 +21,15 @@ type TestimoniFormProps = {
   submitError?: string
   onSubmit: (values: TestimoniFormValues) => Promise<void> | void
   onCancel?: () => void
+  existingPhotoUrl?: string | null
+}
+
+function resolveImageUrl(value: string | null | undefined): string {
+  if (!value) return ''
+  if (value.startsWith('http')) return value
+  const cleanBase = appEnv.storageBaseUrl.replace(/\/+$/, '')
+  const cleanPath = value.replace(/^\/+/, '')
+  return cleanBase + '/' + cleanPath
 }
 
 export default function TestimoniForm({
@@ -29,6 +39,7 @@ export default function TestimoniForm({
   submitError,
   onSubmit,
   onCancel,
+  existingPhotoUrl,
 }: TestimoniFormProps) {
   const [values, setValues] = useState<TestimoniFormValues>({
     name: initialValues?.name || '',
@@ -105,6 +116,7 @@ export default function TestimoniForm({
           maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
           label="Unggah Foto"
           acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
+          defaultImageUrl={resolveImageUrl(existingPhotoUrl)}
           onChange={(event) => {
             const file = event.target.files?.[0] || null
             setValues((prev) => ({ ...prev, photoFile: file }))
