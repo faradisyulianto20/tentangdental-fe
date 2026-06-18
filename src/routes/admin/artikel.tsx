@@ -133,7 +133,20 @@ function ArtikelForm({
       data-testid="artikel-form"
       onSubmit={async (event) => {
         event.preventDefault()
-        await onSubmit(values)
+        
+        // Check if rich text editor content only contains empty HTML tags
+        const isContentEmpty = (html: string) => {
+          if (!html) return true
+          const cleanText = html.replace(/<[^>]*>/g, '').trim()
+          return cleanText.length === 0
+        }
+
+        const finalValues = {
+          ...values,
+          content: isContentEmpty(values.content) ? '' : values.content,
+        }
+
+        await onSubmit(finalValues)
       }}
     >
       <FieldGroup>
@@ -273,7 +286,7 @@ function RouteComponent() {
     setCreateError('')
 
     if (!values.imageFile) {
-      setCreateError('Gambar artikel wajib diunggah.')
+      setCreateError('Gambar artikel wajib diupload')
       return
     }
 
