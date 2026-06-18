@@ -72,7 +72,8 @@ function RouteComponent() {
 
   // Transform recent reservations from admin reservations data (only pending, validated, rejected)
   const recentReservationItems =
-    adminReservations.data?.reservations
+    adminReservations.data?.pages
+      .flatMap((page) => page.reservations)
       ?.filter(
         (item) =>
           item.status === 'pending' ||
