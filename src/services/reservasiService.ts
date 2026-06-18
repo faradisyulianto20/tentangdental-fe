@@ -221,10 +221,12 @@ function toPatientDetailsRequestBody(
   return body
 }
 
-export async function getAdminReservations(): Promise<AdminReservationsResponse> {
+export async function getAdminReservations(
+  page: number = 1,
+): Promise<AdminReservationsResponse> {
   const response = await apiRequest<
     AdminReservationsResponse | ReservasiApiItem[]
-  >('admin/reservations', {
+  >(`admin/reservations?page=${page}`, {
     method: 'GET',
     auth: true,
   })

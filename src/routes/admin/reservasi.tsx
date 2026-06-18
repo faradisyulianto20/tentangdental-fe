@@ -749,7 +749,9 @@ function ReservationCard({
       onSaved?.()
       setConfirmComplete(false)
     } catch (error) {
-      setSubmitError(readApiErrorMessage(error, 'Gagal menyelesaikan reservasi.'))
+      setSubmitError(
+        readApiErrorMessage(error, 'Gagal menyelesaikan reservasi.'),
+      )
     }
   }
 
@@ -1333,7 +1335,9 @@ function ReservationCard({
                           onClick={() => setConfirmCancel(true)}
                           disabled={updateStatus.isPending}
                         >
-                          {updateStatus.isPending ? 'Membatalkan...' : 'Batalkan Reservasi'}
+                          {updateStatus.isPending
+                            ? 'Membatalkan...'
+                            : 'Batalkan Reservasi'}
                         </Button>
                         <Button
                           type="button"
@@ -1341,7 +1345,9 @@ function ReservationCard({
                           onClick={() => setConfirmValidate(true)}
                           disabled={updateStatus.isPending}
                         >
-                          {updateStatus.isPending ? 'Memvalidasi...' : 'Validasi'}
+                          {updateStatus.isPending
+                            ? 'Memvalidasi...'
+                            : 'Validasi'}
                         </Button>
                       </>
                     )}
@@ -1353,7 +1359,9 @@ function ReservationCard({
                           onClick={() => setConfirmCancel(true)}
                           disabled={updateStatus.isPending}
                         >
-                          {updateStatus.isPending ? 'Membatalkan...' : 'Batalkan Reservasi'}
+                          {updateStatus.isPending
+                            ? 'Membatalkan...'
+                            : 'Batalkan Reservasi'}
                         </Button>
                         <Button
                           type="button"
@@ -1361,13 +1369,18 @@ function ReservationCard({
                           onClick={() => setConfirmComplete(true)}
                           disabled={updateStatus.isPending}
                         >
-                          {updateStatus.isPending ? 'Menyelesaikan...' : 'Selesai'}
+                          {updateStatus.isPending
+                            ? 'Menyelesaikan...'
+                            : 'Selesai'}
                         </Button>
                       </>
                     )}
                   </DialogFooter>
 
-                  <AlertDialog open={confirmValidate} onOpenChange={setConfirmValidate}>
+                  <AlertDialog
+                    open={confirmValidate}
+                    onOpenChange={setConfirmValidate}
+                  >
                     <AlertDialogContent>
                       <AlertDialogTitle>Validasi Reservasi</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -1375,20 +1388,22 @@ function ReservationCard({
                       </AlertDialogDescription>
                       <div className="flex justify-end gap-2">
                         <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleValidate}
-                        >
+                        <AlertDialogAction onClick={handleValidate}>
                           Validasi
                         </AlertDialogAction>
                       </div>
                     </AlertDialogContent>
                   </AlertDialog>
 
-                  <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+                  <AlertDialog
+                    open={confirmCancel}
+                    onOpenChange={setConfirmCancel}
+                  >
                     <AlertDialogContent>
                       <AlertDialogTitle>Batalkan Reservasi</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Apakah Anda yakin ingin membatalkan reservasi ini? Tindakan ini tidak dapat dibatalkan.
+                        Apakah Anda yakin ingin membatalkan reservasi ini?
+                        Tindakan ini tidak dapat dibatalkan.
                       </AlertDialogDescription>
                       <div className="flex justify-end gap-2">
                         <AlertDialogCancel>Batal</AlertDialogCancel>
@@ -1402,7 +1417,10 @@ function ReservationCard({
                     </AlertDialogContent>
                   </AlertDialog>
 
-                  <AlertDialog open={confirmComplete} onOpenChange={setConfirmComplete}>
+                  <AlertDialog
+                    open={confirmComplete}
+                    onOpenChange={setConfirmComplete}
+                  >
                     <AlertDialogContent>
                       <AlertDialogTitle>Selesaikan Reservasi</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -1410,9 +1428,7 @@ function ReservationCard({
                       </AlertDialogDescription>
                       <div className="flex justify-end gap-2">
                         <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleComplete}
-                        >
+                        <AlertDialogAction onClick={handleComplete}>
                           Selesai
                         </AlertDialogAction>
                       </div>
@@ -1500,22 +1516,20 @@ function YesNoFieldWithDetail({
 }
 
 function RouteComponent() {
-  const { data: reservasiData } = useAdminReservations()
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useAdminReservations()
 
-  const { pending, validated, completed, cancelled } = useMemo(
-    () => {
-      const all = [...(reservasiData?.reservations || [])].sort(
-        (a, b) => getReservationSortTime(a) - getReservationSortTime(b),
-      )
-      return {
-        pending: all.filter((r) => r.status === 'pending'),
-        validated: all.filter((r) => r.status === 'validated'),
-        completed: all.filter((r) => r.status === 'completed'),
-        cancelled: all.filter((r) => r.status === 'cancelled'),
-      }
-    },
-    [reservasiData],
-  )
+  const { pending, validated, completed, cancelled } = useMemo(() => {
+    const all = [
+      ...(data?.pages.flatMap((page) => page.reservations) || []),
+    ].sort((a, b) => getReservationSortTime(a) - getReservationSortTime(b))
+    return {
+      pending: all.filter((r) => r.status === 'pending'),
+      validated: all.filter((r) => r.status === 'validated'),
+      completed: all.filter((r) => r.status === 'completed'),
+      cancelled: all.filter((r) => r.status === 'cancelled'),
+    }
+  }, [data])
 
   return (
     <div className="flex flex-col">
@@ -1598,10 +1612,25 @@ function RouteComponent() {
           </div>
         )}
 
-        {pending.length === 0 && validated.length === 0 && completed.length === 0 && cancelled.length === 0 && (
-          <p className="text-center text-muted-foreground py-8">
-            Tidak ada reservasi
-          </p>
+        {pending.length === 0 &&
+          validated.length === 0 &&
+          completed.length === 0 &&
+          cancelled.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">
+              Tidak ada reservasi
+            </p>
+          )}
+
+        {hasNextPage && (
+          <div className="flex justify-center py-6">
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="px-4 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isFetchingNextPage ? 'Memuat...' : 'Muat Lebih Banyak'}
+            </button>
+          </div>
         )}
       </div>
     </div>

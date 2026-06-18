@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import {
   createPublicReservation,
   deleteAdminReservation,
@@ -72,9 +77,16 @@ export function useReservasi() {
 }
 
 export function useAdminReservations() {
-  return useQuery<AdminReservationsQueryData>({
+  return useInfiniteQuery({
     queryKey: ['admin-reservations'],
-    queryFn: getAdminReservations,
+    queryFn: ({ pageParam = 1 }) => getAdminReservations(pageParam as number),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.current_page < lastPage.pagination.last_page) {
+        return lastPage.pagination.current_page + 1
+      }
+      return undefined
+    },
     staleTime: 1000 * 30,
   })
 }
