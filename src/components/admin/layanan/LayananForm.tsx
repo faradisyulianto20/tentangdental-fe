@@ -66,7 +66,20 @@ export default function LayananForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    await onSubmit(values)
+    
+    // Check if rich text editor content only contains empty HTML tags
+    const isArticleEmpty = (html: string) => {
+      if (!html) return true
+      const cleanText = html.replace(/<[^>]*>/g, '').trim()
+      return cleanText.length === 0
+    }
+
+    const finalValues = {
+      ...values,
+      articleContent: isArticleEmpty(values.articleContent) ? '' : values.articleContent,
+    }
+
+    await onSubmit(finalValues)
   }
 
   return (

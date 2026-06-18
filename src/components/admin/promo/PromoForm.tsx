@@ -63,7 +63,20 @@ export default function PromoForm({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    await onSubmit(values)
+    
+    // Check if rich text editor content only contains empty HTML tags
+    const isDetailEmpty = (html: string) => {
+      if (!html) return true
+      const cleanText = html.replace(/<[^>]*>/g, '').trim()
+      return cleanText.length === 0
+    }
+
+    const finalValues = {
+      ...values,
+      detail: isDetailEmpty(values.detail) ? '' : values.detail,
+    }
+
+    await onSubmit(finalValues)
   }
 
   return (
