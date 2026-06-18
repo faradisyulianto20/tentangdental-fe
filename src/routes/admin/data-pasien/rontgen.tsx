@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQueries } from '@tanstack/react-query'
+import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { Download, Trash2 } from 'lucide-react'
+import { getStoredToken } from '@/lib/auth-storage'
 import { ApiError } from '@/lib/api-client'
 import {
   useAdminPatientRontgens,
@@ -10,6 +12,16 @@ import {
   getAdminRontgenDetail,
   getAdminRontgenDownloadUrl,
 } from '@/services/patientService'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 type RontgenSearch = {
   id?: string
@@ -34,6 +46,31 @@ function RouteComponent() {
   )
 
   const deleteImageMutation = useDeleteRontgenImage()
+  const queryClient = useQueryClient()
+  const [selectedImage, setSelectedImage] = useState<{
+    rontgenId: number
+    imageId: number
+  } | null>(null)
+
+  const rontgenList = patientQuery.data?.rontgens || []
+
+  const rontgenDetails = useQueries({
+    queries: rontgenList.map((rontgen) => ({
+      queryKey: ['admin-rontgen-detail', rontgen.id],
+      queryFn: () => getAdminRontgenDetail(rontgen.id),
+      enabled: rontgenList.length > 0,
+      staleTime: 1000 * 30,
+    })),
+  })
+
+  useEffect(() => {
+    if (
+      patientQuery.error instanceof ApiError &&
+      patientQuery.error.status === 401
+    ) {
+      navigate({ to: '/login' })
+    }
+  }, [patientQuery.error, navigate])
 
   if (!id || !patientId || Number.isNaN(patientId)) {
     return (
@@ -41,13 +78,6 @@ function RouteComponent() {
         <p className="text-destructive text-sm">ID pasien tidak valid.</p>
       </div>
     )
-  }
-
-  if (
-    patientQuery.error instanceof ApiError &&
-    patientQuery.error.status === 401
-  ) {
-    navigate({ to: '/login' })
   }
 
   if (patientQuery.isLoading) {
@@ -71,44 +101,66 @@ function RouteComponent() {
   }
 
   const patient = patientQuery.data
-  const rontgenList = patientQuery.data?.rontgens || []
 
-  const rontgenDetails = useQueries({
-    queries: rontgenList.map((rontgen) => ({
-      queryKey: ['admin-rontgen-detail', rontgen.id],
-      queryFn: () => getAdminRontgenDetail(rontgen.id),
-      enabled: rontgenList.length > 0,
-      staleTime: 1000 * 30,
-    })),
-  })
+  const imageTypeLabels: Record<string, string> = {
+    xray: 'X-Ray',
+    profil_gigi: 'Profil Gigi',
+    intraoral: 'Intraoral',
+    dental: 'Dental',
+  }
 
   const images = rontgenDetails.flatMap((detail) =>
     (detail.data?.examination_images || []).map((img) => ({
       rontgenId: detail.data!.id,
       id: img.id,
       imgPath: img.image_url,
-      imageType: img.image_type,
       imagePhase: img.image_phase,
-      title:
-        img.image_type === 'xray'
-          ? 'X-Ray'
-          : img.image_type === 'profil_gigi'
-            ? 'Profil Gigi'
-            : img.image_type === 'intraoral'
-              ? 'Intraoral'
-              : img.image_type === 'dental'
-                ? 'Dental'
-                : `Rontgen ${detail.data!.id}`,
+      title: imageTypeLabels[img.image_type] ?? `Rontgen ${detail.data!.id}`,
     })),
   )
 
-  const handleDelete = (rontgenId: number, imageId: number) => {
-    if (!confirm('Yakin ingin menghapus foto rontgen ini?')) return
+  const handleDownload = async (rontgenId: number, filename: string) => {
+    try {
+      const token = getStoredToken()
+      const response = await fetch(getAdminRontgenDownloadUrl(rontgenId), {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      })
+      if (!response.ok) throw new Error('Download gagal')
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Download gagal:', error)
+    }
+  }
 
-    deleteImageMutation.mutate({
-      id: String(rontgenId),
-      imageId: String(imageId),
-    })
+  const handleDelete = (rontgenId: number, imageId: number) => {
+    setSelectedImage({ rontgenId, imageId })
+  }
+
+  const confirmDelete = async () => {
+    if (!selectedImage) return
+
+    deleteImageMutation.mutate(
+      {
+        id: String(selectedImage.rontgenId),
+        imageId: String(selectedImage.imageId),
+      },
+      {
+        onSettled: () => setSelectedImage(null),
+        onSuccess: () => {
+          queryClient.invalidateQueries()
+        },
+      },
+    )
   }
 
   return (
@@ -128,21 +180,20 @@ function RouteComponent() {
               className="w-full h-48 object-cover rounded-md hover:brightness-75 transition-all"
             />
             <div className="group-hover:opacity-100 opacity-0 absolute inset-0 flex items-center justify-center gap-2 transition-all">
-              <a
-                href={getAdminRontgenDownloadUrl(item.rontgenId)}
-                download
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-green-600 hover:scale-110 transition-all shadow"
+              <button
+                type="button"
+                onClick={() => handleDownload(item.rontgenId, item.title)}
+                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-green-600 hover:scale-110 transition-all shadow cursor-pointer"
                 title="Unduh foto"
               >
                 <Download className="w-4 h-4" />
-              </a>
+              </button>
+
               <button
                 type="button"
                 onClick={() => handleDelete(item.rontgenId, item.id)}
                 disabled={deleteImageMutation.isPending}
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-destructive hover:scale-110 transition-all shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer flex items-center justify-center w-9 h-9 rounded-full bg-white/90 hover:bg-white text-destructive hover:scale-110 transition-all shadow disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Hapus foto"
               >
                 <Trash2 className="w-4 h-4" />
@@ -166,6 +217,34 @@ function RouteComponent() {
           Belum ada foto rontgen untuk pasien ini.
         </p>
       ) : null}
+
+      <AlertDialog
+        open={!!selectedImage}
+        onOpenChange={(open) => !open && setSelectedImage(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Foto Rontgen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus foto rontgen ini? Tindakan ini
+              tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={deleteImageMutation.isPending}
+              onClick={(e) => {
+                e.preventDefault()
+                confirmDelete()
+              }}
+            >
+              {deleteImageMutation.isPending ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

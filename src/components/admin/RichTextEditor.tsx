@@ -144,7 +144,9 @@ export default function RichTextEditor({
   const tiptap = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // pakai CodeBlock dari extension terpisah agar bisa dikustomisasi
+        codeBlock: false,
+        link: false,
+        underline: false,
       }),
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
