@@ -49,6 +49,7 @@ type RichTextEditorProps = {
   value: string
   onChange: (value: string) => void
   maxCharacters?: number
+  'data-testid'?: string
 }
 
 type ToolbarGroup = {
@@ -136,6 +137,7 @@ export default function RichTextEditor({
   value,
   onChange,
   maxCharacters,
+  'data-testid': dataTestId,
 }: RichTextEditorProps) {
   const [modal, setModal] = useState<null | 'link' | 'image'>(null)
   const [showHighlightPicker, setShowHighlightPicker] = useState(false)
@@ -428,7 +430,10 @@ export default function RichTextEditor({
   if (!tiptap) return null
 
   return (
-    <div className="rounded-md border border-input overflow-hidden bg-background shadow-sm">
+    <div
+      className="rounded-md border border-input overflow-hidden bg-background shadow-sm"
+      {...(dataTestId ? { 'data-testid': dataTestId } : {})}
+    >
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-input p-1.5 bg-muted/30">
         {groups.map((group, gi) => (

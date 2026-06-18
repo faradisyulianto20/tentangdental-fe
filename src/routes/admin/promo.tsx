@@ -10,6 +10,16 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   useAdminPromos,
   useCreateAdminPromo,
   useDeleteAdminPromo,
@@ -88,6 +98,7 @@ function RouteComponent() {
   const [selectedPromo, setSelectedPromo] = useState<AdminPromoItem | null>(
     null,
   )
+  const [deleteTarget, setDeleteTarget] = useState<AdminPromoItem | null>(null)
   const [createError, setCreateError] = useState('')
   const [updateError, setUpdateError] = useState('')
   const [createFormKey, setCreateFormKey] = useState(0)
@@ -151,8 +162,9 @@ function RouteComponent() {
   }
 
   const handleDelete = async () => {
-    if (!selectedPromo) return
-    await deletePromo.mutateAsync(selectedPromo.id)
+    if (!deleteTarget) return
+    await deletePromo.mutateAsync(deleteTarget.id)
+    setDeleteTarget(null)
     setSelectedPromo(null)
   }
 
@@ -191,6 +203,7 @@ function RouteComponent() {
               setSelectedPromo(promo)
             }}
             className="cursor-pointer"
+            data-testid={`promo-card-${promo.id}`}
           >
             <PromoCard promo={toPromoCard(promo)} variants={null} />
           </div>
@@ -233,19 +246,47 @@ function RouteComponent() {
               type="button"
               className="bg-red-400 hover:bg-red-500"
               disabled={deletePromo.isPending}
-              onClick={async () => {
-                try {
-                  await handleDelete()
-                } catch {
-                  setUpdateError('Gagal menghapus promo.')
-                }
-              }}
+              onClick={() => setDeleteTarget(selectedPromo)}
+              data-testid="promo-hapus-button"
             >
               {deletePromo.isPending ? 'Menghapus...' : 'Hapus Promo'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Promo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus promo ini? Tindakan ini tidak
+              dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={deletePromo.isPending}
+              onClick={async (e) => {
+                e.preventDefault()
+                try {
+                  await handleDelete()
+                } catch {
+                  setUpdateError('Gagal menghapus promo.')
+                  setDeleteTarget(null)
+                }
+              }}
+            >
+              {deletePromo.isPending ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
