@@ -369,6 +369,7 @@ function ReservationCard({
   const { data: servicesData } = useLayanan()
 
   const [submitError, setSubmitError] = useState('')
+  const [phoneError, setPhoneError] = useState('')
   const [selectedStatus, setSelectedStatus] =
     useState<AdminReservationStatus>('pending')
   const [patientId, setPatientId] = useState('')
@@ -427,6 +428,13 @@ function ReservationCard({
   const layananList = Array.isArray(servicesData)
     ? servicesData.map((s) => s.name)
     : []
+
+  const validatePhone = (phone: string): string => {
+    if (!phone) return 'Nomor handphone harus diisi'
+    if (!/^\d{10,13}$/.test(phone))
+      return 'Nomor handphone harus berupa angka dengan panjang 10-13 digit'
+    return ''
+  }
 
   const setFormField = (
     key: keyof ReservationForm,
@@ -548,6 +556,13 @@ function ReservationCard({
       if (!form) return
       setSubmitError('')
 
+      const phoneErr = validatePhone(form.phone)
+      if (phoneErr) {
+        setPhoneError(phoneErr)
+        return
+      }
+      setPhoneError('')
+
       const idNumber = Number(patientId)
       if (!idNumber || Number.isNaN(idNumber)) {
         setSubmitError('Patient ID tidak valid.')
@@ -659,6 +674,13 @@ function ReservationCard({
       // Save form data first
       if (!form) return
       setSubmitError('')
+
+      const phoneErr = validatePhone(form.phone)
+      if (phoneErr) {
+        setPhoneError(phoneErr)
+        return
+      }
+      setPhoneError('')
 
       const idNumber = Number(patientId)
       if (!idNumber || Number.isNaN(idNumber)) {
@@ -866,8 +888,16 @@ function ReservationCard({
                       <FieldLabel>Nomor Handphone</FieldLabel>
                       <Input
                         value={form.phone}
-                        onChange={(e) => setFormField('phone', e.target.value)}
+                        onChange={(e) => {
+                          setFormField('phone', e.target.value)
+                          setPhoneError('')
+                        }}
                       />
+                      {phoneError && (
+                        <FieldDescription className="text-destructive">
+                          {phoneError}
+                        </FieldDescription>
+                      )}
                     </Field>
                     <Field>
                       <FieldLabel>Umur</FieldLabel>
@@ -1217,8 +1247,16 @@ function ReservationCard({
                       <FieldLabel>Nomor Handphone</FieldLabel>
                       <Input
                         value={form.phone}
-                        onChange={(e) => setFormField('phone', e.target.value)}
+                        onChange={(e) => {
+                          setFormField('phone', e.target.value)
+                          setPhoneError('')
+                        }}
                       />
+                      {phoneError && (
+                        <FieldDescription className="text-destructive">
+                          {phoneError}
+                        </FieldDescription>
+                      )}
                     </Field>
                     <Field>
                       <FieldLabel>Jadwal Periksa</FieldLabel>

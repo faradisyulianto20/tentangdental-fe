@@ -113,7 +113,10 @@ const extractStartTime = (slot: string): string => {
 const formSchema = z
   .object({
     namaLengkap: z.string().min(1, 'Nama lengkap harus diisi'),
-    nomorHandphone: z.string().min(1, 'Nomor handphone harus diisi'),
+    nomorHandphone: z
+      .string()
+      .min(1, 'Nomor handphone harus diisi')
+      .regex(/^\d{10,13}$/, 'Nomor handphone harus berupa angka dengan panjang 10-13 digit'),
     tanggalLahir: z.date().nullable(),
     umur: z.string().optional(),
     jenisKelamin: z
