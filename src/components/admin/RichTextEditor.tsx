@@ -430,10 +430,7 @@ export default function RichTextEditor({
   if (!tiptap) return null
 
   return (
-    <div
-      className="rounded-md border border-input overflow-hidden bg-background shadow-sm"
-      {...(dataTestId ? { 'data-testid': dataTestId } : {})}
-    >
+    <div className="rounded-md border border-input overflow-hidden bg-background shadow-sm">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-input p-1.5 bg-muted/30">
         {groups.map((group, gi) => (
@@ -590,7 +587,7 @@ export default function RichTextEditor({
       </BubbleMenu>
 
       {/* Editor area */}
-      <EditorContent editor={tiptap} />
+      <EditorContent editor={tiptap} {...(dataTestId ? { 'data-testid': dataTestId } : {})} />
 
       {/* Footer: word/char count */}
       <div className="flex justify-end gap-3 px-3 py-1.5 bg-muted/20 border-t border-input text-[11px] text-muted-foreground">
