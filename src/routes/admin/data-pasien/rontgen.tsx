@@ -1,9 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useQueries } from '@tanstack/react-query'
 import { Download, Trash2 } from 'lucide-react'
 import { ApiError } from '@/lib/api-client'
-import { useAdminPatientRontgens, useDeleteRontgenImage } from '@/hooks/usePatient'
-import { getAdminRontgenDownloadUrl } from '@/services/patientService'
+import {
+  useAdminPatientRontgens,
+  useDeleteRontgenImage,
+} from '@/hooks/usePatient'
+import {
+  getAdminRontgenDetail,
+  getAdminRontgenDownloadUrl,
+} from '@/services/patientService'
 
 type RontgenSearch = {
   id?: string
@@ -21,7 +27,7 @@ function RouteComponent() {
   const { id } = Route.useSearch()
   const patientId = id ? Number(id) : undefined
 
-  const rontgensQuery = useAdminPatientRontgens(
+  const patientQuery = useAdminPatientRontgens(
     typeof patientId === 'number' && !Number.isNaN(patientId)
       ? patientId
       : undefined,
@@ -38,48 +44,69 @@ function RouteComponent() {
   }
 
   if (
-    rontgensQuery.error instanceof ApiError &&
-    rontgensQuery.error.status === 401
+    patientQuery.error instanceof ApiError &&
+    patientQuery.error.status === 401
   ) {
     navigate({ to: '/login' })
   }
 
-  if (rontgensQuery.isLoading) {
+  if (patientQuery.isLoading) {
     return (
       <p className="text-sm text-muted-foreground">Memuat data rontgen...</p>
     )
   }
 
   if (
-    rontgensQuery.error instanceof ApiError &&
-    rontgensQuery.error.status === 403
+    patientQuery.error instanceof ApiError &&
+    patientQuery.error.status === 403
   ) {
     return <p className="text-sm text-destructive">Akses ditolak.</p>
   }
 
   if (
-    rontgensQuery.error instanceof ApiError &&
-    rontgensQuery.error.status === 404
+    patientQuery.error instanceof ApiError &&
+    patientQuery.error.status === 404
   ) {
     return <p className="text-sm text-destructive">Pasien tidak ditemukan.</p>
   }
 
-  const patient = rontgensQuery.data
-  const rontgens = rontgensQuery.data?.rontgens || []
-  const images = rontgens.flatMap((rontgen) =>
-    (rontgen.images || []).map((image) => ({
-      rontgenId: rontgen.id,
-      id: image.id,
-      imgPath: image.image_url,
-      title: image.image_type || `Rontgen ${rontgen.id}`,
+  const patient = patientQuery.data
+  const rontgenList = patientQuery.data?.rontgens || []
+
+  const rontgenDetails = useQueries({
+    queries: rontgenList.map((rontgen) => ({
+      queryKey: ['admin-rontgen-detail', rontgen.id],
+      queryFn: () => getAdminRontgenDetail(rontgen.id),
+      enabled: rontgenList.length > 0,
+      staleTime: 1000 * 30,
+    })),
+  })
+
+  const images = rontgenDetails.flatMap((detail) =>
+    (detail.data?.examination_images || []).map((img) => ({
+      rontgenId: detail.data!.id,
+      id: img.id,
+      imgPath: img.image_url,
+      imageType: img.image_type,
+      imagePhase: img.image_phase,
+      title:
+        img.image_type === 'xray'
+          ? 'X-Ray'
+          : img.image_type === 'profil_gigi'
+            ? 'Profil Gigi'
+            : img.image_type === 'intraoral'
+              ? 'Intraoral'
+              : img.image_type === 'dental'
+                ? 'Dental'
+                : `Rontgen ${detail.data!.id}`,
     })),
   )
 
-  const handleDelete = (id: number, imageId: number) => {
+  const handleDelete = (rontgenId: number, imageId: number) => {
     if (!confirm('Yakin ingin menghapus foto rontgen ini?')) return
 
     deleteImageMutation.mutate({
-      id: String(id),
+      id: String(rontgenId),
       imageId: String(imageId),
     })
   }
@@ -94,15 +121,13 @@ function RouteComponent() {
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         {images.map((item) => (
-          <div className="group relative" key={item.id}>
+          <div className="group relative" key={`${item.rontgenId}-${item.id}`}>
             <img
               src={item.imgPath}
               alt={item.title}
               className="w-full h-48 object-cover rounded-md hover:brightness-75 transition-all"
             />
-            {/* Action buttons overlay */}
             <div className="group-hover:opacity-100 opacity-0 absolute inset-0 flex items-center justify-center gap-2 transition-all">
-              {/* Download button */}
               <a
                 href={getAdminRontgenDownloadUrl(item.rontgenId)}
                 download
@@ -113,7 +138,6 @@ function RouteComponent() {
               >
                 <Download className="w-4 h-4" />
               </a>
-              {/* Delete button */}
               <button
                 type="button"
                 onClick={() => handleDelete(item.rontgenId, item.id)}
@@ -124,8 +148,16 @@ function RouteComponent() {
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
-            {/* Image title */}
-            <p className="text-xs text-muted-foreground mt-1 truncate">{item.title}</p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-xs text-muted-foreground truncate">
+                {item.title}
+              </p>
+              {item.imagePhase && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase">
+                  {item.imagePhase}
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>

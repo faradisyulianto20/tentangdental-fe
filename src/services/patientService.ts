@@ -92,24 +92,27 @@ export type AdminPatientDetail = {
   updated_at: string | null
 }
 
-export type PatientRontgenImage = {
+export type RontgenExaminationImage = {
   id: number
   image_url: string
-  image_type: string | null
+  image_type: 'xray' | 'profil_gigi' | 'intraoral' | 'dental'
+  image_phase: string | null
   created_at: string | null
 }
 
-export type PatientRontgenItem = {
+export type AdminRontgenDetail = {
   id: number
-  doctor: {
-    id: number
-    name: string
-  } | null
-  detail: string | null
-  status: string | null
   latest_image_url: string | null
-  images: PatientRontgenImage[]
+  examination_images: RontgenExaminationImage[]
+  status: string
+  detail: string | null
+  patient: { id: number; name: string } | null
+  doctor: { id: number; name: string } | null
+  tags: Array<{ id: number; tag_name: string }>
+  physical_examination: Record<string, unknown> | null
+  extra_oral_examination: Record<string, unknown> | null
   created_at: string | null
+  updated_at: string | null
 }
 
 export type AdminPatientReservation = {
@@ -136,7 +139,7 @@ export type AdminPatientRontgensData = {
   medical_history: Record<string, unknown> | null
   dental_history: Record<string, unknown> | null
   reservations: AdminPatientReservation[]
-  rontgens: PatientRontgenItem[]
+  rontgens: PatientRontgenSummary[]
   created_at: string | null
   updated_at: string | null
 }
@@ -210,6 +213,13 @@ export async function getAdminPatientById(id: number) {
 
 export async function getAdminPatientRontgens(id: number) {
   return apiRequest<AdminPatientRontgensData>(`admin/patients/${id}`, {
+    method: 'GET',
+    auth: true,
+  })
+}
+
+export async function getAdminRontgenDetail(id: number) {
+  return apiRequest<AdminRontgenDetail>(`admin/rontgens/${id}`, {
     method: 'GET',
     auth: true,
   })

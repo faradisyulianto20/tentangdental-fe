@@ -5,12 +5,14 @@ import {
   getAdminPatientById,
   getAdminPatientRontgens,
   getAdminPatients,
+  getAdminRontgenDetail,
   updateAdminPatient,
   deleteAdminRontgenImage,
 } from '@/services/patientService'
 import type {
   AdminPatientDetail,
   AdminPatientRontgensData,
+  AdminRontgenDetail,
   UpdateAdminPatientPayload,
 } from '@/services/patientService'
 
@@ -86,6 +88,15 @@ export function useDownloadAdminPatientPdf() {
   })
 }
 
+export function useAdminRontgenDetail(id?: number, enabled = true) {
+  return useQuery<AdminRontgenDetail>({
+    queryKey: rontgenKeys.detail(String(id)),
+    queryFn: () => getAdminRontgenDetail(id as number),
+    enabled: enabled && typeof id === 'number',
+    staleTime: 1000 * 30,
+  })
+}
+
 export function useDeleteRontgenImage() {
   const queryClient = useQueryClient()
  
@@ -93,7 +104,7 @@ export function useDeleteRontgenImage() {
     mutationFn: ({ id, imageId }: { id: string; imageId: string }) =>
       deleteAdminRontgenImage(id, imageId),
  
-    onSuccess: (_data, { id, imageId }) => {
+    onSuccess: (_data, { id }) => {
       // Invalidate list dan detail agar UI refresh otomatis
       queryClient.invalidateQueries({ queryKey: rontgenKeys.lists() })
       queryClient.invalidateQueries({ queryKey: rontgenKeys.detail(id) })
