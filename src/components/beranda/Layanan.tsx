@@ -42,7 +42,10 @@ export function LayananCard({
     >
       <img src={resolvedIcon} alt={layanan.name} className="w-20 h-20" />
       <h2 className="text-xl font-bold">{layanan.name}</h2>
-      <p className="text-muted-foreground text-center text-sm line-clamp-3">
+      <p
+        className="text-muted-foreground text-center text-sm line-clamp-3"
+        data-testid={`layanan-deskripsi-${layanan.id}`}
+      >
         {layanan.detail}
       </p>
     </motion.button>
@@ -89,7 +92,10 @@ export default function Layanan() {
         {heading}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="flex flex-col items-center gap-2 border border-muted p-6 rounded-lg">
+            <div
+              key={i}
+              className="flex flex-col items-center gap-2 border border-muted p-6 rounded-lg"
+            >
               <Skeleton className="w-12 h-12 rounded-full" />
               <Skeleton className="h-6 w-32 rounded" />
               <Skeleton className="h-4 w-full rounded" />

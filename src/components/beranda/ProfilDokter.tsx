@@ -57,8 +57,16 @@ export function ProfilDokterCard({
             }}
             data-testid={`dokter-statement-${index}`}
           />
-          <p className="font-bold text-lg md:mt-6" data-testid={`dokter-name-${index}`}>{dokter?.name}</p>
-          <p className="font-bold text-muted-foreground" data-testid={`dokter-specialization-${index}`}>
+          <p
+            className="font-bold text-lg md:mt-6"
+            data-testid={`dokter-name-${index}`}
+          >
+            {dokter?.name}
+          </p>
+          <p
+            className="font-bold text-muted-foreground"
+            data-testid={`dokter-specialization-${index}`}
+          >
             {dokter.specialization}
           </p>
         </div>
@@ -109,7 +117,12 @@ export default function ProfilDokter() {
         >
           Temukan dokter-dokter profesional
         </motion.p>
-        <p className="text-muted-foreground mt-6" data-testid="dokter-empty-state">Data dokter belum tersedia.</p>
+        <p
+          className="text-muted-foreground mt-6"
+          data-testid="dokter-empty-state"
+        >
+          Data dokter belum tersedia.
+        </p>
       </div>
     )
   }

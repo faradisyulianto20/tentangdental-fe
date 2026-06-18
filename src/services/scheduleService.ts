@@ -122,10 +122,10 @@ export async function getScheduleOptions(): Promise<ScheduleOptions> {
   const timeSlotOptionsRaw = Array.isArray(response?.time_slot_options)
     ? response.time_slot_options
     : []
-  
+
   // Generate all 1-hour intervals based on API time slot range
   const timeSlotOptions = generateAllHourlySlots(timeSlotOptionsRaw)
-  
+
   // Create default schedule with all hourly slots for all days
   const defaultSchedule: DoctorScheduleMap = {}
   days.forEach((day) => {

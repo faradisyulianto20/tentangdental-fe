@@ -99,11 +99,11 @@ export function useAdminRontgenDetail(id?: number, enabled = true) {
 
 export function useDeleteRontgenImage() {
   const queryClient = useQueryClient()
- 
+
   return useMutation({
     mutationFn: ({ id, imageId }: { id: string; imageId: string }) =>
       deleteAdminRontgenImage(id, imageId),
- 
+
     onSuccess: (_data, { id }) => {
       // Invalidate list dan detail agar UI refresh otomatis
       queryClient.invalidateQueries({ queryKey: rontgenKeys.lists() })

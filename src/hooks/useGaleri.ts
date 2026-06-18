@@ -3,12 +3,13 @@ import {
   createAdminGallery,
   deleteAdminGallery,
   getAdminGalleries,
-  getGallery,
-  type AdminGalleryPagination,
-  type CreateAdminGalleryPayload,
-  type GalleryApiItem,
-  type GalleryPagination,
+  getGallery
+  
+  
+  
+  
 } from '#/services/galeriService'
+import type {AdminGalleryPagination, CreateAdminGalleryPayload, GalleryApiItem, GalleryPagination} from '#/services/galeriService';
 
 type GalleryQueryData = {
   galleries: GalleryApiItem[]

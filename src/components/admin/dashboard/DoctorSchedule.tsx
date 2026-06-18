@@ -66,10 +66,14 @@ export default function DoctorSchedule() {
         <p className="text-sm text-muted-foreground">{formattedDate}</p>
       </div>
       <div className="mt-4">
-        {isLoading && <p className="text-muted-foreground">Memuat jadwal dokter...</p>}
+        {isLoading && (
+          <p className="text-muted-foreground">Memuat jadwal dokter...</p>
+        )}
         {isError && <p className="text-red-500">Gagal memuat jadwal dokter</p>}
         {doctors?.map((doctor) => {
-          const todaySchedule = filterAndMergeTodaySchedule(doctor.schedule ?? [])
+          const todaySchedule = filterAndMergeTodaySchedule(
+            doctor.schedule ?? [],
+          )
           return (
             <div
               key={doctor.id}
@@ -86,16 +90,19 @@ export default function DoctorSchedule() {
                   <div className="flex flex-wrap gap-1 mt-1">
                     {todaySchedule.map((slot, i) => {
                       return (
-                      <span
-                        key={i}
-                        className="text-xs bg-white border border-blue-200 text-blue-700 rounded-full px-2 py-0.5"
-                      >
-                        {slot}
-                      </span>
-                    )})}
+                        <span
+                          key={i}
+                          className="text-xs bg-white border border-blue-200 text-blue-700 rounded-full px-2 py-0.5"
+                        >
+                          {slot}
+                        </span>
+                      )
+                    })}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Tidak ada jadwal hari ini</p>
+                  <p className="text-sm text-muted-foreground">
+                    Tidak ada jadwal hari ini
+                  </p>
                 )}
               </div>
             </div>

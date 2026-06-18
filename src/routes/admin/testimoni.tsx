@@ -226,6 +226,7 @@ function RouteComponent() {
                   setUpdateError('Gagal menghapus testimoni.')
                 }
               }}
+              data-testid="testimoni-hapus-button"
             >
               {deleteTestimonial.isPending ? 'Menghapus...' : 'Hapus Testimoni'}
             </Button>
@@ -244,23 +245,24 @@ function TestimoniCard({
   onClick?: () => void
 }) {
   return (
-      <div
-        onClick={onClick}
-        className="flex border rounded-lg p-4 gap-2 cursor-pointer"
-      >
-        {testimoni.photo_url ? (
-          <img
-            src={mapPhoto(testimoni.photo_url)}
-            alt={testimoni.name}
-            className="w-16 h-16 rounded-full object-cover aspect-square shrink-0"
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-full shrink-0 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl aspect-square">
-            {testimoni.name ? testimoni.name.charAt(0).toUpperCase() : 'P'}
-          </div>
-        )}
+    <div
+      onClick={onClick}
+      className="flex border rounded-lg p-4 gap-2 cursor-pointer"
+      data-testid={`testimoni-card-${testimoni.id}`}
+    >
+      {testimoni.photo_url ? (
+        <img
+          src={mapPhoto(testimoni.photo_url)}
+          alt={testimoni.name}
+          className="w-16 h-16 rounded-full object-cover aspect-square shrink-0"
+        />
+      ) : (
+        <div className="w-16 h-16 rounded-full shrink-0 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl aspect-square">
+          {testimoni.name ? testimoni.name.charAt(0).toUpperCase() : 'P'}
+        </div>
+      )}
 
-        <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1">
         <p className="text-sm font-bold">{testimoni.name}</p>
         <div className="flex gap-0.5">
           {Array.from({ length: 5 }, (_, i) => (
@@ -277,6 +279,7 @@ function TestimoniCard({
           dangerouslySetInnerHTML={{
             __html: decodeHtmlEntities(testimoni.testimoni || ''),
           }}
+          data-testid={`testimoni-text-${testimoni.id}`}
         />
       </div>
     </div>

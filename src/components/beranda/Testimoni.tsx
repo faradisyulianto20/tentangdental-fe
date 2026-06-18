@@ -153,7 +153,9 @@ export default function Testimoni() {
           >
             Periksa apa yang dikatakan pasien tentang kami.
           </motion.p>
-          <p className="text-muted-foreground mt-6">Belum ada testimoni yang tersedia.</p>
+          <p className="text-muted-foreground mt-6">
+            Belum ada testimoni yang tersedia.
+          </p>
         </div>
       </section>
     )
@@ -170,7 +172,10 @@ export default function Testimoni() {
   const index5 = (activeIndex + 5) % testimonialsSource.length
 
   return (
-    <section className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between items-center w-full px-6 md:max-w-6xl" data-testid="testimoni-carousel">
+    <section
+      className="flex flex-col-reverse md:flex-row md:items-end gap-6 py-12 md:py-20 text-center justify-between items-center w-full px-6 md:max-w-6xl"
+      data-testid="testimoni-carousel"
+    >
       {/* Sembunyikan seluruh decorative element di mobile */}
       <div className="hidden  lg:flex gap-2 items-end relative">
         <div className="bg-primary w-38.75 h-60.5 rounded-tr-4xl rounded-bl-4xl rounded" />
@@ -196,7 +201,9 @@ export default function Testimoni() {
               className="w-30 rounded-full h-30 aspect-square absolute top-12 right-12 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-2xl"
               data-testid={`testimoni-preview-img-${index1}`}
             >
-              {testimonialsSource[index1].name ? testimonialsSource[index1].name.charAt(0).toUpperCase() : 'P'}
+              {testimonialsSource[index1].name
+                ? testimonialsSource[index1].name.charAt(0).toUpperCase()
+                : 'P'}
             </motion.div>
           )}
           {testimonialsSource[index2].imgUrl ? (
@@ -219,7 +226,9 @@ export default function Testimoni() {
               className="w-18.5 rounded-full h-18.5 aspect-square absolute top-12 -left-20 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
               data-testid={`testimoni-preview-img-${index2}`}
             >
-              {testimonialsSource[index2].name ? testimonialsSource[index2].name.charAt(0).toUpperCase() : 'P'}
+              {testimonialsSource[index2].name
+                ? testimonialsSource[index2].name.charAt(0).toUpperCase()
+                : 'P'}
             </motion.div>
           )}
           {testimonialsSource[index3].imgUrl ? (
@@ -242,7 +251,9 @@ export default function Testimoni() {
               className="w-25 rounded-full h-25 aspect-square absolute top-32 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
               data-testid={`testimoni-preview-img-${index3}`}
             >
-              {testimonialsSource[index3].name ? testimonialsSource[index3].name.charAt(0).toUpperCase() : 'P'}
+              {testimonialsSource[index3].name
+                ? testimonialsSource[index3].name.charAt(0).toUpperCase()
+                : 'P'}
             </motion.div>
           )}
           {testimonialsSource[index4].imgUrl ? (
@@ -265,7 +276,9 @@ export default function Testimoni() {
               className="w-22.5 rounded-full h-22.5 aspect-square absolute top-52 right-30 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl"
               data-testid={`testimoni-preview-img-${index4}`}
             >
-              {testimonialsSource[index4].name ? testimonialsSource[index4].name.charAt(0).toUpperCase() : 'P'}
+              {testimonialsSource[index4].name
+                ? testimonialsSource[index4].name.charAt(0).toUpperCase()
+                : 'P'}
             </motion.div>
           )}
           {testimonialsSource[index5].imgUrl ? (
@@ -288,7 +301,9 @@ export default function Testimoni() {
               className="w-18.75 rounded-full h-18.75 aspect-square absolute top-64 right-0 transform -translate-x-1/4 -translate-y-3/4 flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-lg"
               data-testid={`testimoni-preview-img-${index5}`}
             >
-              {testimonialsSource[index5].name ? testimonialsSource[index5].name.charAt(0).toUpperCase() : 'P'}
+              {testimonialsSource[index5].name
+                ? testimonialsSource[index5].name.charAt(0).toUpperCase()
+                : 'P'}
             </motion.div>
           )}
         </div>
@@ -356,11 +371,16 @@ export default function Testimoni() {
                     className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center bg-[#B4E5F6] text-white font-bold text-xl aspect-square"
                     data-testid="testimoni-author-photo"
                   >
-                    {testimonial.name ? testimonial.name.charAt(0).toUpperCase() : 'P'}
+                    {testimonial.name
+                      ? testimonial.name.charAt(0).toUpperCase()
+                      : 'P'}
                   </motion.div>
                 )}
                 <div className="flex flex-col w-full mt-2">
-                  <p className="font-bold max-w-md md:text-lg" data-testid="testimoni-author-name">
+                  <p
+                    className="font-bold max-w-md md:text-lg"
+                    data-testid="testimoni-author-name"
+                  >
                     {testimonial.name}
                   </p>
                   <div className="flex w-4 h-4 gap-1">

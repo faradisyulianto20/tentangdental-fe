@@ -54,10 +54,16 @@ export default function TestimoniForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} data-testid="testimoni-form">
+    <form
+      className="space-y-4"
+      onSubmit={handleSubmit}
+      data-testid="testimoni-form"
+    >
       {/* FIELD NAMA */}
       <Field>
-        <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
+        <FieldLabel>
+          Nama <span className="text-red-500">*</span>
+        </FieldLabel>
         <Input
           id="testimoni-nama"
           name="testimoni-nama"
@@ -72,7 +78,9 @@ export default function TestimoniForm({
 
       {/* FIELD RATING */}
       <Field className="gap-1">
-        <FieldLabel>Rating <span className="text-red-500">*</span></FieldLabel>
+        <FieldLabel>
+          Rating <span className="text-red-500">*</span>
+        </FieldLabel>
         <div className="flex gap-1">
           {Array.from({ length: 5 }, (_, i: number) => (
             <span
@@ -89,10 +97,12 @@ export default function TestimoniForm({
 
       {/* FIELD FOTO */}
       <Field>
-        <FieldLabel>Foto <span className="text-red-500">*</span></FieldLabel>
+        <FieldLabel>
+          Foto <span className="text-red-500">*</span>
+        </FieldLabel>
         <FileUpload
-           maxFileSizeBytes={maxPromoImageSizeBytes}
-           maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
+          maxFileSizeBytes={maxPromoImageSizeBytes}
+          maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
           label="Unggah Foto"
           acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
           onChange={(event) => {
@@ -105,7 +115,9 @@ export default function TestimoniForm({
 
       {/* FIELD TESTIMONI (RICH TEXT EDITOR) */}
       <Field>
-        <FieldLabel>Testimoni <span className="text-red-500">*</span></FieldLabel>
+        <FieldLabel>
+          Testimoni <span className="text-red-500">*</span>
+        </FieldLabel>
         <RichTextEditor
           value={values.testimoni}
           onChange={(next) =>
@@ -117,17 +129,31 @@ export default function TestimoniForm({
 
       {/* ERROR MESSAGE */}
       {submitError ? (
-        <p className="text-sm text-destructive font-medium" data-testid="testimoni-error-message">{submitError}</p>
+        <p
+          className="text-sm text-destructive font-medium"
+          data-testid="testimoni-error-message"
+        >
+          {submitError}
+        </p>
       ) : null}
 
       {/* TOMBOL AKSI */}
       <div className="flex items-center gap-2 pt-2">
         {onCancel ? (
-          <Button type="button" variant="outline" onClick={onCancel} data-testid="testimoni-cancel-button">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            data-testid="testimoni-cancel-button"
+          >
             Batal
           </Button>
         ) : null}
-        <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="testimoni-submit-button">
+        <Button
+          type="submit"
+          disabled={Boolean(isSubmitting)}
+          data-testid="testimoni-submit-button"
+        >
           {isSubmitting ? 'Memproses...' : submitLabel}
         </Button>
       </div>

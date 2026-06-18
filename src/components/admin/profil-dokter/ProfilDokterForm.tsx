@@ -70,12 +70,18 @@ export default function ProfilDokterForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} data-testid="dokter-form">
+    <form
+      className="space-y-4"
+      onSubmit={handleSubmit}
+      data-testid="dokter-form"
+    >
       <FieldGroup>
         <FieldSet>
           <FieldGroup>
             <Field>
-              <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Nama <span className="text-red-500">*</span>
+              </FieldLabel>
               <Input
                 id="dokter-nama"
                 name="dokter-nama"
@@ -90,7 +96,9 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Spesialis <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Spesialis <span className="text-red-500">*</span>
+              </FieldLabel>
               <Input
                 id="dokter-spesialis"
                 name="dokter-spesialis"
@@ -108,7 +116,9 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Pernyataan <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Pernyataan <span className="text-red-500">*</span>
+              </FieldLabel>
               <RichTextEditor
                 value={values.statement}
                 onChange={(next) =>
@@ -118,7 +128,9 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Jadwal <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Jadwal <span className="text-red-500">*</span>
+              </FieldLabel>
               <MultiSelect
                 items={finalScheduleOptions}
                 value={values.schedule}
@@ -130,7 +142,9 @@ export default function ProfilDokterForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Foto <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Foto <span className="text-red-500">*</span>
+              </FieldLabel>
               <FileUpload
                 label="Unggah Foto"
                 acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
@@ -147,16 +161,30 @@ export default function ProfilDokterForm({
         </FieldSet>
 
         {submitError ? (
-          <p className="text-sm text-destructive" data-testid="dokter-error-message">{submitError}</p>
+          <p
+            className="text-sm text-destructive"
+            data-testid="dokter-error-message"
+          >
+            {submitError}
+          </p>
         ) : null}
 
         <Field orientation="horizontal" className="gap-2">
           {onCancel ? (
-            <Button type="button" variant="outline" onClick={onCancel} data-testid="dokter-cancel-button">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              data-testid="dokter-cancel-button"
+            >
               Batal
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="dokter-submit-button">
+          <Button
+            type="submit"
+            disabled={Boolean(isSubmitting)}
+            data-testid="dokter-submit-button"
+          >
             {isSubmitting ? 'Memproses...' : submitLabel}
           </Button>
         </Field>

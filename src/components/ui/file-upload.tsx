@@ -44,7 +44,8 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         ) {
           clearSelection()
           setFileError(
-            maxFileSizeMessage || 'File terlalu besar, upload file kurang dari 2MB',
+            maxFileSizeMessage ||
+              'File terlalu besar, upload file kurang dari 2MB',
           )
           return false
         }
@@ -165,7 +166,9 @@ const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(
         )}
 
         {fileError ? (
-          <p className="mt-2 text-xs text-destructive text-center">{fileError}</p>
+          <p className="mt-2 text-xs text-destructive text-center">
+            {fileError}
+          </p>
         ) : null}
       </div>
     )

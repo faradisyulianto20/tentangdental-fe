@@ -56,13 +56,21 @@ export default function PromoForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} data-testid="promo-form">
+    <form
+      className="space-y-4"
+      onSubmit={handleSubmit}
+      data-testid="promo-form"
+    >
       <FieldGroup>
         <FieldSet>
           <FieldGroup>
             <Field>
               <FileUpload
-                label={<span>Unggah Gambar Promo <span className="text-red-500">*</span></span>}
+                label={
+                  <span>
+                    Unggah Gambar Promo <span className="text-red-500">*</span>
+                  </span>
+                }
                 acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
                 maxFileSizeBytes={maxPromoImageSizeBytes}
                 maxFileSizeMessage="File terlalu besar, upload file kurang dari 2MB"
@@ -75,7 +83,9 @@ export default function PromoForm({
             </Field>
 
             <Field>
-              <FieldLabel>Judul Promo <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Judul Promo <span className="text-red-500">*</span>
+              </FieldLabel>
               <Input
                 id="promo-judul"
                 name="promo-judul"
@@ -91,7 +101,9 @@ export default function PromoForm({
 
             <FieldGroup className="grid grid-cols-2">
               <Field>
-                <FieldLabel>Harga Awal <span className="text-red-500">*</span></FieldLabel>
+                <FieldLabel>
+                  Harga Awal <span className="text-red-500">*</span>
+                </FieldLabel>
                 <Input
                   id="promo-original-price"
                   name="promo-original-price"
@@ -108,7 +120,9 @@ export default function PromoForm({
                 />
               </Field>
               <Field>
-                <FieldLabel>Harga Diskon <span className="text-red-500">*</span></FieldLabel>
+                <FieldLabel>
+                  Harga Diskon <span className="text-red-500">*</span>
+                </FieldLabel>
                 <Input
                   id="promo-discount-price"
                   name="promo-discount-price"
@@ -127,7 +141,9 @@ export default function PromoForm({
             </FieldGroup>
 
             <Field>
-              <FieldLabel>Deskripsi Promo <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Deskripsi Promo <span className="text-red-500">*</span>
+              </FieldLabel>
               <RichTextEditor
                 value={values.detail}
                 onChange={(next) =>
@@ -140,16 +156,30 @@ export default function PromoForm({
         </FieldSet>
 
         {submitError ? (
-          <p className="text-sm text-destructive" data-testid="promo-error-message">{submitError}</p>
+          <p
+            className="text-sm text-destructive"
+            data-testid="promo-error-message"
+          >
+            {submitError}
+          </p>
         ) : null}
 
         <Field orientation="horizontal" className="gap-2">
           {onCancel ? (
-            <Button type="button" variant="outline" onClick={onCancel} data-testid="promo-cancel-button">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              data-testid="promo-cancel-button"
+            >
               Batal
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="promo-submit-button">
+          <Button
+            type="submit"
+            disabled={Boolean(isSubmitting)}
+            data-testid="promo-submit-button"
+          >
             {isSubmitting ? 'Memproses...' : submitLabel}
           </Button>
         </Field>

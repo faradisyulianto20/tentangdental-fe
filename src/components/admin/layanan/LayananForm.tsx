@@ -57,12 +57,18 @@ export default function LayananForm({
   }
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit} data-testid="layanan-form">
+    <form
+      className="space-y-4"
+      onSubmit={handleSubmit}
+      data-testid="layanan-form"
+    >
       <FieldGroup>
         <FieldSet>
           <FieldGroup>
             <Field>
-              <FieldLabel>Nama <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Nama <span className="text-red-500">*</span>
+              </FieldLabel>
               <Input
                 id="layanan-nama"
                 name="layanan-nama"
@@ -77,7 +83,9 @@ export default function LayananForm({
               />
             </Field>
             <Field>
-              <FieldLabel>Detail Layanan <span className="text-red-500">*</span></FieldLabel>
+              <FieldLabel>
+                Detail Layanan <span className="text-red-500">*</span>
+              </FieldLabel>
               <Input
                 id="layanan-detail"
                 name="layanan-detail"
@@ -103,7 +111,9 @@ export default function LayananForm({
             </Field>
             <FieldGroup className="grid md:grid-cols-2">
               <Field>
-                <FieldLabel>Gambar Pendukung <span className="text-red-500">*</span></FieldLabel>
+                <FieldLabel>
+                  Gambar Pendukung <span className="text-red-500">*</span>
+                </FieldLabel>
                 <FileUpload
                   label="Unggah Gambar"
                   acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
@@ -117,7 +127,9 @@ export default function LayananForm({
                 />
               </Field>
               <Field>
-                <FieldLabel>Icon <span className="text-red-500">*</span></FieldLabel>
+                <FieldLabel>
+                  Icon <span className="text-red-500">*</span>
+                </FieldLabel>
                 <FileUpload
                   label="Unggah Icon"
                   acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
@@ -135,16 +147,30 @@ export default function LayananForm({
         </FieldSet>
 
         {submitError ? (
-          <p className="text-sm text-destructive" data-testid="layanan-error-message">{submitError}</p>
+          <p
+            className="text-sm text-destructive"
+            data-testid="layanan-error-message"
+          >
+            {submitError}
+          </p>
         ) : null}
 
         <Field orientation="horizontal" className="gap-2">
           {onCancel ? (
-            <Button type="button" variant="outline" onClick={onCancel} data-testid="layanan-cancel-button">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              data-testid="layanan-cancel-button"
+            >
               Batal
             </Button>
           ) : null}
-          <Button type="submit" disabled={Boolean(isSubmitting)} data-testid="layanan-submit-button">
+          <Button
+            type="submit"
+            disabled={Boolean(isSubmitting)}
+            data-testid="layanan-submit-button"
+          >
             {isSubmitting ? 'Memproses...' : submitLabel}
           </Button>
         </Field>

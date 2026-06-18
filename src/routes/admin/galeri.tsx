@@ -110,12 +110,12 @@ function RouteComponent() {
 
   const [submitError, setSubmitError] = useState('') // State error global untuk operasi create/delete galeri
 
-  
-
   return (
     <div>
       <Field data-testid="galeri-upload-section">
-        <FieldLabel>Unggah Gambar Galeri <span className="text-red-500">*</span></FieldLabel>
+        <FieldLabel>
+          Unggah Gambar Galeri <span className="text-red-500">*</span>
+        </FieldLabel>
         <FileUpload
           acceptedFileTypes="image/png,image/jpeg,image/jpg,image/webp"
           maxFileSizeBytes={2048 * 1024}
@@ -130,7 +130,12 @@ function RouteComponent() {
       </Field>
 
       {submitError ? (
-        <p className="text-sm text-destructive mt-3" data-testid="galeri-error-message">{submitError}</p>
+        <p
+          className="text-sm text-destructive mt-3"
+          data-testid="galeri-error-message"
+        >
+          {submitError}
+        </p>
       ) : null}
 
       <Button
@@ -143,14 +148,24 @@ function RouteComponent() {
       </Button>
 
       {galleriesQuery.isError ? (
-        <p className="text-sm text-destructive mt-4" data-testid="galeri-load-error">
+        <p
+          className="text-sm text-destructive mt-4"
+          data-testid="galeri-load-error"
+        >
           Gagal memuat daftar galeri.
         </p>
       ) : null}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6" data-testid="galeri-list">
+      <div
+        className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6"
+        data-testid="galeri-list"
+      >
         {galleries.map((item) => (
-          <div className="group relative" key={item.id} data-testid={`galeri-item-${item.id}`}>
+          <div
+            className="group relative"
+            key={item.id}
+            data-testid={`galeri-item-${item.id}`}
+          >
             <img
               src={mapImageUrl(item.image_url)}
               alt={`Galeri ${item.id}`}
@@ -185,21 +200,26 @@ function RouteComponent() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="galeri-hapus-batal">Batal</AlertDialogCancel>
+            <AlertDialogCancel data-testid="galeri-hapus-batal">
+              Batal
+            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90"
               disabled={deleteGallery.isPending}
               data-testid="galeri-hapus-konfirmasi"
               onClick={async (e) => {
                 if (!selectedGaleri) return
-                
+
                 e.preventDefault()
 
                 try {
                   await deleteGallery.mutateAsync(selectedGaleri.id)
                   setSelectedGaleri(null)
                 } catch (error) {
-                  const msg = readApiErrorMessage(error, 'Gagal menghapus gambar galeri.')
+                  const msg = readApiErrorMessage(
+                    error,
+                    'Gagal menghapus gambar galeri.',
+                  )
                   setSubmitError(msg)
                   setSelectedGaleri(null)
                 }

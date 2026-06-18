@@ -1,6 +1,12 @@
 import { motion } from 'framer-motion'
 
-const images = ['/heroes/hero5.png', '/heroes/hero4.png', '/heroes/hero3.png', '/heroes/hero2.png', '/heroes/hero1.png']
+const images = [
+  '/heroes/hero5.png',
+  '/heroes/hero4.png',
+  '/heroes/hero3.png',
+  '/heroes/hero2.png',
+  '/heroes/hero1.png',
+]
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -67,23 +73,30 @@ export default function Heroes() {
         </motion.div>
 
         {/* Desktop layout */}
-        <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        viewport={{ once: true }}
-        className="hidden md:flex justify-end items-end gap-2">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          viewport={{ once: true }}
+          className="hidden md:flex justify-end items-end gap-2"
+        >
           <div className="gap-2 flex flex-col justify-end items-end">
             <div className="flex gap-2 justify-end items-end">
               <div className="flex flex-col items-end gap-2">
-                <motion.div variants={itemVariants}  className="w-16.5 h-16.75 rounded-lg overflow-hidden">
+                <motion.div
+                  variants={itemVariants}
+                  className="w-16.5 h-16.75 rounded-lg overflow-hidden"
+                >
                   <img
                     src={images[0]}
                     alt="Hero Image"
                     className="w-full h-full object-cover"
                   />
                 </motion.div>
-                <motion.div variants={itemVariants} className="w-33 h-9.75 rounded-lg overflow-hidden">
+                <motion.div
+                  variants={itemVariants}
+                  className="w-33 h-9.75 rounded-lg overflow-hidden"
+                >
                   <img
                     src={images[1]}
                     alt="Hero Image"
@@ -91,7 +104,10 @@ export default function Heroes() {
                   />
                 </motion.div>
               </div>
-              <motion.div variants={itemVariants} className="w-29.5 h-34.25 rounded-lg overflow-hidden">
+              <motion.div
+                variants={itemVariants}
+                className="w-29.5 h-34.25 rounded-lg overflow-hidden"
+              >
                 <img
                   src={images[2]}
                   alt="Hero Image"
@@ -99,7 +115,10 @@ export default function Heroes() {
                 />
               </motion.div>
             </div>
-            <motion.div variants={itemVariants} className="w-66 h-20 rounded-lg overflow-hidden">
+            <motion.div
+              variants={itemVariants}
+              className="w-66 h-20 rounded-lg overflow-hidden"
+            >
               <img
                 src={images[3]}
                 alt="Hero Image"
@@ -107,7 +126,10 @@ export default function Heroes() {
               />
             </motion.div>
           </div>
-          <motion.div variants={itemVariants} className="h-85.75 w-42.75 rounded-lg overflow-hidden shadow-lg">
+          <motion.div
+            variants={itemVariants}
+            className="h-85.75 w-42.75 rounded-lg overflow-hidden shadow-lg"
+          >
             <img
               src={images[4]}
               alt="Hero Image"

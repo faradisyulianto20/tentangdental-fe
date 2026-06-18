@@ -218,7 +218,9 @@ function RouteComponent() {
                     className="w-8 h-8 shrink-0"
                   />
                   <div className="truncate">
-                    <h2 className="text-base font-bold truncate">{item.name}</h2>
+                    <h2 className="text-base font-bold truncate">
+                      {item.name}
+                    </h2>
                   </div>
                 </motion.button>
               ))

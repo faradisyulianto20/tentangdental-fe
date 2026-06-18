@@ -5,12 +5,13 @@ import {
   getAdminPromoById,
   getAdminPromos,
   getPromos,
-  updateAdminPromo,
-  type AdminPromoItem,
-  type AdminPromoPagination,
-  type CreateAdminPromoPayload,
-  type UpdateAdminPromoPayload,
+  updateAdminPromo
+  
+  
+  
+  
 } from '#/services/promoService'
+import type {AdminPromoItem, AdminPromoPagination, CreateAdminPromoPayload, UpdateAdminPromoPayload} from '#/services/promoService';
 
 type AdminPromosQueryData = {
   promos: AdminPromoItem[]

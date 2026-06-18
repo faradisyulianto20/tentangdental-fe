@@ -72,7 +72,7 @@ const isDoctorAvailableOnDate = (
   // If schedule is already an object with day keys
   if (typeof doctorSchedule === 'object' && !Array.isArray(doctorSchedule)) {
     const dayName = getDayNameIndonesian(date)
-    const daySchedule = (doctorSchedule as Record<string, string[]>)[dayName]
+    const daySchedule = (doctorSchedule)[dayName]
     if (!Array.isArray(daySchedule)) return []
 
     return daySchedule
@@ -116,7 +116,10 @@ const formSchema = z
     nomorHandphone: z
       .string()
       .min(1, 'Nomor handphone harus diisi')
-      .regex(/^\d{10,13}$/, 'Nomor handphone harus berupa angka dengan panjang 10-13 digit'),
+      .regex(
+        /^\d{10,13}$/,
+        'Nomor handphone harus berupa angka dengan panjang 10-13 digit',
+      ),
     tanggalLahir: z.date().nullable(),
     umur: z.string().optional(),
     jenisKelamin: z
@@ -296,9 +299,7 @@ export default function FormReservasi() {
 
       try {
         const payload = {
-          patient_category: (checked ? 'existing' : 'new') as
-            | 'existing'
-            | 'new',
+          patient_category: (checked ? 'existing' : 'new'),
           name: value.namaLengkap,
           phone: value.nomorHandphone,
           gender: mapGenderToApi(value.jenisKelamin),

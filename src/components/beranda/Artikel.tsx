@@ -48,7 +48,6 @@ export default function Berita() {
 
       <div className="relative mt-12">
         {/* Left Arrow */}
-        
 
         {/* Scroll Container */}
         <motion.div
@@ -60,56 +59,61 @@ export default function Berita() {
           viewport={{ once: true }}
           data-testid="artikel-list"
         >
-          {isLoading
-            ? [...Array(5)].map((_, index) => (
-                <div key={index} className="flex flex-col shrink-0 w-64 snap-start">
-                  <Skeleton className="rounded-t-xl w-64 h-44" />
-                  <div className="flex flex-col p-4 gap-2">
-                    <Skeleton className="h-5 w-full rounded-md" />
-                    <Skeleton className="h-5 w-5/6 rounded-md" />
-                    <Skeleton className="h-4 w-full rounded-md mt-2" />
-                  </div>
+          {isLoading ? (
+            [...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className="flex flex-col shrink-0 w-64 snap-start"
+              >
+                <Skeleton className="rounded-t-xl w-64 h-44" />
+                <div className="flex flex-col p-4 gap-2">
+                  <Skeleton className="h-5 w-full rounded-md" />
+                  <Skeleton className="h-5 w-5/6 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded-md mt-2" />
                 </div>
-              ))
-            : !articlesData || articlesData.length === 0
-              ? null
-              : (
-                <>
-                <button
-                  onClick={() => scroll('left')}
-                  className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
-                  data-testid="artikel-prev-button"
-                >
-                  <div className="bg-white rounded-full p-1.5">
-                    <ChevronLeft className="w-5 h-5 text-gray-700" />
-                  </div>
-                </button>
-                {articlesData.map((item, index) => (
-                  <ArtikelCard
-                    key={item.id}
-                    artikel={item}
-                    index={index}
-                    onClick={() => navigateBerita(String(item.id))}
-                  />
-                ))}
-                        {/* Right Arrow */}
-                  <button
-                    onClick={() => scroll('right')}
-                    className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
-                    data-testid="artikel-next-button"
-                  >
-                    <div className="bg-white rounded-full p-1.5">
-                      <ChevronRight className="w-5 h-5 text-gray-700" />
-                    </div>
-                  </button>
-                </>
-              )}
+              </div>
+            ))
+          ) : !articlesData || articlesData.length === 0 ? null : (
+            <>
+              <button
+                onClick={() => scroll('left')}
+                className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+                data-testid="artikel-prev-button"
+              >
+                <div className="bg-white rounded-full p-1.5">
+                  <ChevronLeft className="w-5 h-5 text-gray-700" />
+                </div>
+              </button>
+              {articlesData.map((item, index) => (
+                <ArtikelCard
+                  key={item.id}
+                  artikel={item}
+                  index={index}
+                  onClick={() => navigateBerita(String(item.id))}
+                />
+              ))}
+              {/* Right Arrow */}
+              <button
+                onClick={() => scroll('right')}
+                className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 p-0.5 bg-linear-to-b from-[#01C7FE] to-[#89FBA4] rounded-full shadow-md cursor-pointer"
+                data-testid="artikel-next-button"
+              >
+                <div className="bg-white rounded-full p-1.5">
+                  <ChevronRight className="w-5 h-5 text-gray-700" />
+                </div>
+              </button>
+            </>
+          )}
         </motion.div>
 
         {!isLoading && (!articlesData || articlesData.length === 0) && (
-          <p className="text-muted-foreground mt-4" data-testid="artikel-empty-state">Artikel belum tersedia.</p>
+          <p
+            className="text-muted-foreground mt-4"
+            data-testid="artikel-empty-state"
+          >
+            Artikel belum tersedia.
+          </p>
         )}
-
       </div>
     </div>
   )
@@ -146,10 +150,16 @@ export function ArtikelCard({
         data-testid={`artikel-image-${artikel.id}`}
       />
       <div className="flex flex-col text-left p-4">
-        <h2 className="text-lg font-semibold leading-5 line-clamp-2" data-testid={`artikel-title-${artikel.id}`}>
+        <h2
+          className="text-lg font-semibold leading-5 line-clamp-2"
+          data-testid={`artikel-title-${artikel.id}`}
+        >
           {artikel.title}
         </h2>
-        <p className="text-gray-600 mt-2 line-clamp-3 text-sm" data-testid={`artikel-meta-${artikel.id}`}>
+        <p
+          className="text-gray-600 mt-2 line-clamp-3 text-sm"
+          data-testid={`artikel-meta-${artikel.id}`}
+        >
           {artikel.writer} • {artikel.published_at}
         </p>
       </div>

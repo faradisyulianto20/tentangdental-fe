@@ -5,12 +5,13 @@ import {
   getAdminFaqById,
   getAdminFaqs,
   getFaqs,
-  updateAdminFaq,
-  type AdminFaqPagination,
-  type CreateAdminFaqPayload,
-  type FaqApiItem,
-  type UpdateAdminFaqPayload,
+  updateAdminFaq
+  
+  
+  
+  
 } from '#/services/faqService'
+import type {AdminFaqPagination, CreateAdminFaqPayload, FaqApiItem, UpdateAdminFaqPayload} from '#/services/faqService';
 
 type AdminFaqsQueryData = {
   faqs: FaqApiItem[]

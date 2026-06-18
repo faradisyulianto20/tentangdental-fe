@@ -79,7 +79,7 @@ export function useReservasi() {
 export function useAdminReservations() {
   return useInfiniteQuery({
     queryKey: ['admin-reservations'],
-    queryFn: ({ pageParam = 1 }) => getAdminReservations(pageParam as number),
+    queryFn: ({ pageParam = 1 }) => getAdminReservations(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
       if (lastPage.pagination.current_page < lastPage.pagination.last_page) {

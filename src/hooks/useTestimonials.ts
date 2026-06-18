@@ -5,12 +5,13 @@ import {
   getAdminTestimonialById,
   getAdminTestimonials,
   getTestimonials,
-  updateAdminTestimonial,
-  type AdminTestimonialPagination,
-  type CreateAdminTestimonialPayload,
-  type TestimonialApiItem,
-  type UpdateAdminTestimonialPayload,
+  updateAdminTestimonial
+  
+  
+  
+  
 } from '@/services/testimonialService'
+import type {AdminTestimonialPagination, CreateAdminTestimonialPayload, TestimonialApiItem, UpdateAdminTestimonialPayload} from '@/services/testimonialService';
 
 type AdminTestimonialsQueryData = {
   testimonials: TestimonialApiItem[]

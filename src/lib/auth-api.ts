@@ -51,9 +51,7 @@ export async function loginAdmin(payload: LoginPayload): Promise<{
   })
 
   const token = pickToken(data)
-  const rawUser = (data.admin || data.user) as
-    | Record<string, unknown>
-    | undefined
+  const rawUser = (data.admin || data.user)
 
   if (!token || !rawUser) {
     throw new ApiError(500, 'Invalid login response format', data)

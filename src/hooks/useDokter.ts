@@ -6,12 +6,13 @@ import {
   getAdminDoctors,
   getDoctors,
   getAdminDoctorScheduleOptions,
-  updateAdminDoctor,
-  type AdminDoctorPagination,
-  type CreateAdminDoctorPayload,
-  type DoctorApiItem,
-  type UpdateAdminDoctorPayload,
+  updateAdminDoctor
+  
+  
+  
+  
 } from '@/services/dokterService'
+import type {AdminDoctorPagination, CreateAdminDoctorPayload, DoctorApiItem, UpdateAdminDoctorPayload} from '@/services/dokterService';
 
 export function useAdminDoctorScheduleOptions() {
   return useQuery({

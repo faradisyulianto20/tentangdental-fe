@@ -53,9 +53,7 @@ export default function DetailPasien({ id }: DetailPasienProps) {
             <h1 className="text-2xl font-bold text-slate-800">
               {pasien.name} {pasien.nickname ? `(${pasien.nickname})` : ''}
             </h1>
-            <p className="text-sm text-gray-500">
-              ID Pasien: {pasien.id}
-            </p>
+            <p className="text-sm text-gray-500">ID Pasien: {pasien.id}</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -75,11 +73,33 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <h2>Informasi Pribadi</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-2 text-sm">
-              <InfoItem label="Jenis Kelamin" value={pasien.gender === 'laki-laki' ? 'Laki-laki' : pasien.gender === 'perempuan' ? 'Perempuan' : '-'} />
-              <InfoItem label="Umur" value={pasien.age ? `${pasien.age} Tahun` : '-'} />
+              <InfoItem
+                label="Jenis Kelamin"
+                value={
+                  pasien.gender === 'laki-laki'
+                    ? 'Laki-laki'
+                    : pasien.gender === 'perempuan'
+                      ? 'Perempuan'
+                      : '-'
+                }
+              />
+              <InfoItem
+                label="Umur"
+                value={pasien.age ? `${pasien.age} Tahun` : '-'}
+              />
               <InfoItem label="Pekerjaan" value={pasien.occupation || '-'} />
-              <InfoItem label="Tanggal Lahir" value={pasien.birth_date ? new Date(pasien.birth_date).toLocaleDateString('id-ID') : '-'} />
-              <InfoItem label="Orang Tua/Wali" value={pasien.parent_name || '-'} />
+              <InfoItem
+                label="Tanggal Lahir"
+                value={
+                  pasien.birth_date
+                    ? new Date(pasien.birth_date).toLocaleDateString('id-ID')
+                    : '-'
+                }
+              />
+              <InfoItem
+                label="Orang Tua/Wali"
+                value={pasien.parent_name || '-'}
+              />
               <InfoItem label="No. Handphone" value={pasien.phone || '-'} />
             </div>
           </div>
@@ -95,7 +115,10 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <InfoItem label="Kecamatan" value={pasien.district || '-'} />
               <InfoItem label="Kelurahan" value={pasien.village || '-'} />
               <div className="col-span-2">
-                <InfoItem label="Alamat Lengkap" value={pasien.address || '-'} />
+                <InfoItem
+                  label="Alamat Lengkap"
+                  value={pasien.address || '-'}
+                />
               </div>
             </div>
           </div>
@@ -106,7 +129,9 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <Stethoscope size={18} />
               <h2>Keluhan Utama</h2>
             </div>
-            <p className="text-gray-700 italic">"{ pasien.reservations?.[0]?.complain || '-'}"</p>
+            <p className="text-gray-700 italic">
+              "{pasien.reservations?.[0]?.complain || '-'}"
+            </p>
           </div>
         </div>
 
@@ -142,24 +167,32 @@ export default function DetailPasien({ id }: DetailPasienProps) {
               <div className="flex justify-between">
                 <span className="text-gray-500">Layanan:</span>
                 <span className="font-medium text-primary">
-                  {pasien.last_reservation?.services?.map((s) => s.name).join(', ') || '-'}
+                  {pasien.last_reservation?.services
+                    ?.map((s) => s.name)
+                    .join(', ') || '-'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Tanggal:</span>
                 <span className="font-medium">
                   {pasien.last_reservation?.reservation_date
-                    ? new Date(pasien.last_reservation.reservation_date).toLocaleDateString('id-ID')
+                    ? new Date(
+                        pasien.last_reservation.reservation_date,
+                      ).toLocaleDateString('id-ID')
                     : '-'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Jam:</span>
-                <span className="font-medium">{pasien.last_reservation?.appointment_time || '-'}</span>
+                <span className="font-medium">
+                  {pasien.last_reservation?.appointment_time || '-'}
+                </span>
               </div>
               <div className="flex justify-between border-t pt-2 mt-2">
                 <span className="text-gray-500">Dokter:</span>
-                <span className="font-bold">{pasien.last_reservation?.doctor_name || '-'}</span>
+                <span className="font-bold">
+                  {pasien.last_reservation?.doctor_name || '-'}
+                </span>
               </div>
             </div>
           </div>

@@ -300,13 +300,12 @@ export function getAdminRontgenDownloadUrl(id: string | number): string {
   return joinUrl(appEnv.apiBaseUrl, `admin/rontgens/${id}/download`)
 }
 
-
 export async function deleteAdminRontgenImage(id: string, imageId: string) {
   return apiRequest<DeleteRontgenImageResponse>(
     `admin/rontgens/${id}/images/${imageId}`,
     {
       method: 'DELETE',
       auth: true,
-    }
+    },
   )
 }

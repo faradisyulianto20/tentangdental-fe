@@ -61,7 +61,7 @@ export default function Footer() {
           <p className="font-bold text-xl mb-2">Alamat</p>
           <div className="h-37.5 rounded-xl overflow-hidden">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3967.0!2d106.6744397!3d-6.1823326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f900579a25d9:0x4f4a2eb8fddb6166!2sPraktek+dokter+gigi+spesialis+Konservasi+(Tentang+Dental)!5e0!3m2!1sid!2sid!4v1" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3967.0!2d106.6744397!3d-6.1823326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f900579a25d9:0x4f4a2eb8fddb6166!2sPraktek+dokter+gigi+spesialis+Konservasi+(Tentang+Dental)!5e0!3m2!1sid!2sid!4v1"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -93,11 +93,11 @@ const socialMedia = [
     url: 'mailto:tentangdental@gmail.com',
     icon: Mail,
   },
-{
-  name: 'Maps',
-  url: 'https://www.google.com/maps/place/Praktek+dokter+gigi+spesialis+Konservasi+(Tentang+Dental)/@-6.1823326,106.6744397,15z/data=!4m8!3m7!1s0x2e69f900579a25d9:0x4f4a2eb8fddb6166!8m2!3d-6.1823326!4d106.6744397!9m1!1b1!16s%2Fg%2F11yk906587?hl=id&entry=ttu',
-  icon: MapPin,
-},
+  {
+    name: 'Maps',
+    url: 'https://www.google.com/maps/place/Praktek+dokter+gigi+spesialis+Konservasi+(Tentang+Dental)/@-6.1823326,106.6744397,15z/data=!4m8!3m7!1s0x2e69f900579a25d9:0x4f4a2eb8fddb6166!8m2!3d-6.1823326!4d106.6744397!9m1!1b1!16s%2Fg%2F11yk906587?hl=id&entry=ttu',
+    icon: MapPin,
+  },
 ]
 
 const menu = [

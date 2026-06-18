@@ -124,7 +124,6 @@ function RouteComponent() {
     [doctorsQuery.data],
   )
 
-
   const handleCreate = async (values: {
     name: string
     specialization: string
@@ -268,6 +267,7 @@ function RouteComponent() {
                   setUpdateError('Gagal menghapus dokter.')
                 }
               }}
+              data-testid="dokter-hapus-button"
             >
               {deleteDoctor.isPending ? 'Menghapus...' : 'Hapus Dokter'}
             </Button>

@@ -46,7 +46,10 @@ export default function FAQ() {
         {heading}
         <div className="flex flex-col gap-2 my-6 mx-6">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="p-4 rounded-lg border border-muted flex flex-col gap-2">
+            <div
+              key={i}
+              className="p-4 rounded-lg border border-muted flex flex-col gap-2"
+            >
               <Skeleton className="h-5 w-3/4 rounded-md" />
             </div>
           ))}

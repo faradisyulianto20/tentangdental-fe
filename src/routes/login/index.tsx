@@ -98,7 +98,12 @@ function RouteComponent() {
             Silahkan login menggunakan akun admin.
           </p>
           <div>
-            <form className="space-y-4" method="POST" onSubmit={handleLogin} data-testid="login-form">
+            <form
+              className="space-y-4"
+              method="POST"
+              onSubmit={handleLogin}
+              data-testid="login-form"
+            >
               <FieldGroup>
                 <FieldSet>
                   <Field>
@@ -132,7 +137,12 @@ function RouteComponent() {
                 </FieldSet>
               </FieldGroup>
               {errorMessage && (
-                <p className="text-sm text-red-600" data-testid="login-error-message">{errorMessage}</p>
+                <p
+                  className="text-sm text-red-600"
+                  data-testid="login-error-message"
+                >
+                  {errorMessage}
+                </p>
               )}
               <Field orientation="horizontal" className="w-full">
                 <Button

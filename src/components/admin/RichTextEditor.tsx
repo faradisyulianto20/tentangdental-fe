@@ -168,7 +168,9 @@ export default function RichTextEditor({
       Color,
       Subscript,
       Superscript,
-      ...(maxCharacters ? [CharacterCount.configure({ limit: maxCharacters })] : [CharacterCount]),
+      ...(maxCharacters
+        ? [CharacterCount.configure({ limit: maxCharacters })]
+        : [CharacterCount]),
     ],
     content: value,
     editorProps: {
@@ -527,7 +529,10 @@ export default function RichTextEditor({
             }}
             className="p-1.5 rounded transition-colors hover:bg-muted text-muted-foreground"
           >
-            <span className="text-xs font-bold leading-none" style={{ fontFamily: 'serif' }}>
+            <span
+              className="text-xs font-bold leading-none"
+              style={{ fontFamily: 'serif' }}
+            >
               A
             </span>
           </button>
@@ -587,7 +592,10 @@ export default function RichTextEditor({
       </BubbleMenu>
 
       {/* Editor area */}
-      <EditorContent editor={tiptap} {...(dataTestId ? { 'data-testid': dataTestId } : {})} />
+      <EditorContent
+        editor={tiptap}
+        {...(dataTestId ? { 'data-testid': dataTestId } : {})}
+      />
 
       {/* Footer: word/char count */}
       <div className="flex justify-end gap-3 px-3 py-1.5 bg-muted/20 border-t border-input text-[11px] text-muted-foreground">

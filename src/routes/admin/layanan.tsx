@@ -10,6 +10,16 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   useAdminServices,
   useCreateAdminService,
   useDeleteAdminService,
@@ -77,6 +87,9 @@ function readApiErrorMessage(error: unknown, fallback: string) {
 function RouteComponent() {
   const [selectedService, setSelectedService] =
     useState<AdminServiceItem | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminServiceItem | null>(
+    null,
+  )
   const [createError, setCreateError] = useState('')
   const [updateError, setUpdateError] = useState('')
   const [createFormKey, setCreateFormKey] = useState(0)
@@ -145,8 +158,9 @@ function RouteComponent() {
   }
 
   const handleDelete = async () => {
-    if (!selectedService) return
-    await deleteService.mutateAsync(selectedService.id)
+    if (!deleteTarget) return
+    await deleteService.mutateAsync(deleteTarget.id)
+    setDeleteTarget(null)
     setSelectedService(null)
   }
 
@@ -176,7 +190,10 @@ function RouteComponent() {
         </p>
       ) : null}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6"
+        data-testid="layanan-grid"
+      >
         {serviceList.map((service) => (
           <div
             key={service.id}
@@ -185,6 +202,7 @@ function RouteComponent() {
               setSelectedService(service)
             }}
             className="cursor-pointer"
+            data-testid={`layanan-card-${service.id}`}
           >
             <LayananCard layanan={toLayananCard(service)} />
           </div>
@@ -226,19 +244,47 @@ function RouteComponent() {
               type="button"
               className="bg-red-400 hover:bg-red-500"
               disabled={deleteService.isPending}
-              onClick={async () => {
-                try {
-                  await handleDelete()
-                } catch {
-                  setUpdateError('Gagal menghapus layanan.')
-                }
-              }}
+              onClick={() => setDeleteTarget(selectedService)}
+              data-testid="layanan-hapus-button"
             >
               {deleteService.isPending ? 'Menghapus...' : 'Hapus Layanan'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Layanan</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus layanan ini? Tindakan ini tidak
+              dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={deleteService.isPending}
+              onClick={async (e) => {
+                e.preventDefault()
+                try {
+                  await handleDelete()
+                } catch {
+                  setUpdateError('Gagal menghapus layanan.')
+                  setDeleteTarget(null)
+                }
+              }}
+            >
+              {deleteService.isPending ? 'Menghapus...' : 'Hapus'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

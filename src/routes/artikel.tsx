@@ -76,63 +76,62 @@ function RouteComponent() {
   return (
     <div className="w-full">
       <div className="max-w-7xl mx-auto px-6">
-        {
-          !currentArtikel ? (
-            <p className="text-muted-foreground mt-4 text-center py-12">Artikel tidak ditemukan.</p>
-          ) : (
+        {!currentArtikel ? (
+          <p className="text-muted-foreground mt-4 text-center py-12">
+            Artikel tidak ditemukan.
+          </p>
+        ) : (
           <>
             <motion.div
-          variants={fadeUp}
-          custom={0}
-          initial="hidden"
-          animate="visible"
-          className="w-full my-12 rounded-xl overflow-hidden"
-        >
-          <img
-            src={resolveImage(currentArtikel?.image_url)}
-            alt={currentArtikel?.title}
-            className="object-cover w-full h-full"
-          />
-        </motion.div>
+              variants={fadeUp}
+              custom={0}
+              initial="hidden"
+              animate="visible"
+              className="w-full my-12 rounded-xl overflow-hidden"
+            >
+              <img
+                src={resolveImage(currentArtikel?.image_url)}
+                alt={currentArtikel?.title}
+                className="object-cover w-full h-full"
+              />
+            </motion.div>
 
-        <div className="text-left w-full">
-          <motion.h1
-            variants={fadeUp}
-            custom={0.2}
-            initial="hidden"
-            animate="visible"
-            className="text-xl md:text-3xl font-bold"
-          >
-            {currentArtikel?.title}
-          </motion.h1>
+            <div className="text-left w-full">
+              <motion.h1
+                variants={fadeUp}
+                custom={0.2}
+                initial="hidden"
+                animate="visible"
+                className="text-xl md:text-3xl font-bold"
+              >
+                {currentArtikel?.title}
+              </motion.h1>
 
-          <motion.p
-            variants={fadeUp}
-            custom={0.35}
-            initial="hidden"
-            animate="visible"
-            className="text-muted-foreground text-sm md:text-base mt-3"
-          >
-            {currentArtikel?.writer} - {currentArtikel?.published_at}
-          </motion.p>
-        </div>
+              <motion.p
+                variants={fadeUp}
+                custom={0.35}
+                initial="hidden"
+                animate="visible"
+                className="text-muted-foreground text-sm md:text-base mt-3"
+              >
+                {currentArtikel?.writer} - {currentArtikel?.published_at}
+              </motion.p>
+            </div>
 
-        <motion.div
-          variants={fadeUp}
-          custom={0.5}
-          initial="hidden"
-          animate="visible"
-          className="my-6 leading-relaxed prose prose-slate max-w-none w-full"
-          dangerouslySetInnerHTML={{
-            __html: decodeHtmlEntities(currentArtikel?.content || ''),
-          }}
-        />
-          <Artikel />
-            </>
-          )
-        }
+            <motion.div
+              variants={fadeUp}
+              custom={0.5}
+              initial="hidden"
+              animate="visible"
+              className="my-6 leading-relaxed prose prose-slate max-w-none w-full"
+              dangerouslySetInnerHTML={{
+                __html: decodeHtmlEntities(currentArtikel?.content || ''),
+              }}
+            />
+            <Artikel />
+          </>
+        )}
       </div>
-
     </div>
   )
 }

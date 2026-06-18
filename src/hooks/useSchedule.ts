@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { getScheduleOptions, type ScheduleOptions } from '@/services/scheduleService'
+import {
+  getScheduleOptions
+  
+} from '@/services/scheduleService'
+import type {ScheduleOptions} from '@/services/scheduleService';
 
 /**
  * Hook to fetch schedule options

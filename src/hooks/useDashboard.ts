@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import {
   getAdminDashboard,
   getAdminReservationStats,
-  getAdminServiceAnalytics,
-  type ReservationStatsData,
-  type ServiceAnalyticsData,
+  getAdminServiceAnalytics
+  
+  
 } from '@/services/dashboardService'
+import type {ReservationStatsData, ServiceAnalyticsData} from '@/services/dashboardService';
 
 type DashboardQuery = {
   month?: string

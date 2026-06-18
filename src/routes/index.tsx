@@ -8,6 +8,7 @@ import ProfilDokter from '../components/beranda/ProfilDokter'
 import Promo from '../components/beranda/Promo'
 import Berita from '../components/beranda/Artikel'
 import FAQ from '../components/beranda/FAQ'
+
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
         <Heroes />
         <Testimoni />
         <Promo />
-        <div id='layanan'>
+        <div id="layanan">
           <Layanan />
         </div>
         <div className="bg-linear-to-r from-[#01C8FF] to-[#6DDFFF] w-full mt-16 py-6">

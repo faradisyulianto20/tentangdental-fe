@@ -1,10 +1,11 @@
 import { apiRequest } from '#/lib/api-client'
-import { 
-  getScheduleOptions, 
-  formatScheduleLabel, 
-  type ScheduleOptions,
-  type DoctorScheduleMap,
+import {
+  getScheduleOptions,
+  formatScheduleLabel
+  
+  
 } from './scheduleService'
+import type {ScheduleOptions, DoctorScheduleMap} from './scheduleService';
 
 export type DoctorApiItem = {
   id: number

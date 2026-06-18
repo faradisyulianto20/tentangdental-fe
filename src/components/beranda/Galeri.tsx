@@ -103,7 +103,7 @@ export default function GalleryCarousel() {
     return configs[absOffset] ?? { display: 'none' }
   }
 
-  if(isLoading) {
+  if (isLoading) {
     return (
       <div className="w-full flex flex-col items-center gap-8 py-12 overflow-hidden max-w-6xl mx-6">
         <div className="text-center">
@@ -123,7 +123,6 @@ export default function GalleryCarousel() {
                 transform: 'translateX(-50%) scale(0.8)',
                 opacity: 0.5,
               }}
-
             >
               <Skeleton className="w-full h-full rounded-lg" />
             </div>

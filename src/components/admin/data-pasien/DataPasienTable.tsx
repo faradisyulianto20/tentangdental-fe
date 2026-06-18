@@ -375,15 +375,18 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
 
   // Get first/last reservation ID from patient detail
   const firstReservationId = useMemo(() => {
-    if (!detailQuery.data?.reservations || detailQuery.data.reservations.length === 0) {
+    if (
+      !detailQuery.data?.reservations ||
+      detailQuery.data.reservations.length === 0
+    ) {
       return undefined
     }
-    
+
     // Karena sudah fetch patient spesifik, semua reservasi di array ini adalah milik patient itu
     // Ambil reservation pertama (index 0)
     const firstReservation = detailQuery.data.reservations[0]
     const id = Number(firstReservation.id)
-    
+
     return id
   }, [detailQuery.data?.reservations, pasien.id])
 
@@ -424,11 +427,11 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
     if (!detailQuery.data) {
       return
     }
-    
+
     // Only initialize on first load, not on subsequent data changes
     if (!isInitializedRef.current) {
       const mapped = mapPatientToForm(detailQuery.data, reservationQuery.data)
-      
+
       setForm(mapped.form)
       setMedical(mapped.medical)
       setDental(mapped.dental)
@@ -570,463 +573,470 @@ function FormulirDialog({ pasien }: { pasien: PatientRow }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar rounded-sm p-8">
         {(() => {
-          return detailQuery.isLoading || reservationQuery.isLoading || !form ? (
+          return detailQuery.isLoading ||
+            reservationQuery.isLoading ||
+            !form ? (
             <p className="text-sm text-muted-foreground">
               Memuat detail pasien...
             </p>
           ) : (
             <>
+              <FieldGroup className="flex">
+                <FieldLegend className="flex gap-2">
+                  <User className="w-12 h-12 text-primary" />
+                  <div>
+                    <FieldTitle className="font-bold text-lg">
+                      Data Pasien
+                    </FieldTitle>
+                    <FieldDescription>
+                      Nomor Pasien:{' '}
+                      <span className="font-medium">{pasien.nomorPasien}</span>
+                    </FieldDescription>
+                  </div>
+                </FieldLegend>
+              </FieldGroup>
+              <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
+                <Field>
+                  <FieldLabel>Nama Pasien</FieldLabel>
+                  <Input
+                    placeholder="Masukkan nama pasien"
+                    value={form.name}
+                    onChange={(e) => setFormField('name', e.target.value)}
+                  />
+                  {fieldErrors.name ? (
+                    <FieldDescription className="text-destructive">
+                      {fieldErrors.name}
+                    </FieldDescription>
+                  ) : null}
+                </Field>
+                <Field>
+                  <FieldLabel>Nama Panggilan</FieldLabel>
+                  <Input
+                    placeholder="Masukkan nama panggilan pasien"
+                    value={form.nickname}
+                    onChange={(e) => setFormField('nickname', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Jenis Kelamin</FieldLabel>
+                  <DropdownMenu
+                    open={dropdownJenisKelaminOpen}
+                    onOpenChange={setDropdownJenisKelaminOpen}
+                  >
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-between border-primary"
+                      >
+                        <span
+                          className={form.gender ? '' : 'text-muted-foreground'}
+                        >
+                          {form.gender || 'Pilih jenis kelamin'}
+                        </span>
+                        {dropdownJenisKelaminOpen ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+                      {['Laki-laki', 'Perempuan'].map((jk) => (
+                        <DropdownMenuItem
+                          key={jk}
+                          onSelect={() => setFormField('gender', jk)}
+                        >
+                          {jk}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {fieldErrors.gender ? (
+                    <FieldDescription className="text-destructive">
+                      {fieldErrors.gender}
+                    </FieldDescription>
+                  ) : null}
+                </Field>
+                <Field>
+                  <FieldLabel>Nomor Handphone</FieldLabel>
+                  <Input
+                    placeholder="Masukkan nomor HP pasien"
+                    value={form.phone}
+                    onChange={(e) => setFormField('phone', e.target.value)}
+                  />
+                  {fieldErrors.phone ? (
+                    <FieldDescription className="text-destructive">
+                      {fieldErrors.phone}
+                    </FieldDescription>
+                  ) : null}
+                </Field>
+                <Field>
+                  <FieldLabel>Umur</FieldLabel>
+                  <Input
+                    placeholder="Masukkan umur pasien"
+                    value={form.age}
+                    onChange={(e) => setFormField('age', e.target.value)}
+                  />
+                  {fieldErrors.age ? (
+                    <FieldDescription className="text-destructive">
+                      {fieldErrors.age}
+                    </FieldDescription>
+                  ) : null}
+                </Field>
+                <Field>
+                  <FieldLabel>Pekerjaan</FieldLabel>
+                  <Input
+                    placeholder="Masukkan pekerjaan pasien"
+                    value={form.occupation}
+                    onChange={(e) => setFormField('occupation', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Tanggal Lahir</FieldLabel>
+                  <DatePicker
+                    value={form.birthDate}
+                    onChange={(date) => setFormField('birthDate', date)}
+                    placeholder="Pilih tanggal lahir"
+                  />
+                  {fieldErrors.birth_date ? (
+                    <FieldDescription className="text-destructive">
+                      {fieldErrors.birth_date}
+                    </FieldDescription>
+                  ) : null}
+                </Field>
+                <Field>
+                  <FieldLabel>Nama Orang Tua</FieldLabel>
+                  <Input
+                    placeholder="Masukkan nama orang tua pasien"
+                    value={form.parentName}
+                    onChange={(e) => setFormField('parentName', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Kota/Kabupaten</FieldLabel>
+                  <Input
+                    placeholder="Masukkan kota/kabupaten pasien"
+                    value={form.city}
+                    onChange={(e) => setFormField('city', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Kecamatan</FieldLabel>
+                  <Input
+                    placeholder="Masukkan kecamatan pasien"
+                    value={form.district}
+                    onChange={(e) => setFormField('district', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Kelurahan</FieldLabel>
+                  <Input
+                    placeholder="Masukkan kelurahan pasien"
+                    value={form.village}
+                    onChange={(e) => setFormField('village', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Alamat Lengkap</FieldLabel>
+                  <Input
+                    placeholder="Masukkan alamat lengkap pasien"
+                    value={form.address}
+                    onChange={(e) => setFormField('address', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Tinggi Badan (cm)</FieldLabel>
+                  <Input
+                    placeholder="Masukkan tinggi badan pasien"
+                    value={form.height}
+                    onChange={(e) => setFormField('height', e.target.value)}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Berat Badan (kg)</FieldLabel>
+                  <Input
+                    placeholder="Masukkan berat badan pasien"
+                    value={form.weight}
+                    onChange={(e) => setFormField('weight', e.target.value)}
+                  />
+                </Field>
+              </FieldGroup>
 
-            <FieldGroup className="flex">
-              <FieldLegend className="flex gap-2">
-                <User className="w-12 h-12 text-primary" />
-                <div>
+              <FieldSeparator />
+
+              <FieldGroup className="flex">
+                <FieldLegend className="flex gap-2">
+                  <Heart className="w-12 h-12 text-primary" />
                   <FieldTitle className="font-bold text-lg">
-                    Data Pasien
+                    Riwayat Kesehatan Umum
                   </FieldTitle>
-                  <FieldDescription>
-                    Nomor Pasien:{' '}
-                    <span className="font-medium">{pasien.nomorPasien}</span>
-                  </FieldDescription>
-                </div>
-              </FieldLegend>
-            </FieldGroup>
-            <FieldGroup className="grid md:grid-cols-2 gap-x-16 gap-y-4">
-              <Field>
-                <FieldLabel>Nama Pasien</FieldLabel>
-                <Input
-                  placeholder="Masukkan nama pasien"
-                  value={form.name}
-                  onChange={(e) => setFormField('name', e.target.value)}
+                </FieldLegend>
+              </FieldGroup>
+              <FieldGroup className="flex">
+                <YesNoFieldWithDetail
+                  label="Apakah ada alergi obat atau makanan?"
+                  checked={toggles.hasAlergi}
+                  onCheckedChange={(checked) => setToggle('hasAlergi', checked)}
+                  detailValue={String(medical.allergy_detail || '')}
+                  onDetailChange={(value) =>
+                    setMedical((prev) => ({ ...prev, allergy_detail: value }))
+                  }
+                  placeholder="Jika ya, sebutkan alergi tersebut"
                 />
-                {fieldErrors.name ? (
-                  <FieldDescription className="text-destructive">
-                    {fieldErrors.name}
-                  </FieldDescription>
-                ) : null}
-              </Field>
-              <Field>
-                <FieldLabel>Nama Panggilan</FieldLabel>
-                <Input
-                  placeholder="Masukkan nama panggilan pasien"
-                  value={form.nickname}
-                  onChange={(e) => setFormField('nickname', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Jenis Kelamin</FieldLabel>
-                <DropdownMenu
-                  open={dropdownJenisKelaminOpen}
-                  onOpenChange={setDropdownJenisKelaminOpen}
-                >
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-between border-primary"
-                    >
-                      <span
-                        className={form.gender ? '' : 'text-muted-foreground'}
-                      >
-                        {form.gender || 'Pilih jenis kelamin'}
-                      </span>
-                      {dropdownJenisKelaminOpen ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
-                    {['Laki-laki', 'Perempuan'].map((jk) => (
-                      <DropdownMenuItem
-                        key={jk}
-                        onSelect={() => setFormField('gender', jk)}
-                      >
-                        {jk}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                {fieldErrors.gender ? (
-                  <FieldDescription className="text-destructive">
-                    {fieldErrors.gender}
-                  </FieldDescription>
-                ) : null}
-              </Field>
-              <Field>
-                <FieldLabel>Nomor Handphone</FieldLabel>
-                <Input
-                  placeholder="Masukkan nomor HP pasien"
-                  value={form.phone}
-                  onChange={(e) => setFormField('phone', e.target.value)}
-                />
-                {fieldErrors.phone ? (
-                  <FieldDescription className="text-destructive">
-                    {fieldErrors.phone}
-                  </FieldDescription>
-                ) : null}
-              </Field>
-              <Field>
-                <FieldLabel>Umur</FieldLabel>
-                <Input
-                  placeholder="Masukkan umur pasien"
-                  value={form.age}
-                  onChange={(e) => setFormField('age', e.target.value)}
-                />
-                {fieldErrors.age ? (
-                  <FieldDescription className="text-destructive">
-                    {fieldErrors.age}
-                  </FieldDescription>
-                ) : null}
-              </Field>
-              <Field>
-                <FieldLabel>Pekerjaan</FieldLabel>
-                <Input
-                  placeholder="Masukkan pekerjaan pasien"
-                  value={form.occupation}
-                  onChange={(e) => setFormField('occupation', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Tanggal Lahir</FieldLabel>
-                <DatePicker
-                  value={form.birthDate}
-                  onChange={(date) => setFormField('birthDate', date)}
-                  placeholder="Pilih tanggal lahir"
-                />
-                {fieldErrors.birth_date ? (
-                  <FieldDescription className="text-destructive">
-                    {fieldErrors.birth_date}
-                  </FieldDescription>
-                ) : null}
-              </Field>
-              <Field>
-                <FieldLabel>Nama Orang Tua</FieldLabel>
-                <Input
-                  placeholder="Masukkan nama orang tua pasien"
-                  value={form.parentName}
-                  onChange={(e) => setFormField('parentName', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Kota/Kabupaten</FieldLabel>
-                <Input
-                  placeholder="Masukkan kota/kabupaten pasien"
-                  value={form.city}
-                  onChange={(e) => setFormField('city', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Kecamatan</FieldLabel>
-                <Input
-                  placeholder="Masukkan kecamatan pasien"
-                  value={form.district}
-                  onChange={(e) => setFormField('district', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Kelurahan</FieldLabel>
-                <Input
-                  placeholder="Masukkan kelurahan pasien"
-                  value={form.village}
-                  onChange={(e) => setFormField('village', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Alamat Lengkap</FieldLabel>
-                <Input
-                  placeholder="Masukkan alamat lengkap pasien"
-                  value={form.address}
-                  onChange={(e) => setFormField('address', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Tinggi Badan (cm)</FieldLabel>
-                <Input
-                  placeholder="Masukkan tinggi badan pasien"
-                  value={form.height}
-                  onChange={(e) => setFormField('height', e.target.value)}
-                />
-              </Field>
-              <Field>
-                <FieldLabel>Berat Badan (kg)</FieldLabel>
-                <Input
-                  placeholder="Masukkan berat badan pasien"
-                  value={form.weight}
-                  onChange={(e) => setFormField('weight', e.target.value)}
-                />
-              </Field>
-            </FieldGroup>
-
-            <FieldSeparator />
-
-            <FieldGroup className="flex">
-              <FieldLegend className="flex gap-2">
-                <Heart className="w-12 h-12 text-primary" />
-                <FieldTitle className="font-bold text-lg">
-                  Riwayat Kesehatan Umum
-                </FieldTitle>
-              </FieldLegend>
-            </FieldGroup>
-            <FieldGroup className="flex">
-              <YesNoFieldWithDetail
-                label="Apakah ada alergi obat atau makanan?"
-                checked={toggles.hasAlergi}
-                onCheckedChange={(checked) => setToggle('hasAlergi', checked)}
-                detailValue={String(medical.allergy_detail || '')}
-                onDetailChange={(value) =>
-                  setMedical((prev) => ({ ...prev, allergy_detail: value }))
-                }
-                placeholder="Jika ya, sebutkan alergi tersebut"
-              />
-              <YesNoFieldWithDetail
-                label="Apakah ada riwayat penyakit sistemik? (Misalnya hipertensi, Jantung, Kanker, dll)"
-                checked={toggles.hasPenyakitSistemik}
-                onCheckedChange={(checked) =>
-                  setToggle('hasPenyakitSistemik', checked)
-                }
-                detailValue={String(medical.systemic_disease_detail || '')}
-                onDetailChange={(value) =>
-                  setMedical((prev) => ({
-                    ...prev,
-                    systemic_disease_detail: value,
-                  }))
-                }
-                placeholder="Jika ya, sebutkan penyakit sistemik tersebut"
-              />
-              <YesNoFieldWithDetail
-                label="Apakah Anda sedang konsumsi obat, kemoterapi, atau radiasi?"
-                checked={toggles.isKonsumsiObat}
-                onCheckedChange={(checked) =>
-                  setToggle('isKonsumsiObat', checked)
-                }
-                detailValue={String(medical.treatment_detail || '')}
-                onDetailChange={(value) =>
-                  setMedical((prev) => ({ ...prev, treatment_detail: value }))
-                }
-                placeholder="Jika ya, sebutkan obat, kemoterapi, atau radiasi yang sedang dikonsumsi"
-              />
-              <YesNoFieldWithDetail
-                label="Apakah Anda pernah dirawat di rumah sakit?"
-                checked={toggles.isRawatRumahSakit}
-                onCheckedChange={(checked) =>
-                  setToggle('isRawatRumahSakit', checked)
-                }
-                detailValue={String(medical.hospitalized_reason || '')}
-                onDetailChange={(value) =>
-                  setMedical((prev) => ({
-                    ...prev,
-                    hospitalized_reason: value,
-                  }))
-                }
-                placeholder="Jika ya, sebutkan kapan dan untuk penyakit apa Anda dirawat di rumah sakit"
-              />
-              <YesNoField
-                label="Memiliki kebiasaan merokok atau alkohol?"
-                checked={toggles.isKebiasaanRokok}
-                onCheckedChange={(checked) =>
-                  setToggle('isKebiasaanRokok', checked)
-                }
-              />
-            </FieldGroup>
-
-            <FieldSeparator />
-
-            <FieldGroup className="flex">
-              <FieldLegend className="flex gap-2">
-                <Smile className="w-12 h-12 text-primary" />
-                <FieldTitle className="font-bold text-lg">
-                  Riwayat Kesehatan Gigi dan Mulut
-                </FieldTitle>
-              </FieldLegend>
-            </FieldGroup>
-            <FieldGroup>
-              <YesNoFieldWithDetail
-                label="Apakah Anda sering mengalami sakit gigi?"
-                checked={toggles.isSakitGigi}
-                onCheckedChange={(checked) => setToggle('isSakitGigi', checked)}
-                detailValue={String(dental.tooth_pain_detail || '')}
-                onDetailChange={(value) =>
-                  setDental((prev) => ({ ...prev, tooth_pain_detail: value }))
-                }
-                placeholder="Jika ya, sebutkan sejak kapan dan seberapa sering Anda mengalami sakit gigi"
-              />
-              <YesNoField
-                label="Apakah Anda pernah mengalami berdarah saat menyikat gigi?"
-                checked={toggles.isBerdarahSikatGigi}
-                onCheckedChange={(checked) =>
-                  setToggle('isBerdarahSikatGigi', checked)
-                }
-              />
-              <YesNoFieldWithDetail
-                label="Apakah Anda pernah melakukan perawatan gigi sebelumnya?"
-                checked={toggles.isPerawatanGigiSebelumnya}
-                onCheckedChange={(checked) =>
-                  setToggle('isPerawatanGigiSebelumnya', checked)
-                }
-                detailValue={String(dental.dental_treatment_detail || '')}
-                onDetailChange={(value) =>
-                  setDental((prev) => ({
-                    ...prev,
-                    dental_treatment_detail: value,
-                  }))
-                }
-                placeholder="Jika ya, sebutkan jenis perawatan gigi yang pernah Anda lakukan sebelumnya"
-              />
-              <Field className="flex flex-row items-center justify-between w-full">
-                <FieldLabel>
-                  Seberapa sering Anda menyikat gigi dalam sehari?
-                </FieldLabel>
-                <Select
-                  value={dental.brushing_frequency ?? undefined}
-                  onValueChange={(value) =>
-                    setDental((prev) => ({
+                <YesNoFieldWithDetail
+                  label="Apakah ada riwayat penyakit sistemik? (Misalnya hipertensi, Jantung, Kanker, dll)"
+                  checked={toggles.hasPenyakitSistemik}
+                  onCheckedChange={(checked) =>
+                    setToggle('hasPenyakitSistemik', checked)
+                  }
+                  detailValue={String(medical.systemic_disease_detail || '')}
+                  onDetailChange={(value) =>
+                    setMedical((prev) => ({
                       ...prev,
-                      brushing_frequency: value,
+                      systemic_disease_detail: value,
                     }))
                   }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih frekuensi" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 kali sehari</SelectItem>
-                    <SelectItem value="2">2 kali sehari</SelectItem>
-                    <SelectItem value="more_than_2">
-                      Lebih dari 2 kali sehari
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              {fieldErrors['dental_history.brushing_frequency'] ? (
-                <FieldDescription className="text-destructive">
-                  {fieldErrors['dental_history.brushing_frequency']}
-                </FieldDescription>
-              ) : null}
-              <YesNoField
-                label="Apakah Anda menggunakan benang gigi atau mouthwash secara rutin?"
-                checked={toggles.isKebisaanKesehatanMulut}
-                onCheckedChange={(checked) =>
-                  setToggle('isKebisaanKesehatanMulut', checked)
-                }
-              />
-              <YesNoFieldWithDetail
-                label="Apakah Anda memiliki kebiasaan buruk (Misal menggertakan gigi)"
-                checked={toggles.isKebiasaanBuruk}
-                onCheckedChange={(checked) =>
-                  setToggle('isKebiasaanBuruk', checked)
-                }
-                detailValue={String(dental.bad_habits_detail || '')}
-                onDetailChange={(value) =>
-                  setDental((prev) => ({ ...prev, bad_habits_detail: value }))
-                }
-                placeholder="Jika ya, sebutkan kebiasaan buruk apa yang Anda miliki"
-              />
-              <YesNoFieldWithDetail
-                label="Apakah Anda pernah menggunakan kawat gigi atau behel? (dalam tahun)"
-                checked={toggles.isKawatGigi}
-                onCheckedChange={(checked) => setToggle('isKawatGigi', checked)}
-                detailValue={String(dental.braces_years || '')}
-                onDetailChange={(value) =>
-                  setDental((prev) => ({ ...prev, braces_years: value }))
-                }
-                placeholder="Jika ya, sebutkan kapan dan berapa lama Anda menggunakan kawat gigi atau behel"
-              />
-              <YesNoFieldWithDetail
-                label="Apakah Anda pernah menjalani perawatan saluran akar (PSA)?"
-                checked={toggles.isPSA}
-                onCheckedChange={(checked) => setToggle('isPSA', checked)}
-                detailValue={String(dental.root_canal_detail || '')}
-                onDetailChange={(value) =>
-                  setDental((prev) => ({ ...prev, root_canal_detail: value }))
-                }
-                placeholder="Jika ya, sebutkan kapan dan gigi mana yang pernah menjalani perawatan saluran akar (PSA)"
-              />
-              <YesNoField
-                label="Apakah Anda memiliki gigi palsu (lepas atau permanen)?"
-                checked={toggles.isMemilikiGigiPalsu}
-                onCheckedChange={(checked) =>
-                  setToggle('isMemilikiGigiPalsu', checked)
-                }
-              />
-              <YesNoField
-                label="Apakah Anda rutin kontrol ke dokter gigi setiap 6 bulan?"
-                checked={toggles.isRutinKontrol}
-                onCheckedChange={(checked) =>
-                  setToggle('isRutinKontrol', checked)
-                }
-              />
-              <Field className="flex flex-row items-center justify-between w-full">
-                <FieldLabel>
-                  Berapa kali Anda checkup ke dokter gigi?
-                </FieldLabel>
-                <Select
-                  value={dental.dental_checkup_frequency ?? undefined}
-                  onValueChange={(value) =>
-                    setDental((prev) => ({
+                  placeholder="Jika ya, sebutkan penyakit sistemik tersebut"
+                />
+                <YesNoFieldWithDetail
+                  label="Apakah Anda sedang konsumsi obat, kemoterapi, atau radiasi?"
+                  checked={toggles.isKonsumsiObat}
+                  onCheckedChange={(checked) =>
+                    setToggle('isKonsumsiObat', checked)
+                  }
+                  detailValue={String(medical.treatment_detail || '')}
+                  onDetailChange={(value) =>
+                    setMedical((prev) => ({ ...prev, treatment_detail: value }))
+                  }
+                  placeholder="Jika ya, sebutkan obat, kemoterapi, atau radiasi yang sedang dikonsumsi"
+                />
+                <YesNoFieldWithDetail
+                  label="Apakah Anda pernah dirawat di rumah sakit?"
+                  checked={toggles.isRawatRumahSakit}
+                  onCheckedChange={(checked) =>
+                    setToggle('isRawatRumahSakit', checked)
+                  }
+                  detailValue={String(medical.hospitalized_reason || '')}
+                  onDetailChange={(value) =>
+                    setMedical((prev) => ({
                       ...prev,
-                      dental_checkup_frequency: value,
+                      hospitalized_reason: value,
                     }))
                   }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih frekuensi checkup" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="6_months">Setiap 6 bulan</SelectItem>
-                    <SelectItem value="1_year">1 kali setahun</SelectItem>
-                    <SelectItem value="more_than_1_year">
-                      1 kali tiap lebih dari 1 tahun
-                    </SelectItem>
-                    <SelectItem value="never">Belum pernah</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-              {fieldErrors['dental_history.dental_checkup_frequency'] ? (
-                <FieldDescription className="text-destructive">
-                  {fieldErrors['dental_history.dental_checkup_frequency']}
-                </FieldDescription>
-              ) : null}
-            </FieldGroup> 
-
-            <FieldSeparator />
-
-            <FieldGroup className="flex">
-              <FieldLegend className="flex gap-2">
-                <FileText className="w-12 h-12 text-primary" />
-                <FieldTitle className="font-bold text-lg">
-                  Catatan Dokter
-                </FieldTitle>
-              </FieldLegend>
-            </FieldGroup>
-            <FieldGroup className="grid md:grid-cols-1 gap-4">
-              <Field>
-                <FieldLabel>Catatan/Rekomendasi Dokter</FieldLabel>
-                <Textarea
-                  placeholder="Masukkan catatan atau rekomendasi dokter"
-                  value={form.doctorNotes}
-                  onChange={(e) => setFormField('doctorNotes', e.target.value)}
+                  placeholder="Jika ya, sebutkan kapan dan untuk penyakit apa Anda dirawat di rumah sakit"
                 />
-              </Field>
-            </FieldGroup>
+                <YesNoField
+                  label="Memiliki kebiasaan merokok atau alkohol?"
+                  checked={toggles.isKebiasaanRokok}
+                  onCheckedChange={(checked) =>
+                    setToggle('isKebiasaanRokok', checked)
+                  }
+                />
+              </FieldGroup>
 
-            {submitError ? (
-              <p className="text-sm text-destructive">{submitError}</p>
-            ) : null}
+              <FieldSeparator />
 
-            <DialogFooter className="mt-6">
-              <DialogClose asChild>
-                <Button variant="outline">Batal</Button>
-              </DialogClose>
-              <Button
-                type="button"
-                className="bg-[#B9D654] text-white hover:bg-[#A8C24A]"
-                onClick={save}
-                disabled={updatePatientDetails.isPending}
-              >
-                {updatePatientDetails.isPending ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-            </DialogFooter>
+              <FieldGroup className="flex">
+                <FieldLegend className="flex gap-2">
+                  <Smile className="w-12 h-12 text-primary" />
+                  <FieldTitle className="font-bold text-lg">
+                    Riwayat Kesehatan Gigi dan Mulut
+                  </FieldTitle>
+                </FieldLegend>
+              </FieldGroup>
+              <FieldGroup>
+                <YesNoFieldWithDetail
+                  label="Apakah Anda sering mengalami sakit gigi?"
+                  checked={toggles.isSakitGigi}
+                  onCheckedChange={(checked) =>
+                    setToggle('isSakitGigi', checked)
+                  }
+                  detailValue={String(dental.tooth_pain_detail || '')}
+                  onDetailChange={(value) =>
+                    setDental((prev) => ({ ...prev, tooth_pain_detail: value }))
+                  }
+                  placeholder="Jika ya, sebutkan sejak kapan dan seberapa sering Anda mengalami sakit gigi"
+                />
+                <YesNoField
+                  label="Apakah Anda pernah mengalami berdarah saat menyikat gigi?"
+                  checked={toggles.isBerdarahSikatGigi}
+                  onCheckedChange={(checked) =>
+                    setToggle('isBerdarahSikatGigi', checked)
+                  }
+                />
+                <YesNoFieldWithDetail
+                  label="Apakah Anda pernah melakukan perawatan gigi sebelumnya?"
+                  checked={toggles.isPerawatanGigiSebelumnya}
+                  onCheckedChange={(checked) =>
+                    setToggle('isPerawatanGigiSebelumnya', checked)
+                  }
+                  detailValue={String(dental.dental_treatment_detail || '')}
+                  onDetailChange={(value) =>
+                    setDental((prev) => ({
+                      ...prev,
+                      dental_treatment_detail: value,
+                    }))
+                  }
+                  placeholder="Jika ya, sebutkan jenis perawatan gigi yang pernah Anda lakukan sebelumnya"
+                />
+                <Field className="flex flex-row items-center justify-between w-full">
+                  <FieldLabel>
+                    Seberapa sering Anda menyikat gigi dalam sehari?
+                  </FieldLabel>
+                  <Select
+                    value={dental.brushing_frequency ?? undefined}
+                    onValueChange={(value) =>
+                      setDental((prev) => ({
+                        ...prev,
+                        brushing_frequency: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih frekuensi" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 kali sehari</SelectItem>
+                      <SelectItem value="2">2 kali sehari</SelectItem>
+                      <SelectItem value="more_than_2">
+                        Lebih dari 2 kali sehari
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                {fieldErrors['dental_history.brushing_frequency'] ? (
+                  <FieldDescription className="text-destructive">
+                    {fieldErrors['dental_history.brushing_frequency']}
+                  </FieldDescription>
+                ) : null}
+                <YesNoField
+                  label="Apakah Anda menggunakan benang gigi atau mouthwash secara rutin?"
+                  checked={toggles.isKebisaanKesehatanMulut}
+                  onCheckedChange={(checked) =>
+                    setToggle('isKebisaanKesehatanMulut', checked)
+                  }
+                />
+                <YesNoFieldWithDetail
+                  label="Apakah Anda memiliki kebiasaan buruk (Misal menggertakan gigi)"
+                  checked={toggles.isKebiasaanBuruk}
+                  onCheckedChange={(checked) =>
+                    setToggle('isKebiasaanBuruk', checked)
+                  }
+                  detailValue={String(dental.bad_habits_detail || '')}
+                  onDetailChange={(value) =>
+                    setDental((prev) => ({ ...prev, bad_habits_detail: value }))
+                  }
+                  placeholder="Jika ya, sebutkan kebiasaan buruk apa yang Anda miliki"
+                />
+                <YesNoFieldWithDetail
+                  label="Apakah Anda pernah menggunakan kawat gigi atau behel? (dalam tahun)"
+                  checked={toggles.isKawatGigi}
+                  onCheckedChange={(checked) =>
+                    setToggle('isKawatGigi', checked)
+                  }
+                  detailValue={String(dental.braces_years || '')}
+                  onDetailChange={(value) =>
+                    setDental((prev) => ({ ...prev, braces_years: value }))
+                  }
+                  placeholder="Jika ya, sebutkan kapan dan berapa lama Anda menggunakan kawat gigi atau behel"
+                />
+                <YesNoFieldWithDetail
+                  label="Apakah Anda pernah menjalani perawatan saluran akar (PSA)?"
+                  checked={toggles.isPSA}
+                  onCheckedChange={(checked) => setToggle('isPSA', checked)}
+                  detailValue={String(dental.root_canal_detail || '')}
+                  onDetailChange={(value) =>
+                    setDental((prev) => ({ ...prev, root_canal_detail: value }))
+                  }
+                  placeholder="Jika ya, sebutkan kapan dan gigi mana yang pernah menjalani perawatan saluran akar (PSA)"
+                />
+                <YesNoField
+                  label="Apakah Anda memiliki gigi palsu (lepas atau permanen)?"
+                  checked={toggles.isMemilikiGigiPalsu}
+                  onCheckedChange={(checked) =>
+                    setToggle('isMemilikiGigiPalsu', checked)
+                  }
+                />
+                <YesNoField
+                  label="Apakah Anda rutin kontrol ke dokter gigi setiap 6 bulan?"
+                  checked={toggles.isRutinKontrol}
+                  onCheckedChange={(checked) =>
+                    setToggle('isRutinKontrol', checked)
+                  }
+                />
+                <Field className="flex flex-row items-center justify-between w-full">
+                  <FieldLabel>
+                    Berapa kali Anda checkup ke dokter gigi?
+                  </FieldLabel>
+                  <Select
+                    value={dental.dental_checkup_frequency ?? undefined}
+                    onValueChange={(value) =>
+                      setDental((prev) => ({
+                        ...prev,
+                        dental_checkup_frequency: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih frekuensi checkup" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="6_months">Setiap 6 bulan</SelectItem>
+                      <SelectItem value="1_year">1 kali setahun</SelectItem>
+                      <SelectItem value="more_than_1_year">
+                        1 kali tiap lebih dari 1 tahun
+                      </SelectItem>
+                      <SelectItem value="never">Belum pernah</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                {fieldErrors['dental_history.dental_checkup_frequency'] ? (
+                  <FieldDescription className="text-destructive">
+                    {fieldErrors['dental_history.dental_checkup_frequency']}
+                  </FieldDescription>
+                ) : null}
+              </FieldGroup>
+
+              <FieldSeparator />
+
+              <FieldGroup className="flex">
+                <FieldLegend className="flex gap-2">
+                  <FileText className="w-12 h-12 text-primary" />
+                  <FieldTitle className="font-bold text-lg">
+                    Catatan Dokter
+                  </FieldTitle>
+                </FieldLegend>
+              </FieldGroup>
+              <FieldGroup className="grid md:grid-cols-1 gap-4">
+                <Field>
+                  <FieldLabel>Catatan/Rekomendasi Dokter</FieldLabel>
+                  <Textarea
+                    placeholder="Masukkan catatan atau rekomendasi dokter"
+                    value={form.doctorNotes}
+                    onChange={(e) =>
+                      setFormField('doctorNotes', e.target.value)
+                    }
+                  />
+                </Field>
+              </FieldGroup>
+
+              {submitError ? (
+                <p className="text-sm text-destructive">{submitError}</p>
+              ) : null}
+
+              <DialogFooter className="mt-6">
+                <DialogClose asChild>
+                  <Button variant="outline">Batal</Button>
+                </DialogClose>
+                <Button
+                  type="button"
+                  className="bg-[#B9D654] text-white hover:bg-[#A8C24A]"
+                  onClick={save}
+                  disabled={updatePatientDetails.isPending}
+                >
+                  {updatePatientDetails.isPending ? 'Menyimpan...' : 'Simpan'}
+                </Button>
+              </DialogFooter>
             </>
           )
         })()}
@@ -1113,7 +1123,6 @@ export default function DataPasienTable() {
 
   const patientsQuery = useAdminPatients(currentPage, itemsPerPage)
   const deletePatientMutation = useDeleteAdminPatient()
-
 
   useEffect(() => {
     if (
@@ -1277,23 +1286,22 @@ export default function DataPasienTable() {
                         >
                           Lihat
                         </Button>
-                       
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                       <Button
-                          variant="destructive"
-                          size="sm"
-                          className="text-xs md:text-sm"
-                          onClick={() => {
-                            setDeletePatientId(pasien.id)
-                            setDeleteConfirmOpen(true)
-                          }}
-                          disabled={deletePatientMutation.isPending}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="text-xs md:text-sm"
+                        onClick={() => {
+                          setDeletePatientId(pasien.id)
+                          setDeleteConfirmOpen(true)
+                        }}
+                        disabled={deletePatientMutation.isPending}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -1350,8 +1358,8 @@ export default function DataPasienTable() {
         <DialogContent>
           <h2 className="text-lg font-semibold">Hapus Pasien</h2>
           <p className="text-sm text-gray-600 mt-2">
-            Apakah Anda yakin ingin menghapus data pasien ini? Tindakan ini tidak
-            dapat diundo.
+            Apakah Anda yakin ingin menghapus data pasien ini? Tindakan ini
+            tidak dapat diundo.
           </p>
           <DialogFooter className="mt-6">
             <DialogClose asChild>

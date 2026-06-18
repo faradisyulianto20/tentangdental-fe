@@ -30,22 +30,22 @@ export default function StatisticsDashboard({
 
   const BAR_WIDTH = 80 // px per kolom, sesuaikan selera
 
-
   const containerRef = useRef<HTMLDivElement>(null)
-const [containerWidth, setContainerWidth] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(0)
 
-useEffect(() => {
-  if (!containerRef.current) return
-  const observer = new ResizeObserver(([entry]) => {
-    setContainerWidth(entry.contentRect.width)
-  })
-  observer.observe(containerRef.current)
-  return () => observer.disconnect()
-}, [])
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width)
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
 
-const chartWidth = containerWidth > 0
-  ? Math.max(containerWidth, chartData.length * BAR_WIDTH)
-  : chartData.length * BAR_WIDTH
+  const chartWidth =
+    containerWidth > 0
+      ? Math.max(containerWidth, chartData.length * BAR_WIDTH)
+      : chartData.length * BAR_WIDTH
 
   return (
     <div className="bg-[#E0F4FB] rounded-lg p-4 md:p-6 space-y-4 md:space-y-6 my-6 w-full overflow-hidden shadow-sm">
@@ -61,38 +61,38 @@ const chartWidth = containerWidth > 0
       </div>
 
       <div className="w-full overflow-x-auto" ref={containerRef}>
-            <BarChart
-              width={chartWidth}
-              height={260}
-              data={chartData}
-              accessibilityLayer
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-            >
-              <CartesianGrid horizontal vertical={false} stroke="#d1d5db" />
-              <XAxis
-                dataKey="service"
-                tick={{ fontSize: 11 }}
-                angle={-35}
-                textAnchor="end"
-                height={90}
-                tickLine={false}
-                axisLine={{ stroke: '#d1d5db' }}
-              />
-              <YAxis
-                tick={{ fontSize: 12 }}
-                tickLine={false}
-                axisLine={{ stroke: '#d1d5db' }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                }}
-              />
-              <Bar dataKey="total" fill={chartConfig.total.color} radius={2} />
-            </BarChart>
-                    </div>
+        <BarChart
+          width={chartWidth}
+          height={260}
+          data={chartData}
+          accessibilityLayer
+          margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+        >
+          <CartesianGrid horizontal vertical={false} stroke="#d1d5db" />
+          <XAxis
+            dataKey="service"
+            tick={{ fontSize: 11 }}
+            angle={-35}
+            textAnchor="end"
+            height={90}
+            tickLine={false}
+            axisLine={{ stroke: '#d1d5db' }}
+          />
+          <YAxis
+            tick={{ fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: '#d1d5db' }}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: '#fff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+            }}
+          />
+          <Bar dataKey="total" fill={chartConfig.total.color} radius={2} />
+        </BarChart>
+      </div>
     </div>
   )
 }

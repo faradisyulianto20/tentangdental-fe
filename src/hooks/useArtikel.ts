@@ -6,12 +6,13 @@ import {
   getAdminArticles,
   getArticleBySlug,
   getArticles,
-  updateAdminArticle,
-  type AdminArticleItem,
-  type AdminArticlePagination,
-  type CreateAdminArticlePayload,
-  type UpdateAdminArticlePayload,
+  updateAdminArticle
+  
+  
+  
+  
 } from '#/services/artikelService'
+import type {AdminArticleItem, AdminArticlePagination, CreateAdminArticlePayload, UpdateAdminArticlePayload} from '#/services/artikelService';
 
 type AdminArticlesQueryData = {
   articles: AdminArticleItem[]
