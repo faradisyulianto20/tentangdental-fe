@@ -4,6 +4,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query'
+import type { InfiniteData } from '@tanstack/react-query'
 import {
   createPublicReservation,
   deleteAdminReservation,
@@ -107,14 +108,21 @@ export function useUpdateAdminReservationStatus() {
     mutationFn: (payload: { id: number; status: AdminReservationStatus }) =>
       updateAdminReservationStatus(payload),
     onSuccess: async (updatedItem: UpdateAdminReservationStatusResult) => {
-      queryClient.setQueryData<AdminReservationsQueryData>(
+      queryClient.setQueryData<InfiniteData<AdminReservationsQueryData>>(
         ['admin-reservations'],
-        (prev) =>
-          updateReservationInList(prev, {
-            id: updatedItem.id,
-            status: updatedItem.status,
-            created_at: updatedItem.created_at,
-          }),
+        (prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            pages: prev.pages.map((page) =>
+              updateReservationInList(page, {
+                id: updatedItem.id,
+                status: updatedItem.status,
+                created_at: updatedItem.created_at,
+              }),
+            ),
+          }
+        },
       )
 
       queryClient.setQueryData<AdminReservationDetail | undefined>(
